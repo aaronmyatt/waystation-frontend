@@ -1,6 +1,8 @@
 import m from 'mithril'
 import { MarkdownRenderer } from './ws-marked'
 import { SyntaxHighlighter } from './ws-hljs'
+import { upSvg, downSvg } from './ws-svg'
+
 
 function dispatch(eventName, data){
  return globalThis.dispatchEvent(new CustomEvent(eventName, { detail: data || {} }));
@@ -8,9 +10,21 @@ function dispatch(eventName, data){
 
 const _events = {
   action: {
+    // flow actions
     prompt: 'ws::action::prompt',
     editFlow: 'ws::action:editFlow',
-    export: 'ws::action::export'
+    export: 'ws::action::export',
+
+    // flow match actions
+    editFlowMatch: 'ws::action::editFlowMatch',
+    deleteFlowMatch: 'ws::action::deleteFlowMatch',
+    moveFlowMatchUp: 'ws::action::moveFlowMatchUp',
+    moveFlowMatchDown: 'ws::action::moveFlowMatchDown',
+    generateFlowMatchContent: 'ws::action::generateFlowMatchContent',
+
+    // create a new flow with the current match as parent and first step
+    addChildFlow: 'ws::action::addChildFlow',
+
   }
 }
 
@@ -60,24 +74,25 @@ const FlowToolbar = {
 
 const FlowMatchToolbar = {
   view(){
+    console.log(upSvg, downSvg)
     return m('ul.match-toolbar.flex flex-wrap gap-2 mb-4', [
       m('button.btn btn-xs btn-ghost', { 
-        onclick: () => { dispatch(_events.action.prompt, globalThis.flowService) }
-      }, 'Up'),
+        onclick: () => { dispatch(_events.action.moveFlowMatchUp, globalThis.flowService) }
+      }, m('span.text-primary block size-4', m.trust(upSvg))),
       m('button.btn btn-xs btn-ghost', { 
-        onclick: () => { dispatch(_events.action.prompt, globalThis.flowService) }
-      }, 'Down'),
+        onclick: () => { dispatch(_events.action.moveFlowMatchDown, globalThis.flowService) }
+      }, m('span.text-primary block size-4', m.trust(downSvg))),
       m('button.btn btn-xs btn-outline', { 
-        onclick: () => { dispatch(_events.action.prompt, globalThis.flowService) }
+        onclick: () => { dispatch(_events.action.generateFlowMatchContent, globalThis.flowService) }
       }, 'Generate'),
       m('button.btn btn-xs btn-outline', { 
-        onclick: () => { dispatch(_events.action.prompt, globalThis.flowService) }
+        onclick: () => { dispatch(_events.action.editFlowMatch, globalThis.flowService) }
       }, 'Edit'),
       m('button.btn btn-xs btn-outline btn-error', { 
-        onclick: () => { dispatch(_events.action.editFlow, globalThis.flowService) }
+        onclick: () => { dispatch(_events.action.deleteFlowMatch, globalThis.flowService) }
       }, 'Delete'),
       m('button.btn btn-xs btn-success', { 
-        onclick: () => { dispatch(_events.action.export, globalThis.flowService) }
+        onclick: () => { dispatch(_events.action.addChildFlow, globalThis.flowService) }
       }, 'Add Child'),
     ])
   }

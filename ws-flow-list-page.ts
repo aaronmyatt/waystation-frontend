@@ -7,7 +7,7 @@ class FlowListService {
     return this._flows;  
   }
   
-  loadFlows(flows){
+  load(flows){
    this._flows = flows;
    m.redraw()
   }
@@ -48,6 +48,12 @@ const FlowCard = {
 }
 
 export const FlowList = {
+  oninit(){
+    // Load initial data if available
+    if (globalThis.__INITIAL_DATA__?.flows) {
+      globalThis.flowListService.loadFlows(globalThis.__INITIAL_DATA__.flows);
+    }
+  },
   view(){
     return (
     m('.container mx-auto p-4', 

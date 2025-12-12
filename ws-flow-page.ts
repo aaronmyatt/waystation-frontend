@@ -42,7 +42,7 @@ class FlowService {
     return this._flow?.matches || []
   }
   
-  loadFlow(flow){
+  load(flow){
     if(flow.hasOwnProperty('flow') && flow.hasOwnProperty('matches')){
       this._flow = flow;
       m.redraw()
@@ -74,7 +74,6 @@ const FlowToolbar = {
 
 const FlowMatchToolbar = {
   view(){
-    console.log(upSvg, downSvg)
     return m('ul.match-toolbar.flex flex-wrap gap-2 mb-4', [
       m('button.btn btn-xs btn-ghost', { 
         onclick: () => { dispatch(_events.action.moveFlowMatchUp, globalThis.flowService) }
@@ -160,14 +159,18 @@ const FlowMatch = {
   view(vnode){
     const match = vnode.attrs.match;
     const description = this._description(match)
-    const children = [
-      m('.toolbar-wrapper', m(FlowMatchToolbar)),
-      m('h2.text-lg font-semibold text-primary', this._title(match))
-    ]
-    description && children.push(m(FlowMatchDescriptionMd, { description }))
-    match.content_kind === 'match' && children.push(m(FlowMatchCodeBlock, { match }))
     return m('.match.card bg-base-100 shadow-md border border-base-300 mb-6', 
-      m('.card-body', children)
+      m('.card-body', [
+        // title & toolbar
+        m('.flex justify-between items-center mb-2', 
+          [
+            m('h2.text-lg font-semibold text-primary', this._title(match)),
+            m('.toolbar-wrapper', m(FlowMatchToolbar))
+          ]
+        ),
+        description && m(FlowMatchDescriptionMd, { description }),
+        match.content_kind === 'match' && m(FlowMatchCodeBlock, { match })
+      ])
     )
   }
 }
@@ -185,8 +188,13 @@ export function Flow(){
     },
     view(){
       return m('.flow.container mx-auto p-4 max-w-5xl', [
-        m('.toolbar-wrapper', m(FlowToolbar)),
-        m('h1.text-2xl font-bold text-base-content mb-4', title),
+        // title & toolbar
+        m('.flex justify-between items-center mb-4',
+          [
+            m('h1.text-2xl font-bold text-base-content', title),
+            m('.toolbar-wrapper', m(FlowToolbar))
+          ]
+        ),
         description && m(FlowDescriptionMd, { description }),
         m('.mt-8', 
           m('h2.text-xl font-semibold mb-4', 'Matches'),

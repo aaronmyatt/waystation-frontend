@@ -25,16 +25,9 @@
 <body>
 
 <script>
-function ready(fn) {
-  if (document.readyState !== 'loading') {
-    fn();
-  } else {
-    document.addEventListener('DOMContentLoaded', fn);
-  }
-}
-
-ready(_ => {
-  const flows = [
+// Define mock data globally before loading the app
+window.__INITIAL_DATA__ = {
+  flows: [
   {
     "id": "a04b3b6c-1d48-44bb-9ce4-2b955ef7b792",
     "name": "PR: new state management setup",
@@ -131,9 +124,8 @@ ready(_ => {
     "updated_at": "2025-10-14T12:04:37.154Z",
     "matchCount": 3
   }
-]
-
-const oneFlow = {
+  ],
+  oneFlow: {
   "flow": {
     "id": "a04b3b6c-1d48-44bb-9ce4-2b955ef7b792",
     "name": "PR: new state management setup",
@@ -315,31 +307,8 @@ const oneFlow = {
     }
   ],
   "isDirty": false
-}
-
-  const i = setInterval( _ => {
-    if(window.flowListService)
-    {
-      window.flowListService.loadFlows(flows);
-      clearInterval(i);
-    }
-  }, 500)
-  
-  const ii = setInterval( _ => {
-    if (window.flowService)
-    {
-      try {
-        window.flowService.loadFlow(oneFlow)
-      } 
-      catch(err) {
-       console.error(err);
-      } 
-      finally {
-        clearInterval(ii);
-      }
-    }
-  }, 500)
-})
+  }
+};
 </script>
 <script src="dist/bundle.js"></script>
 </body>

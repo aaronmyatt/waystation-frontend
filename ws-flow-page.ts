@@ -1,7 +1,8 @@
 import m from "mithril";
 import { MarkdownRenderer } from "./ws-marked";
 import { SyntaxHighlighter } from "./ws-hljs";
-import { upSvg, downSvg, verticalDotsSvg, plusSvg } from "./ws-svg";
+import OverType from 'overtype';
+import { upSvg, downSvg, verticalDotsSvg, plusSvg, editSvg } from "./ws-svg";
 
 function dispatch(eventName, data) {
   return globalThis.dispatchEvent(
@@ -33,8 +34,23 @@ const _events = {
 };
 
 class FlowService {
-  _flow = {
-    flow: {},
+  _flow: {
+    flow: { name: string; description: string };
+    matches: {
+      id: string;
+      content_kind: string;
+      note?: { name: string; description: string };
+      step_content?: { title: string; body: string };
+      match: {
+        file_name: string;
+        grep_meta: string;
+      };
+    }[];
+  } = {
+    flow: {
+      name: "",
+      description: "",
+    },
     matches: [],
   };
 
@@ -45,6 +61,24 @@ class FlowService {
   get matches() {
     return this._flow?.matches || [];
   }
+
+  updateFlow(flow){
+    this._flow.flow = flow;
+    dispatch("ws::flow:updated", this._flow.flow);
+    console.debug("Flow updated:", this._flow.flow);
+    m.redraw();
+  }
+
+  updateFlowMatch(match){
+    const index = this.matches.findIndex((m) => m.id === match.id);
+    if (index !== -1) {
+      this._flow.matches[index] = match;
+      dispatch("ws::flowMatch:updated", match);
+      console.debug("Flow match updated:", match);
+      m.redraw();
+    }
+  }
+
 
   load(flow) {
     if (flow.hasOwnProperty("flow") && flow.hasOwnProperty("matches")) {
@@ -61,16 +95,7 @@ globalThis.marked = new MarkdownRenderer();
 globalThis.syntaxHighlighter = new SyntaxHighlighter();
 const FlowToolbar = {
   view() {
-    return m("ul.flow-toolbar.flex flex-wrap gap-2 mb-6", [
-      m(
-        "button.btn btn-sm btn-outline",
-        {
-          onclick: () => {
-            dispatch(_events.action.editFlow, globalThis.flowService);
-          },
-        },
-        "Edit"
-      ),
+    return m("ul.flow-toolbar.flex flex-wrap gap-2", [
       m(
         "button.btn btn-sm btn-outline",
         {
@@ -88,7 +113,7 @@ const FlowToolbar = {
           m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
         ),
         m(
-          "ul.menu dropdown-content bg-base-200 rounded-box z-1 w-52 p-2 shadow-sm",
+          "ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 shadow-sm",
           { tabIndex: -1 },
           m(
             "li",
@@ -220,29 +245,11 @@ function FlowMatchCodeBlock() {
       code = globalThis.syntaxHighlighter.highlightCode(lines, language);
     },
     view() {
-      return m(
-        ".code.card bg-base-200 mt-4",
-        m(
-          ".card-body p-4",
-          m(
-            "pre.overflow-x-auto",
-            m("code", { classes: `language-${language}` }, m.trust(code))
-          )
+      return m(".code.card bg-base-200 p-1",
+        m("pre.overflow-x-auto",
+          m("code", { classes: `language-${language}` }, m.trust(code))
         )
       );
-    },
-  };
-}
-
-function FlowDescriptionMd() {
-  let description = "";
-  return {
-    oninit(vnode) {
-      if (vnode.attrs.description)
-        description = globalThis.marked.parse(vnode.attrs.description);
-    },
-    view() {
-      return m(".text-base text-base-content/70 mt-2", m.trust(description));
     },
   };
 }
@@ -260,19 +267,16 @@ const FlowMatchList = {
 };
 
 const FlowMatch = {
+  editing: false,
   _title(match) {
     const maybeNote = match.note?.name;
     const maybeContent = match.step_content?.title;
-    return maybeNote || maybeContent || "";
-  },
-  _description(match) {
-    const maybeNote = match.note?.description;
-    const maybeContent = match.step_content?.body;
+    // console.log("Determining title for match:", match, "->", maybeNote || maybeContent || "");
     return maybeNote || maybeContent || "";
   },
   view(vnode) {
     const match = vnode.attrs.match;
-    const description = this._description(match);
+    const title = this._title(match);
     return m(
       // peer: allows the next sibling to style itself based on this element's hover state
       ".match.card bg-base-100 shadow-md border border-base-300 peer",
@@ -285,18 +289,52 @@ const FlowMatch = {
       },
       m(".card-body", [
         // title & toolbar
-        m(".flex justify-between items-center mb-2", [
-          m("h2.text-lg font-semibold text-primary", this._title(match)),
+        m(".flex justify-between items-center", [
+          m('.flex', 
+            [
+              this.editing ? 
+                m("h2.text-lg font-semibold text-accent-content",
+                  m('input.title w-full border border-primary rounded p-1', { 
+                    value: title,
+                    onblur: () => {
+                      this.editing = false;
+                    },
+                    oninput: (e) => {
+                      const updatedMatch = { ...match }; 
+                      const newValue = e.target.value;
+                      if (vnode.attrs.match.content_kind === "match") {
+                        updatedMatch.note = {
+                          ...updatedMatch.note,
+                          name: newValue,
+                        };
+                      } else if (vnode.attrs.match.content_kind === "note") {
+                        updatedMatch.step_content = {
+                          ...updatedMatch.step_content,
+                          title: newValue,
+                        };
+                      } 
+                      globalThis.flowService.updateFlowMatch({ ...updatedMatch } );
+                    } 
+                  })) 
+              : m("h2.text-lg font-semibold text-primary", title),
+              m('.btn btn-xs btn-ghost text-primary',
+                {
+                  onclick: (e) => {
+                    e.stopPropagation();
+                    this.editing = !this.editing;
+                  }
+                },
+                m("span.block size-4 text-primary", m.trust(editSvg)))
+            ]),
           m(".toolbar-wrapper", m(FlowMatchToolbar)),
         ]),
-        description && m(FlowMatchDescriptionMd, { description }),
+        m(FlowMatchDescriptionEditor, { match, onclick: (e) => e.stopPropagation() }),
         match.content_kind === "match" && m(FlowMatchCodeBlock, { match }),
       ])
     );
   },
 };
 
-const FlowMatchDescriptionMd = FlowDescriptionMd;
 const FlowMatchInsertBetween = {
   view(vnode) {
     const match = vnode.attrs.match;
@@ -324,27 +362,117 @@ const FlowMatchInsertBetween = {
   },
 };
 
+const OvertypeBase = {
+  oncreate(vnode) {
+    OverType.init(vnode.dom, {
+        value: vnode.attrs.value || "",
+        placeholder: vnode.attrs.placeholder || "",
+        toolbar: vnode.attrs.toolbar || false,
+        onChange: vnode.attrs.onChange || (() => {}),
+        autoResize: vnode.attrs.autoResize || true,
+        padding: vnode.attrs.padding || "4px",
+        minHeight: vnode.attrs.minHeight || "10px",
+        theme: {
+          name: 'ws-flow-theme',
+          colors: {
+            bgPrimary: 'oklch(98% 0 0)',        // Lemon Chiffon - main background
+            bgSecondary: 'oklch(98% 0 0)',      // White - editor background
+            text: '#0d3b66',             // Yale Blue - main text
+            textPrimary: '#0d3b66',      // Yale Blue - primary text (same as text)
+            textSecondary: '#5a7a9b',    // Muted blue - secondary text
+            h1: '#f95738',               // Tomato - h1 headers
+            h2: '#ee964b',               // Sandy Brown - h2 headers
+            h3: '#3d8a51',               // Forest green - h3 headers
+            strong: '#ee964b',           // Sandy Brown - bold text
+            em: '#f95738',               // Tomato - italic text
+            del: '#ee964b',              // Sandy Brown - deleted text (same as strong)
+            link: '#0d3b66',             // Yale Blue - links
+            code: '#0d3b66',             // Yale Blue - inline code
+            codeBg: 'rgba(244, 211, 94, 0.4)', // Naples Yellow with transparency
+            blockquote: '#5a7a9b',       // Muted blue - blockquotes
+            hr: '#5a7a9b',               // Muted blue - horizontal rules
+            syntaxMarker: 'rgba(13, 59, 102, 0.52)', // Yale Blue with transparency
+            syntax: '#999999',           // Gray - syntax highlighting fallback
+            cursor: '#f95738',           // Tomato - cursor
+            selection: 'rgba(244, 211, 94, 0.4)', // Naples Yellow with transparency
+            listMarker: '#ee964b',       // Sandy Brown - list markers
+            rawLine: '#5a7a9b',          // Muted blue - raw line indicators
+            border: '#e0e0e0',           // Light gray - borders
+            hoverBg: '#f0f0f0',          // Very light gray - hover backgrounds
+            primary: '#0d3b66',          // Yale Blue - primary accent
+            // Toolbar colors
+            toolbarBg: '#ffffff',        // White - toolbar background
+            toolbarIcon: '#0d3b66',      // Yale Blue - icon color
+            toolbarHover: '#f5f5f5',     // Light gray - hover background
+            toolbarActive: '#faf0ca',    // Lemon Chiffon - active button background
+          }
+        }
+      });
+  },
+  view() {
+    return m(".inner-editor");
+  },
+};
+
+const FlowDescriptionEditor = {
+  view(vnode) {
+    return m(".editor", m(OvertypeBase, {
+      value: vnode.attrs.flow.description || "",
+      placeholder: "Enter description...",
+      onChange: (newValue) => {
+        globalThis.flowService.updateFlow({ ...vnode.attrs.flow, description: newValue } );
+      }
+    }))
+  },
+};
+
+const FlowMatchDescriptionEditor = {
+  view(vnode) {
+    return m(".editor", m(OvertypeBase, {
+      value: vnode.attrs.match.note?.description || vnode.attrs.match.step_content?.body || "",
+      placeholder: "Enter description...",
+      onChange: (newValue) => {
+        const updatedMatch = { ...vnode.attrs.match };
+        if (vnode.attrs.match.content_kind === "note") {
+          updatedMatch.step_content = {
+            ...updatedMatch.step_content,
+            body: newValue,
+          };
+        } else if (vnode.attrs.match.content_kind === "match") {
+          updatedMatch.note = {
+            ...updatedMatch.note,
+            description: newValue,
+          };
+        }
+        globalThis.flowService.updateFlowMatch({ ...updatedMatch });
+      }
+    }))
+  },
+};
+
 export function Flow() {
   let title = "";
-  let description = "";
   return {
     oninit() {
       title = globalThis.flowService.flow.name;
-      description = globalThis.flowService.flow.description;
     },
     view() {
       return m(".flow.container mx-auto p-4 max-w-5xl", [
         // title & toolbar
-        m(".flex justify-between items-center mb-4", [
-          m("h1.text-2xl font-bold text-base-content", title),
+        m(".flex justify-between items-baseline", [
+          m("h1.text-2xl flex-1 font-bold text-base-content", 
+            m('input.title w-full', { 
+              value: title,
+              oninput: (e) => { 
+                const title = e.target.value; 
+                globalThis.flowService.updateFlow({ ...globalThis.flowService.flow, name: title } );
+              } 
+            })
+          ),
           m(".toolbar-wrapper", m(FlowToolbar)),
         ]),
-        description && m(FlowDescriptionMd, { description }),
-        m(
-          ".mt-8",
-          m("h2.text-xl font-semibold mb-4", "Matches"),
-          m(FlowMatchList)
-        ),
+        m(FlowDescriptionEditor, { flow: globalThis.flowService.flow }),
+        m(FlowMatchList),
       ]);
     },
   };

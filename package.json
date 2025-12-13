@@ -6,7 +6,8 @@
     "dependencies": {
         "highlight.js": "^11.8.0",
         "marked": "^4.3.0",
-        "mithril": "^2.0.4"
+        "mithril": "^2.0.4",
+        "overtype": "^2.0.1"
     },
     "scripts": {
         "dev": "rollup -c -w",

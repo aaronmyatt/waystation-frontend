@@ -274,7 +274,8 @@ const FlowMatch = {
     const match = vnode.attrs.match;
     const description = this._description(match);
     return m(
-      ".match.card bg-base-100 shadow-md border border-base-300 mb-6",
+      // peer: allows the next sibling to style itself based on this element's hover state
+      ".match.card bg-base-100 shadow-md border border-base-300 peer",
       {
         class:
           "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
@@ -300,8 +301,18 @@ const FlowMatchInsertBetween = {
   view(vnode) {
     const match = vnode.attrs.match;
     const index = vnode.attrs.index;
-    return m(".my-4 flex justify-center",
-      m("button.btn btn-sm btn-outline",
+    return m(
+      ".flex justify-center",
+      {
+        // group: allows children to respond to this wrapper's hover state
+        // peer-hover:[&>button]:opacity-100: shows button when preceding peer (FlowMatch) is hovered
+        class: `group peer-hover:[&>button]:opacity-100 peer-hover:[&>button]:my-4`
+      },
+      m(
+        // opacity-0: hidden by default
+        // group-hover:opacity-100: shows when hovering over the wrapper itself
+        // transition-opacity: smooth fade in/out
+        "button.btn btn-sm btn-outline w-full opacity-0 group-hover:opacity-100 group-hover:my-4 transition-opacity",
         {
           onclick: () => {
             dispatch(_events.action.insertFlowMatchAfter, { match, index });

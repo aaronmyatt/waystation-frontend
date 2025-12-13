@@ -79,11 +79,10 @@ class FlowService {
     }
   }
 
-
   load(flow) {
     if (flow.hasOwnProperty("flow") && flow.hasOwnProperty("matches")) {
       this._flow = flow;
-      m.redraw();
+      // m.redraw();
     } else {
       throw `Incorrect object properties: ${Object.keys(flow)}`;
     }
@@ -137,14 +136,14 @@ const FlowToolbar = {
 };
 
 const FlowMatchToolbar = {
-  view() {
+  view(vnode) {
     return m("ul.match-toolbar.flex flex-wrap gap-2 mb-4", [
       m(
         "button.btn btn-xs btn-ghost",
         {
           onclick: (e) => {
             e.stopPropagation();
-            dispatch(_events.action.moveFlowMatchUp, globalThis.flowService);
+            dispatch(_events.action.moveFlowMatchUp, {match: vnode.attrs.match});
           },
         },
         m("span.text-primary block size-4", m.trust(upSvg))
@@ -154,7 +153,7 @@ const FlowMatchToolbar = {
         {
           onclick: (e) => {
             e.stopPropagation();
-            dispatch(_events.action.moveFlowMatchDown, globalThis.flowService);
+            dispatch(_events.action.moveFlowMatchDown, {match: vnode.attrs.match});
           },
         },
         m("span.text-primary block size-4", m.trust(downSvg))
@@ -165,7 +164,7 @@ const FlowMatchToolbar = {
         {
           onclick: (e) => {
             e.stopPropagation();
-            dispatch(_events.action.editFlowMatch, globalThis.flowService);
+            dispatch(_events.action.editFlowMatch, {match: vnode.attrs.match});
           },
         },
         "Edit"
@@ -175,7 +174,7 @@ const FlowMatchToolbar = {
         {
           onclick: (e) => {
             e.stopPropagation();
-            dispatch(_events.action.deleteFlowMatch, globalThis.flowService);
+            dispatch(_events.action.deleteFlowMatch, {match: vnode.attrs.match});
           },
         },
         "Delete"
@@ -193,7 +192,7 @@ const FlowMatchToolbar = {
           m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
         ),
         m(
-          "ul.menu dropdown-content bg-base-200 rounded-box z-1 w-52 p-2 shadow-sm",
+          "ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 p-2 shadow-sm",
           { tabIndex: -1 },
           m(
             "li",
@@ -204,7 +203,7 @@ const FlowMatchToolbar = {
                   e.stopPropagation();
                   dispatch(
                     _events.action.createChildFlow,
-                    globalThis.flowService
+                    { match: vnode.attrs.match }
                   );
                 },
               },
@@ -220,7 +219,7 @@ const FlowMatchToolbar = {
                   e.stopPropagation();
                   dispatch(
                     _events.action.generateFlowMatchContent,
-                    globalThis.flowService
+                    { match: vnode.attrs.match }
                   );
                 },
               },
@@ -254,53 +253,58 @@ function FlowMatchCodeBlock() {
   };
 }
 
-const FlowMatchList = {
-  view() {
-    return globalThis.flowService.matches.map((match, index) => {
-      return m('div', 
-        [
-          m(FlowMatch, { match, index }), 
+function FlowMatchList(){
+  let matches = [];
+  return  {
+    oninit(){
+      matches = globalThis.flowService.matches;
+      console.log(matches[0]);
+    },
+    view: function(){
+      return m('div.match-list', matches.map(function(match, index) {
+        return [
+          m(FlowMatch, { match, index }),
           m(FlowMatchInsertBetween, { match, index })
-        ]);
-    });
-  },
-};
+        ];
+      }))
+    },
+  }
+}
 
-const FlowMatch = {
-  editing: false,
-  _title(match) {
-    const maybeNote = match.note?.name;
-    const maybeContent = match.step_content?.title;
-    // console.log("Determining title for match:", match, "->", maybeNote || maybeContent || "");
-    return maybeNote || maybeContent || "";
-  },
-  view(vnode) {
-    const match = vnode.attrs.match;
-    const title = this._title(match);
-    return m(
-      // peer: allows the next sibling to style itself based on this element's hover state
-      ".match.card bg-base-100 shadow-md border border-base-300 peer",
-      {
-        class:
-          "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
-        onclick: () => {
-          dispatch(_events.action.clickFlowMatch, { match });
+function FlowMatch() {
+  let editing = false;
+  let title = "";
+  return {
+    oninit(vnode){
+      editing = false;
+      title = vnode.attrs.match.note?.name || vnode.attrs.match.step_content?.title || "";
+    },
+    view(vnode) {
+      return m(
+        // peer: allows the next sibling to style itself based on this element's hover state
+        ".match.card bg-base-100 shadow-md border border-base-300 peer",
+        {
+          class:
+            "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
+          onclick: () => {
+            dispatch(_events.action.clickFlowMatch, { ...vnode.attrs.match  });
+          },
         },
-      },
-      m(".card-body", [
-        // title & toolbar
-        m(".flex justify-between items-center", [
-          m('.flex', 
-            [
-              this.editing ? 
-                m("h2.text-lg font-semibold text-accent-content",
+        m(".card-body", [
+          // title & toolbar
+          m(".flex justify-between", [
+            m('.flex flex-1', 
+              [
+                m("h2.text-lg flex-1 font-semibold text-accent-content",
                   m('input.title w-full border border-primary rounded p-1', { 
                     value: title,
+                    placeholder: "Enter title...",
+                    autofocus: true,
                     onblur: () => {
                       this.editing = false;
                     },
                     oninput: (e) => {
-                      const updatedMatch = { ...match }; 
+                      const updatedMatch = { ...vnode.attrs.match }; 
                       const newValue = e.target.value;
                       if (vnode.attrs.match.content_kind === "match") {
                         updatedMatch.note = {
@@ -315,25 +319,25 @@ const FlowMatch = {
                       } 
                       globalThis.flowService.updateFlowMatch({ ...updatedMatch } );
                     } 
-                  })) 
-              : m("h2.text-lg font-semibold text-primary", title),
-              m('.btn btn-xs btn-ghost text-primary',
-                {
-                  onclick: (e) => {
-                    e.stopPropagation();
-                    this.editing = !this.editing;
-                  }
-                },
-                m("span.block size-4 text-primary", m.trust(editSvg)))
-            ]),
-          m(".toolbar-wrapper", m(FlowMatchToolbar)),
-        ]),
-        m(FlowMatchDescriptionEditor, { match, onclick: (e) => e.stopPropagation() }),
-        match.content_kind === "match" && m(FlowMatchCodeBlock, { match }),
-      ])
-    );
-  },
-};
+                })),
+                m('.btn btn-ghost text-primary',
+                  {
+                    onclick: (e) => {
+                      e.stopPropagation();
+                      editing = !editing;
+                    }
+                  },
+                  m("span.block size-5 text-primary", m.trust(editSvg)))
+              ]),
+            m(".toolbar-wrapper", m(FlowMatchToolbar, { match: vnode.attrs.match } )),
+          ]),
+          m(FlowMatchDescriptionEditor, { match: vnode.attrs.match, onclick: (e) => e.stopPropagation() }),
+          vnode.attrs.match.content_kind === "match" && m(FlowMatchCodeBlock, { match: vnode.attrs.match }),
+        ])
+      );
+    },
+}
+}
 
 const FlowMatchInsertBetween = {
   view(vnode) {
@@ -427,10 +431,13 @@ const FlowDescriptionEditor = {
 };
 
 const FlowMatchDescriptionEditor = {
+  oninit(vnode){
+    this.description = vnode.attrs.match.note?.description || vnode.attrs.match.step_content?.body
+  },
   view(vnode) {
     return m(".editor", m(OvertypeBase, {
-      value: vnode.attrs.match.note?.description || vnode.attrs.match.step_content?.body || "",
-      placeholder: "Enter description...",
+      value: this.description,
+      placeholder: "Enter a description...",
       onChange: (newValue) => {
         const updatedMatch = { ...vnode.attrs.match };
         if (vnode.attrs.match.content_kind === "note") {

@@ -33,20 +33,20 @@ const L = (child) => {
   return {
     onmatch(){
       // Load initial data if available
-            if (globalThis.__INITIAL_DATA__?.flows) {
-              try {
-                globalThis.flowListService.load(globalThis.__INITIAL_DATA__.flows);
-              } catch(err) {
-                console.error('Failed to load initial flow data:', err);
-              }
-            }
-            if (globalThis.__INITIAL_DATA__?.oneFlow) {
-              try {
-                globalThis.flowService.load(globalThis.__INITIAL_DATA__.oneFlow);
-              } catch(err) {
-                console.error('Failed to load initial flow data:', err);
-              }
-            }
+      if (globalThis.__INITIAL_DATA__?.flows) {
+        try {
+          globalThis.flowListService.load(globalThis.__INITIAL_DATA__.flows);
+        } catch(err) {
+          console.error('Failed to load initial flow data:', err);
+        }
+      }
+      if (globalThis.__INITIAL_DATA__?.oneFlow) {
+        try {
+          globalThis.flowService.load(globalThis.__INITIAL_DATA__.oneFlow);
+        } catch(err) {
+          console.error('Failed to load initial flow data:', err);
+        }
+      }
     },
     render(vnode){
       return m(Layout, m(child, vnode.attrs))

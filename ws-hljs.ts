@@ -77,7 +77,7 @@ export class SyntaxHighlighter {
         }
         
         this._initialized = true;
-        console.log('SyntaxHighlighter initialized successfully');
+        console.debug('SyntaxHighlighter initialized successfully');
         return true;
     }
     

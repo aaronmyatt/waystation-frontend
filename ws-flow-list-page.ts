@@ -51,7 +51,7 @@ export const FlowList = {
   oninit(){
     // Load initial data if available
     if (globalThis.__INITIAL_DATA__?.flows) {
-      globalThis.flowListService.loadFlows(globalThis.__INITIAL_DATA__.flows);
+      globalThis.flowListService.load(globalThis.__INITIAL_DATA__.flows);
     }
   },
   view(){

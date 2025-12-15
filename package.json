@@ -13,8 +13,9 @@
         "dev": "rollup -c -w",
         "serve": "npm-run-all --parallel dev serve:http",
         "serve:http": "serve . -p 3000",
-        "build": "rollup -c",
-        "build:prod": "NODE_ENV=production rollup -c"
+        "build": "rollup -c && npm run copy:assets",
+        "build:prod": "NODE_ENV=production rollup -c && npm run copy:assets",
+        "copy:assets": "cp index.html dist/ && (cp favicon.ico icon.svg icon.png site.webmanifest dist/ 2>/dev/null || true)"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^28.0.1",

@@ -1,5 +1,11 @@
 import m from 'mithril'
 
+const _events = {
+  action: {
+    refreshList: 'ws::action::refreshList'
+  },
+};
+
 class FlowListService {
   _flows = []
   

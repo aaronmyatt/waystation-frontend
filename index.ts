@@ -19,6 +19,7 @@ const Layout = {
           m('.flex justify-between items-center h-16',
             [
               Logo,
+              m(m.route.Link, {href: "/flow-new", class: "btn btn-ghost"}, "New Flow"),
               m(m.route.Link, {href: "/", class: "btn btn-ghost"}, "Flows")
             ]
           ))
@@ -56,5 +57,6 @@ const L = (child) => {
 
 m.route(document.body, '/', {
   '/': L(FlowList),
-  '/flow/:id':  L(Flow)
+  '/flow-new':  L(Flow),
+  '/flow/:id':  L(Flow),
 })

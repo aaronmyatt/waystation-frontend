@@ -2,9 +2,16 @@ import m from 'mithril'
 
 const _events = {
   action: {
-    refreshList: 'ws::action::refreshList'
+    refreshList: 'ws::action::refreshList',
+    requestFlow: 'ws::action::requestFlow',
   },
 };
+
+function dispatch(eventName, data) {
+  return globalThis.dispatchEvent(
+    new CustomEvent(eventName, { detail: data || {} })
+  );
+}
 
 class FlowListService {
   _flows = []
@@ -59,6 +66,7 @@ export const FlowList = {
     if (globalThis.__INITIAL_DATA__?.flows) {
       globalThis.flowListService.load(globalThis.__INITIAL_DATA__.flows);
     }
+    dispatch(_events.action.refreshList, {});
   },
   view(){
     return (
@@ -69,7 +77,10 @@ export const FlowList = {
           m('li.list-none', 
             m(m.route.Link, { 
               href: '/flow/' + flow.id,
-              class: 'no-underline hover:no-underline block h-full'
+              class: 'no-underline hover:no-underline block h-full',
+              onclick: () => {
+                dispatch(_events.action.requestFlow, { flowId: flow.id })
+              }
             }, [
               m(FlowCard, { 
                 flow

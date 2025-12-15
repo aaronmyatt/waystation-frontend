@@ -13,15 +13,11 @@ function dispatch(eventName, data) {
 const _events = {
   action: {
     // flow actions
-    editFlow: "ws::action:editFlow",
     export: "ws::action::export",
     generateFlowContent: "ws::action::generateFlowContent",
+    deleteFlow: "ws::action::deleteFlow",
 
     // flow match actions
-    editFlowMatch: "ws::action::editFlowMatch",
-    deleteFlowMatch: "ws::action::deleteFlowMatch",
-    moveFlowMatchUp: "ws::action::moveFlowMatchUp",
-    moveFlowMatchDown: "ws::action::moveFlowMatchDown",
     generateFlowMatchContent: "ws::action::generateFlowMatchContent",
     insertFlowMatchAfter: "ws::action::insertFlowMatchAfter",
 
@@ -63,18 +59,62 @@ class FlowService {
     return this._flow?.matches || [];
   }
 
+  dispatchUpdated(){
+    dispatch("ws::flow:updated", this._flow);
+  }
+
   updateFlow(flow) {
     this._flow.flow = flow;
-    dispatch("ws::flow:updated", this._flow.flow);
-    console.debug("Flow updated:", this._flow.flow);
+    this.dispatchUpdated();
+    console.debug("Flow updated:", this._flow);
   }
 
   updateFlowMatch(match) {
-    const index = this.matches.findIndex((m) => m.id === match.id);
+    const index = this.matches.findIndex((m) => m.flow_match_id === match.flow_match_id);
     if (index !== -1) {
       this._flow.matches[index] = match;
-      dispatch("ws::flowMatch:updated", match);
+      this.dispatchUpdated();
       console.debug("Flow match updated:", match);
+    }
+  }
+
+  deleteFlowMatch(match) {
+    const index = this.matches.findIndex((m) => m.flow_match_id === match.flow_match_id);
+    if (index !== -1) {
+      this._flow.matches.splice(index, 1);
+      // Update order indexes for remaining matches
+      for (let i = index; i < this._flow.matches.length; i++) {
+        const currentMatch = this._flow.matches[i];
+        if (currentMatch.order_index !== undefined) {
+          currentMatch.order_index = i;
+        }
+      }
+      this.dispatchUpdated();
+      console.debug("Flow match deleted:", match);
+    }
+  }
+
+  moveFlowMatchUp(match) {
+    const index = this.matches.findIndex((m) => m.flow_match_id === match.flow_match_id);
+    if (index > 0) {
+      [this._flow.matches[index - 1], this._flow.matches[index]] = [this._flow.matches[index], this._flow.matches[index - 1]];
+      // Update order indexes
+      this._flow.matches[index - 1].order_index = index - 1;
+      this._flow.matches[index].order_index = index;
+      this.dispatchUpdated();
+      console.debug("Flow match moved up:", match);
+    }
+  }
+
+  moveFlowMatchDown(match) {
+    const index = this.matches.findIndex((m) => m.flow_match_id === match.flow_match_id);
+    if (index !== -1 && index < this._flow.matches.length - 1) {
+      [this._flow.matches[index + 1], this._flow.matches[index]] = [this._flow.matches[index], this._flow.matches[index + 1]];
+      // Update order indexes
+      this._flow.matches[index + 1].order_index = index + 1;
+      this._flow.matches[index].order_index = index;
+      this.dispatchUpdated();
+      console.debug("Flow match moved down:", match);
     }
   }
 
@@ -90,7 +130,7 @@ class FlowService {
       }
     }
     
-    dispatch("ws::flowMatch:added", match);
+    this.dispatchUpdated();
     console.debug("Flow match added at index:", insertIndex, match);
   }
 
@@ -165,8 +205,24 @@ const FlowToolbar = {
               },
               "Generate Description"
             )
+          ),
+m(
+            "li",
+            m(
+              "a.text-error",
+              {
+                onclick: () => {
+                  dispatch(
+                    _events.action.deleteFlow,
+                    globalThis.flowService.flow
+                  );
+                },
+              },
+              "Delete Flow"
+            )
           )
-        )
+        ),
+        
       ),
     ]);
   },
@@ -185,10 +241,9 @@ const FlowMatchToolbar = {
         m(
           "button.btn btn-xs btn-ghost",
           {
+            class: vnode.attrs.match.order_index === 0 ? "btn-disabled bg-neutral-content" : "",
             onclick: (e) => {
-              dispatch(_events.action.moveFlowMatchUp, {
-                match: vnode.attrs.match,
-              });
+              globalThis.flowService.moveFlowMatchUp(vnode.attrs.match);
             },
           },
           m("span.text-primary block size-4", m.trust(upSvg))
@@ -196,10 +251,9 @@ const FlowMatchToolbar = {
         m(
           "button.btn btn-xs btn-ghost",
           {
+            class: vnode.attrs.match.order_index === globalThis.flowService.matches.length - 1 ? "btn-disabled bg-neutral-content" : "",
             onclick: (e) => {
-              dispatch(_events.action.moveFlowMatchDown, {
-                match: vnode.attrs.match,
-              });
+              globalThis.flowService.moveFlowMatchDown(vnode.attrs.match);
             },
           },
           m("span.text-primary block size-4", m.trust(downSvg))
@@ -209,13 +263,10 @@ const FlowMatchToolbar = {
           "button.btn btn-xs btn-outline",
           {
             onclick: (e) => {
-              dispatch(_events.action.editFlowMatch, {
-                match: vnode.attrs.match,
-              });
               vnode.attrs.editCb && vnode.attrs.editCb(e);
             },
           },
-          "Edit"
+          vnode.attrs.editing ? "Save" : "Edit"
         ),
         m(
           ".dropdown dropdown-end",
@@ -261,9 +312,7 @@ const FlowMatchToolbar = {
                 "a.text-error",
                 {
                   onclick: (e) => {
-                    dispatch(_events.action.deleteFlowMatch, {
-                      match: vnode.attrs.match,
-                    });
+                    globalThis.flowService.deleteFlowMatch(vnode.attrs.match);
                   },
                 },
                 "Delete Match"
@@ -304,13 +353,15 @@ function FlowMatchList() {
     view(vnode) {
       return m(
         "div.match-list",
-        vnode.attrs.matches.toSorted((a, b) => a.order_index - b.order_index).map(function (match, index) {
-          return m(FlowMatch, {
-            match,
-            index,
-            key: `${match.order_index}-${match.flow_match_id}`,
-          });
-        })
+        vnode.attrs.matches
+          .toSorted((a, b) => a.order_index - b.order_index)
+          .map(function (match, index) {
+            return m(FlowMatch, {
+              match,
+              index,
+              key: `${match.order_index}-${match.flow_match_id}`,
+            });
+          })
       );
     },
   };
@@ -318,11 +369,18 @@ function FlowMatchList() {
 
 function FlowMatch() {
   let editing = false;
+  let title = "";
+  let description = "";
   return {
     oninit(vnode) {
-      vnode.state.title =
+      title =
         vnode.attrs.match.note?.name ||
         vnode.attrs.match.step_content?.title ||
+        "";
+
+      description =
+        vnode.attrs.match.note?.description ||
+        vnode.attrs.match.step_content?.body ||
         "";
     },
     view(vnode) {
@@ -350,42 +408,53 @@ function FlowMatch() {
                       },
                     },
                     m("input.input input-bordered", {
-                      value: vnode.state.title,
+                      value: title,
                       placeholder: "##Title",
-                      oninput: (e) => {
-                        vnode.state.title = e.target.value;
-                        const updatedMatch = { ...vnode.attrs.match };
-                        if (updatedMatch.note) {
-                          updatedMatch.note.name = vnode.state.title;
-                        }
-                        if (updatedMatch.step_content) {
-                          updatedMatch.step_content.title = vnode.state.title;
-                        }
-
-                        globalThis.flowService.updateFlowMatch({
-                          ...updatedMatch,
-                        });
-                      },
+                      oninput: (e) => { title = e.target.value;},
                     })
                   )
                 : m(
                     "h2.text-lg flex-1 font-semibold text-accent-content",
-                    { class: vnode.state.title === "" ? "h-1" : "" },
-                    vnode.state.title
+                    { class: title === "" ? "h-1" : "" },
+                    title
                   ),
               m(
                 ".toolbar-wrapper",
                 m(FlowMatchToolbar, {
+                  editing,
                   match: vnode.attrs.match,
                   editCb: (e) => {
-                    editing = !editing;
+                    if( editing ){
+                      editing = false;
+                      // save changes
+                      const updatedMatch = { ...vnode.attrs.match };
+
+                      if (updatedMatch.content_kind === "match") {
+                        updatedMatch.note = {
+                          ...updatedMatch.note,
+                          name: title,
+                          description: description,
+                        };
+                      } else if (updatedMatch.content_kind === "note") {
+                        updatedMatch.step_content = {
+                          ...updatedMatch.step_content,
+                          title: title,
+                          body: description,
+                        };
+                      }
+                      globalThis.flowService.updateFlowMatch(updatedMatch);
+                      // m.redraw();
+                    } else {
+                      editing = true;
+                    }
                   },
                 })
               ),
             ]),
             m(FlowMatchDescriptionEditor, {
-              match: vnode.attrs.match,
+              description,
               togglePreview: !editing,
+              onKeydown: (e) => { description = e.target.value; }
             }),
             vnode.attrs.match.content_kind === "match" &&
               m(FlowMatchCodeBlock, { match: vnode.attrs.match }),
@@ -429,7 +498,12 @@ const FlowMatchInsertBetween = {
         },
         m(".modal-box",
           [
-            m('h4', 'Add a Step'),
+            m('form', { method: "dialog" },
+              m('button.btn btn-sm btn-circle btn-ghost absolute right-2 top-2', {
+                onclick: () => { vnode.state.showDialog = false; }
+              }, '✕')
+            ),
+            m('h4.font-bold', 'Add a Step'),
             m('p.mb-4', 'Would you like to insert a text only note or a match from your editor cursor position/selection?'),
             m('.modal-action',
               [
@@ -453,9 +527,10 @@ const FlowMatchInsertBetween = {
                   }
                 }, 'Add Note')
               ]
-            )
+            ),
           ]
-        )
+        ),
+        m('form.modal-backdrop', { method: "dialog", onclick: () => { vnode.state.showDialog = false; } }, m('button', 'Close'))
       )
     );
   },
@@ -599,11 +674,6 @@ const OvertypeBase = {
       }
     }
   },
-  onupdate(vnode){
-    for (const editor of vnode.state.editors) {
-      editor.setValue(vnode.attrs.value || "");
-    }
-  },
   view(vnode) {
     return m(".inner-editor", {
       onclick: (e) => {
@@ -617,11 +687,9 @@ function FlowDescriptionEditor() {
   return {
     oninit(vnode){
       vnode.state.description = globalThis.flowService.flow.description
-      console.log(vnode.state.description, vnode.attrs.description)
     },
     onbeforeupdate(vnode){
       vnode.state.description = globalThis.flowService.flow.description
-      console.log(vnode.state.description, vnode.attrs.description)
     },
     view(vnode) {
       return m(
@@ -644,41 +712,19 @@ function FlowDescriptionEditor() {
 
 function FlowMatchDescriptionEditor() {
   return {
-    oninit(vnode) {
-      vnode.state.description =
-        vnode.attrs.match.note?.description ||
-        vnode.attrs.match.step_content?.body;
-    },
     view(vnode) {
       return m(
         ".editor",
         {
-          class: (vnode.attrs.togglePreview && !vnode.state.description) ? "hidden" : ""
+          class: (vnode.attrs.togglePreview && !vnode.attrs.description) ? "hidden" : ""
         },
         [
           !vnode.attrs.togglePreview &&
             m("h3.text-md font-semibold mb-2", "Description"),
           m(OvertypeBase, {
-            value: vnode.state.description,
+            value: vnode.attrs.description,
             preview: vnode.attrs.togglePreview,
-            onKeydown: (e) => {
-              const newValue = e.target.value;
-              const updatedMatch = { ...vnode.attrs.match };
-
-              if (updatedMatch.content_kind === "note") {
-                updatedMatch.step_content = {
-                  ...updatedMatch.step_content,
-                  body: newValue,
-                };
-              } else if (updatedMatch.content_kind === "match") {
-                updatedMatch.note = {
-                  ...updatedMatch.note,
-                  description: newValue,
-                };
-              }
-              vnode.state.description = newValue;
-              globalThis.flowService.updateFlowMatch({ ...updatedMatch });
-            },
+            onKeydown: vnode.attrs.onKeydown || (() => {}),
           }),
         ]
       );

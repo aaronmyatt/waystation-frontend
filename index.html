@@ -309,6 +309,13 @@ window.__INITIAL_DATA__ = {
   "isDirty": false
   }
 };
+
+window.addEventListener('ws::action::requestFlow', (e) => {
+  console.log('Received ws::action::requestFlow event:', e.detail);
+  setTimeout(() => {
+    globalThis.flowService.load(window.__INITIAL_DATA__.oneFlow);
+  }, 1500); // Simulate async delay
+});
 </script>
 <script src="dist/bundle.js"></script>
 

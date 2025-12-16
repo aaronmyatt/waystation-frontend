@@ -15,7 +15,7 @@
         "serve:http": "serve . -p 3000",
         "build": "rollup -c && npm run copy:assets",
         "build:prod": "NODE_ENV=production rollup -c && npm run copy:assets",
-        "copy:assets": "cp index.html dist/ && (cp favicon.ico icon.svg icon.png site.webmanifest dist/ 2>/dev/null || true)"
+        "copy:assets": "cp index.html dist/ && sed -i.bak 's|\"\\./dist/bundle\\.css\"|\"./bundle.css\"|g; s|\"dist/bundle\\.js\"|\"./bundle.js\"|g' dist/index.html && rm dist/index.html.bak && (cp favicon.ico icon.svg icon.png site.webmanifest dist/ 2>/dev/null || true)"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^28.0.1",

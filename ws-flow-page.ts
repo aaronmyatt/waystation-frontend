@@ -164,6 +164,16 @@ class FlowService {
       ],
     };
   }
+
+  clear() {
+    this._flow = {
+      flow: {
+        name: "",
+        description: "",
+      },
+      matches: [],
+    };
+  }
 }
 
 globalThis.flowService = new FlowService();
@@ -741,6 +751,9 @@ export function Flow() {
     onbeforeupdate(vnode) {
       vnode.state.flow = globalThis.flowService.flow;
       vnode.state.matches = globalThis.flowService.matches;
+    },
+    onremove() {
+      globalThis.flowService.clear();
     },
     view(vnode) {
       return m(".flow.container mx-auto p-4 max-w-5xl", [

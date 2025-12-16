@@ -2,6 +2,7 @@ import m from "mithril";
 import { Flow } from "./ws-flow-page";
 import { FlowList } from "./ws-flow-list-page";
 import "./style.css";
+import { dispatch, _events } from "./utils";
 
 const Logo = m(
   m.route.Link,
@@ -50,13 +51,6 @@ const initData = () => {
       console.error("Failed to load initial flow data:", err);
     }
   }
-  if (globalThis.__INITIAL_DATA__?.oneFlow) {
-    try {
-      globalThis.flowService.load(globalThis.__INITIAL_DATA__.oneFlow);
-    } catch (err) {
-      console.error("Failed to load initial flow data:", err);
-    }
-  }
 };
 const L = (child) => {
   return {
@@ -79,5 +73,30 @@ m.route(document.body, "/", {
       return m(Layout, m(Flow, vnode.attrs));
     },
   },
-  "/flow/:id": L(Flow),
+  "/flow/:id": {
+    onmatch(args, requestedPath, route) {
+      dispatch(_events.action.requestFlow, { flowId: args.id });
+,     
+      return new Promise((resolve, reject) => {
+        const interval = setInterval(() => {
+          if(globalThis.flowService.flow.id === args.id) {
+            clearTimeout(timeout);
+            clearInterval(interval);
+            resolve();
+          }
+        }, 100);
+
+        const timeout = setTimeout(() => {
+          clearInterval(interval);
+          dispatch(_events.action.actionError, { 
+            message: `Failed to load flow ${args.id} within 5 seconds` 
+          });
+          reject(`Failed to load flow ${args.id} within 5 seconds` );
+        }, 5000);
+      })
+    },
+    render(vnode) {
+      return m(Layout, m(Flow, vnode.attrs));
+    },
+  },
 });

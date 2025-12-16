@@ -1,17 +1,11 @@
 import m from 'mithril'
+import { _events as _sharedEvents, dispatch } from './utils'
 
 const _events = {
   action: {
     refreshList: 'ws::action::refreshList',
-    requestFlow: 'ws::action::requestFlow',
   },
 };
-
-function dispatch(eventName, data) {
-  return globalThis.dispatchEvent(
-    new CustomEvent(eventName, { detail: data || {} })
-  );
-}
 
 class FlowListService {
   _flows = []
@@ -79,7 +73,7 @@ export const FlowList = {
               href: '/flow/' + flow.id,
               class: 'no-underline hover:no-underline block h-full',
               onclick: () => {
-                dispatch(_events.action.requestFlow, { flowId: flow.id })
+                dispatch(_sharedEvents.action.requestFlow, { flowId: flow.id });
               }
             }, [
               m(FlowCard, { 

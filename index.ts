@@ -16,6 +16,37 @@ const Logo = m(
   )
 );
 
+const THEMES = [
+  "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
+  "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua",
+  "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula",
+  "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee",
+  "winter", "dim", "nord", "sunset", "abyss", "caramellatte", "silk"
+];
+
+const ThemePicker = {
+  oninit: () => {
+    // Load saved theme from local storage
+    const savedTheme = localStorage.getItem("waystation-theme");
+    if (savedTheme) {
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    }
+  },
+  view: () => {
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "cupcake";
+    return m("select.select select-sm", {
+      value: currentTheme,
+      onchange: (e) => {
+        const theme = e.target.value;
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("waystation-theme", theme);
+      },
+    }, THEMES.map(theme => 
+      m("option", { value: theme }, theme.charAt(0).toUpperCase() + theme.slice(1))
+    ));
+  },
+};
+
 const Layout = {
   view: (vnode) => {
     return m("main.layout container mx-auto", [
@@ -30,10 +61,11 @@ const Layout = {
               "New Flow"
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
+            m(ThemePicker)
           ]),
         ]
       ),
-      m("section.mt-28", vnode.children),
+      m("section.mt-10", vnode.children),
       //end
     ]);
   },

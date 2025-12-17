@@ -18,22 +18,19 @@ const Logo = m(
 
 const Layout = {
   view: (vnode) => {
-    return m("main.layout", [
+    return m("main.layout container mx-auto", [
       m(
-        "nav.fixed top-0 left-0 right-0 bg-white shadow-md z-50 border-b border-gray-200",
+        ".navbar",
         [
-          m(
-            ".container mx-auto px-5",
-            m(".flex justify-between items-center h-16", [
-              Logo,
-              m(
-                m.route.Link,
-                { href: "/flow/new", class: "btn btn-ghost" },
-                "New Flow"
-              ),
-              m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
-            ])
-          ),
+          m(".navbar-start", Logo),
+          m(".navbar-end gap-2", [
+            m(
+              m.route.Link,
+              { href: "/flow/new", class: "btn btn-ghost" },
+              "New Flow"
+            ),
+            m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
+          ]),
         ]
       ),
       m("section.mt-28", vnode.children),
@@ -75,8 +72,7 @@ m.route(document.body, "/", {
   },
   "/flow/:id": {
     onmatch(args, requestedPath, route) {
-      dispatch(_events.action.requestFlow, { flowId: args.id });
-,     
+      dispatch(_events.action.requestFlow, { flowId: args.id });     
       return new Promise((resolve, reject) => {
         const interval = setInterval(() => {
           if(globalThis.flowService.flow.id === args.id) {

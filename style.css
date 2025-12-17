@@ -1,2 +1,49 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+    themes: all;
+};
+
+@plugin "daisyui/theme" {
+    name: "vs-abyss";
+
+    color-scheme: dark;
+
+    /* Original custom properties with VS Code variable overrides */
+    --color-base-100: var(--vscode-editor-background, oklch(20% 0.08 209));
+    --color-base-200: var(--vscode-sideBar-background, oklch(15% 0.08 209));
+    --color-base-300: var(--vscode-activityBar-background, oklch(10% 0.08 209));
+    --color-base-content: var(--vscode-editor-foreground, oklch(90% 0.076 70.697));
+
+    --color-primary: var(--vscode-button-background, oklch(92% 0.2653 125));
+    --color-primary-content: var(--vscode-button-foreground, oklch(50% 0.2653 125));
+
+    --color-secondary: var(--vscode-badge-background, oklch(83.27% 0.0764 298.3));
+    --color-secondary-content: var(--vscode-badge-foreground, oklch(43.27% 0.0764 298.3));
+
+    --color-accent: var(--vscode-focusBorder, oklch(43% 0 0));
+    --color-accent-content: var(--vscode-focusBorder, oklch(98% 0 0));
+
+    --color-neutral: var(--vscode-panel-background, oklch(30% 0.08 209));
+    --color-neutral-content: var(--vscode-foreground, oklch(90% 0.076 70.697));
+
+    --color-info: var(--vscode-textLink-foreground, oklch(74% 0.16 232.661));
+    --color-info-content: var(--vscode-textLink-activeForeground, oklch(29% 0.066 243.157));
+
+    --color-success: var(--vscode-terminal-ansiGreen, oklch(79% 0.209 151.711));
+    --color-success-content: var(--vscode-testing-iconPassed, oklch(26% 0.065 152.934));
+
+    --color-warning: var(--vscode-editorWarning-foreground, oklch(84.8% 0.1962 84.62));
+    --color-warning-content: var(--vscode-list-warningForeground, oklch(44.8% 0.1962 84.62));
+
+    --color-error: var(--vscode-errorForeground, oklch(65% 0.1985 24.22));
+    --color-error-content: var(--vscode-inputValidation-errorForeground, oklch(27% 0.1985 24.22));
+
+    --radius-selector: 2rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}

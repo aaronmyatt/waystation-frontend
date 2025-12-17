@@ -3,6 +3,9 @@ import { MarkdownRenderer } from "./ws-marked";
 import { SyntaxHighlighter } from "./ws-hljs";
 import OverType from "overtype";
 import { upSvg, downSvg, verticalDotsSvg, plusSvg } from "./ws-svg";
+import { debounce } from "./utils";
+
+let skipRederaw = false;
 
 function dispatch(eventName, data) {
   return globalThis.dispatchEvent(
@@ -402,8 +405,11 @@ function FlowMatch() {
             class:
               "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
             style: `--card-p: 1rem;`,
-            onclick: () => {
-              dispatch(_events.action.clickFlowMatch, { ...vnode.attrs.match });
+            onclick: (e) => {
+              skipRederaw = true;
+              debounce((match) => {
+                dispatch(_events.action.clickFlowMatch, { ...match });
+              }, 300)(vnode.attrs.match);
             },
           },
           m(".card-body", [
@@ -411,7 +417,7 @@ function FlowMatch() {
             m(".flex justify-between", [
               editing
                 ? m(
-                    "h2.text-lg flex-1 font-semibold text-accent-content",
+                    "h2.text-lg flex-1 font-semibold text-secondary",
                     {
                       onclick: (e) => {
                         e.stopPropagation();
@@ -424,7 +430,7 @@ function FlowMatch() {
                     })
                   )
                 : m(
-                    "h2.text-lg flex-1 font-semibold text-accent-content",
+                    "h2.text-lg flex-1 font-semibold text-secondary",
                     { class: title === "" ? "h-1" : "" },
                     title
                   ),
@@ -547,75 +553,98 @@ const FlowMatchInsertBetween = {
 };
 
 function overtypeOptions(vnode) {
+  // Helper to get CSS variable value
+  const getCSSVar = (varName) => {
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  };
+
+  // Helper to add transparency to a color (works with oklch, rgb, hex)
+  const addAlpha = (color, alpha = 0.4) => {
+    if (!color) return color;
+    // If it's already an oklch color, add alpha
+    if (color.startsWith('oklch(')) {
+      return color.replace(')', ` / ${alpha})`);
+    }
+    // If it's a hex color, convert to rgba
+    if (color.startsWith('#')) {
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    // If it's already rgba or has transparency, return as is
+    return color;
+  };
+
   const previewTheme = {
     name: "ws-flow-preview-theme",
     colors: {
-      bgPrimary: "oklch(98% 0 0)", // Lemon Chiffon - main background
-      bgSecondary: "oklch(98% 0 0)", // White - editor background
-      text: "#0d3b66", // Yale Blue - main text
-      textPrimary: "#0d3b66", // Yale Blue - primary text (same as text)
-      textSecondary: "#5a7a9b", // Muted blue - secondary text
-      h1: "#f95738", // Tomato - h1 headers
-      h2: "#ee964b", // Sandy Brown - h2 headers
-      h3: "#3d8a51", // Forest green - h3 headers
-      strong: "#ee964b", // Sandy Brown - bold text
-      em: "#f95738", // Tomato - italic text
-      del: "#ee964b", // Sandy Brown - deleted text (same as strong)
-      link: "#0d3b66", // Yale Blue - links
-      code: "#0d3b66", // Yale Blue - inline code
-      codeBg: "rgba(244, 211, 94, 0.4)", // Naples Yellow with transparency
-      blockquote: "#5a7a9b", // Muted blue - blockquotes
-      hr: "#5a7a9b", // Muted blue - horizontal rules
-      syntaxMarker: "rgba(13, 59, 102, 0.52)", // Yale Blue with transparency
-      syntax: "#999999", // Gray - syntax highlighting fallback
-      cursor: "#f95738", // Tomato - cursor
-      selection: "rgba(244, 211, 94, 0.4)", // Naples Yellow with transparency
-      listMarker: "#ee964b", // Sandy Brown - list markers
-      rawLine: "#5a7a9b", // Muted blue - raw line indicators
-      border: "#e0e0e0", // Light gray - borders
-      hoverBg: "#f0f0f0", // Very light gray - hover backgrounds
-      primary: "#0d3b66", // Yale Blue - primary accent
+      bgPrimary: getCSSVar('--color-base-100') || "oklch(98% 0 0)",
+      bgSecondary: getCSSVar('--color-base-100') || "oklch(98% 0 0)",
+      text: getCSSVar('--color-base-content') || "#0d3b66",
+      textPrimary: getCSSVar('--color-base-content') || "#0d3b66",
+      textSecondary: getCSSVar('--color-neutral-content') || "#5a7a9b",
+      h1: getCSSVar('--color-error') || "#f95738",
+      h2: getCSSVar('--color-warning') || "#ee964b",
+      h3: getCSSVar('--color-success') || "#3d8a51",
+      strong: getCSSVar('--color-warning') || "#ee964b",
+      em: getCSSVar('--color-error') || "#f95738",
+      del: getCSSVar('--color-warning') || "#ee964b",
+      link: getCSSVar('--color-info') || "#0d3b66",
+      code: getCSSVar('--color-accent-content') || "#0d3b66",
+      codeBg: getCSSVar('--color-base-200') || "rgba(244, 211, 94, 0.4)",
+      blockquote: getCSSVar('--color-neutral-content') || "#5a7a9b",
+      hr: getCSSVar('--color-neutral') || "#5a7a9b",
+      syntaxMarker: getCSSVar('--color-base-content') || "rgba(13, 59, 102, 0.52)",
+      syntax: getCSSVar('--color-neutral-content') || "#999999",
+      cursor: getCSSVar('--color-primary') || "#f95738",
+      selection: addAlpha(getCSSVar('--color-base-200'), 0.4) || "rgba(244, 211, 94, 0.4)",
+      listMarker: getCSSVar('--color-warning') || "#ee964b",
+      rawLine: getCSSVar('--color-neutral-content') || "#5a7a9b",
+      border: getCSSVar('--color-base-300') || "#e0e0e0",
+      hoverBg: getCSSVar('--color-base-200') || "#f0f0f0",
+      primary: getCSSVar('--color-primary') || "#0d3b66",
       // Toolbar colors
-      toolbarBg: "#ffffff", // White - toolbar background
-      toolbarIcon: "#0d3b66", // Yale Blue - icon color
-      toolbarHover: "#f5f5f5", // Light gray - hover background
-      toolbarActive: "#faf0ca", // Lemon Chiffon - active button background
+      toolbarBg: getCSSVar('--color-base-100') || "#ffffff",
+      toolbarIcon: getCSSVar('--color-base-content') || "#0d3b66",
+      toolbarHover: getCSSVar('--color-base-200') || "#f5f5f5",
+      toolbarActive: getCSSVar('--color-primary') || "#faf0ca",
     },
   };
 
   const editTheme = {
     name: "ws-flow-edit-theme",
     colors: {
-      bgPrimary: "#fff8e7", // Warm cream - edit mode background
-      bgSecondary: "#fffcf5", // Lighter cream - editor background
-      text: "#1a4d2e", // Dark forest green - main text
-      textPrimary: "#1a4d2e", // Dark forest green - primary text
-      textSecondary: "#4a7c59", // Medium green - secondary text
-      h1: "#d84315", // Deep orange - h1 headers
-      h2: "#f57c00", // Orange - h2 headers
-      h3: "#2e7d32", // Green - h3 headers
-      strong: "#f57c00", // Orange - bold text
-      em: "#d84315", // Deep orange - italic text
-      del: "#f57c00", // Orange - deleted text
-      link: "#1a4d2e", // Dark forest green - links
-      code: "#1a4d2e", // Dark forest green - inline code
-      codeBg: "rgba(255, 224, 130, 0.3)", // Light amber with transparency
-      blockquote: "#4a7c59", // Medium green - blockquotes
-      hr: "#4a7c59", // Medium green - horizontal rules
-      syntaxMarker: "rgba(26, 77, 46, 0.52)", // Dark green with transparency
-      syntax: "#888888", // Gray - syntax highlighting fallback
-      cursor: "#d84315", // Deep orange - cursor
-      selection: "rgba(255, 224, 130, 0.5)", // Amber with transparency
-      listMarker: "#f57c00", // Orange - list markers
-      rawLine: "#4a7c59", // Medium green - raw line indicators
-      border: "#e0c896", // Tan - borders
-      hoverBg: "#fff4d6", // Light cream - hover backgrounds
-      primary: "#1a4d2e", // Dark forest green - primary accent
+      bgPrimary: getCSSVar('--color-base-200') || "#fff8e7",
+      bgSecondary: getCSSVar('--color-base-100') || "#fffcf5",
+      text: getCSSVar('--color-base-content') || "#1a4d2e",
+      textPrimary: getCSSVar('--color-base-content') || "#1a4d2e",
+      textSecondary: getCSSVar('--color-neutral-content') || "#4a7c59",
+      h1: getCSSVar('--color-error') || "#d84315",
+      h2: getCSSVar('--color-warning') || "#f57c00",
+      h3: getCSSVar('--color-success') || "#2e7d32",
+      strong: getCSSVar('--color-warning') || "#f57c00",
+      em: getCSSVar('--color-error') || "#d84315",
+      del: getCSSVar('--color-warning') || "#f57c00",
+      link: getCSSVar('--color-info') || "#1a4d2e",
+      code: getCSSVar('--color-accent-content') || "#1a4d2e",
+      codeBg: getCSSVar('--color-base-300') || "rgba(255, 224, 130, 0.3)",
+      blockquote: getCSSVar('--color-neutral-content') || "#4a7c59",
+      hr: getCSSVar('--color-neutral') || "#4a7c59",
+      syntaxMarker: getCSSVar('--color-base-content') || "rgba(26, 77, 46, 0.52)",
+      syntax: getCSSVar('--color-neutral-content') || "#888888",
+      cursor: getCSSVar('--color-primary') || "#d84315",
+      selection: addAlpha(getCSSVar('--color-base-300'), 0.5) || "rgba(255, 224, 130, 0.5)",
+      listMarker: getCSSVar('--color-warning') || "#f57c00",
+      rawLine: getCSSVar('--color-neutral-content') || "#4a7c59",
+      border: getCSSVar('--color-base-300') || "#e0c896",
+      hoverBg: getCSSVar('--color-base-200') || "#fff4d6",
+      primary: getCSSVar('--color-primary') || "#1a4d2e",
       // Toolbar colors
-      toolbarBg: "#fffcf5", // Light cream - toolbar background
-      toolbarIcon: "#1a4d2e", // Dark forest green - icon color
-      toolbarHover: "#fff8e7", // Warm cream - hover background
-      toolbarActive: "#ffe082", // Amber - active button background
+      toolbarBg: getCSSVar('--color-base-100') || "#fffcf5",
+      toolbarIcon: getCSSVar('--color-base-content') || "#1a4d2e",
+      toolbarHover: getCSSVar('--color-base-200') || "#fff8e7",
+      toolbarActive: getCSSVar('--color-primary') || "#ffe082",
     },
   };
 
@@ -749,6 +778,11 @@ export function Flow() {
       vnode.state.matches = globalThis.flowService.matches;
     },
     onbeforeupdate(vnode) {
+      if(skipRederaw){
+        skipRederaw = false;
+        return false;
+      }
+
       vnode.state.flow = globalThis.flowService.flow;
       vnode.state.matches = globalThis.flowService.matches;
     },

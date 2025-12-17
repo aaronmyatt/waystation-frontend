@@ -1,4 +1,13 @@
 import hljs from 'highlight.js';
+// Import all themes - the bundler will handle CSS extraction
+import 'highlight.js/styles/default.css';
+import 'highlight.js/styles/github.css';
+import 'highlight.js/styles/github-dark.css';
+import 'highlight.js/styles/monokai.css';
+import 'highlight.js/styles/atom-one-dark.css';
+import 'highlight.js/styles/atom-one-light.css';
+import 'highlight.js/styles/vs.css';
+import 'highlight.js/styles/vs2015.css';
 
 interface SyntaxHighlighterConfig {
     autoDetect?: boolean;
@@ -33,7 +42,6 @@ interface HighlighterConfig {
 export class SyntaxHighlighter {
     private config: HighlighterConfig;
     private _initialized: boolean;
-    private _styleElement: HTMLLinkElement | null;
 
     /**
      * Creates an instance of SyntaxHighlighter
@@ -52,7 +60,6 @@ export class SyntaxHighlighter {
         };
         
         this._initialized = false;
-        this._styleElement = null;
         
         // Initialize on creation
         this.init();
@@ -83,24 +90,23 @@ export class SyntaxHighlighter {
     
     /**
      * Load and apply a theme
+     * Note: Themes are now bundled locally. This method updates the theme class on the body.
      * @param {string} themeName - Name of the theme to load
      */
     loadTheme(themeName: string): void {
-        // Remove existing theme if present
-        if (this._styleElement && this._styleElement.parentNode) {
-            this._styleElement.parentNode.removeChild(this._styleElement);
+        // Remove existing theme class if present
+        if (this.config.theme) {
+            document.body.classList.remove(`hljs-theme-${this.config.theme}`);
         }
-        
-        // Create link element for theme
-        this._styleElement = document.createElement('link');
-        this._styleElement.rel = 'stylesheet';
-        this._styleElement.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/${themeName}.min.css`;
         
         // Update config
         this.config.theme = themeName;
         
-        // Add to document head
-        document.head.appendChild(this._styleElement);
+        // Add new theme class to body
+        // Note: All themes are pre-imported, CSS rules are scoped by theme name
+        document.body.classList.add(`hljs-theme-${themeName}`);
+        
+        console.debug(`Theme loaded: ${themeName}`);
     }
     
     /**

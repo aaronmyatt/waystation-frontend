@@ -408,7 +408,7 @@ function FlowMatch() {
             onclick: (e) => {
               skipRederaw = true;
               debounce((match) => {
-                dispatch(_events.action.clickFlowMatch, { ...match });
+                dispatch(_events.action.clickFlowMatch, {  ...match  });
               }, 300)(vnode.attrs.match);
             },
           },
@@ -525,7 +525,9 @@ const FlowMatchInsertBetween = {
               [
                 m('button.btn btn-primary', {
                   onclick: () => {
-                    dispatch(_events.action.insertFlowMatchAfter, { match, index, kind: 'note' });
+                    // NOTE: I'm accepting the awkwardness of using globalThis.flowService 
+                    // here since this action is exclusively handled by the vscode extension
+                    dispatch(_events.action.insertFlowMatchAfter, { flowId: globalThis.flowService.flow.id, match, index });
                     vnode.state.showDialog = false;
                   }
                 }, 'Match from cursor'),

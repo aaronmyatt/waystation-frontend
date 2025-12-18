@@ -4,7 +4,6 @@ import { SyntaxHighlighter } from "./ws-hljs";
 import OverType from "overtype";
 import { upSvg, downSvg, verticalDotsSvg, plusSvg } from "./ws-svg";
 import { debounce } from "./utils";
-import { Component } from "mithril-global";
 
 let skipRederaw = false;
 
@@ -180,6 +179,10 @@ class FlowService {
       },
       matches: [],
     };
+  }
+
+  redraw() {
+    m.redraw();
   }
 }
 

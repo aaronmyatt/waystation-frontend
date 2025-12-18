@@ -1,22 +1,24 @@
 {
-  "name": "@waystation/shared",
+  "name": "@waystation/frontend",
   "version": "0.1.0",
   "exports": {
-    "./utils": "./src/shared/utils.ts",
-    "./ws-flow-page": "./src/shared/ws-flow-page.ts",
-    "./ws-flow-list-page": "./src/shared/ws-flow-list-page.ts",
-    "./ws-marked": "./src/shared/ws-marked.ts",
-    "./ws-hljs": "./src/shared/ws-hljs.ts",
-    "./ws-svg": "./src/shared/ws-svg.ts"
+    "./shared/utils": "./src/shared/utils.ts",
+    "./shared/ws-flow-page": "./src/shared/ws-flow-page.ts",
+    "./shared/ws-flow-list-page": "./src/shared/ws-flow-list-page.ts",
+    "./shared/ws-marked": "./src/shared/ws-marked.ts",
+    "./shared/ws-hljs": "./src/shared/ws-hljs.ts",
+    "./shared/ws-svg": "./src/shared/ws-svg.ts",
+    "./vscode-extension": "./src/vscode-extension/index.ts",
+    "./vscode-extension/style.css": "./src/vscode-extension/style.css"
   },
   "publish": {
     "include": [
-      "src/shared/**/*.ts",
+      "src/**/*.ts",
+      "src/**/*.css",
       "README.md",
       "LICENSE"
     ],
     "exclude": [
-      "src/vscode-extension/**",
       "node_modules",
       "dist"
     ]

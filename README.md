@@ -73,7 +73,7 @@ npm run serve
 
 ## JSR Package Distribution
 
-The shared code in `src/shared/` is published to [JSR (JavaScript Registry)](https://jsr.io/) for use by other projects.
+Both the shared code in `src/shared/` and the VSCode extension bundle in `src/vscode-extension/` are published to [JSR (JavaScript Registry)](https://jsr.io/) for use by other projects.
 
 ### Publishing to JSR
 
@@ -95,55 +95,70 @@ npm run build
 jsr publish
 ```
 
-This will publish the `@waystation/shared` package to JSR based on the configuration in `jsr.json`.
+This will publish the `@waystation/frontend` package to JSR based on the configuration in `jsr.json`.
 
 ### Installing from JSR
 
-To use the shared Waystation components in your project:
+To use the Waystation components in your project:
 
 **Using Deno:**
 
 ```typescript
-import { dispatch, _events } from "jsr:@waystation/shared/utils";
-import { Flow } from "jsr:@waystation/shared/ws-flow-page";
-import { FlowList } from "jsr:@waystation/shared/ws-flow-list-page";
+// Shared components
+import { dispatch, _events } from "jsr:@waystation/frontend/shared/utils";
+import { Flow } from "jsr:@waystation/frontend/shared/ws-flow-page";
+import { FlowList } from "jsr:@waystation/frontend/shared/ws-flow-list-page";
+
+// VSCode extension bundle (includes all UI components)
+import "jsr:@waystation/frontend/vscode-extension";
+import "jsr:@waystation/frontend/vscode-extension/style.css";
 ```
 
 **Using Node.js/npm:**
 
 ```bash
-npx jsr add @waystation/shared
+npx jsr add @waystation/frontend
 ```
 
 Then import in your code:
 
 ```typescript
-import { dispatch, _events } from "@waystation/shared/utils";
-import { Flow } from "@waystation/shared/ws-flow-page";
-import { FlowList } from "@waystation/shared/ws-flow-list-page";
+// Shared components
+import { dispatch, _events } from "@waystation/frontend/shared/utils";
+import { Flow } from "@waystation/frontend/shared/ws-flow-page";
+import { FlowList } from "@waystation/frontend/shared/ws-flow-list-page";
+
+// VSCode extension bundle (includes all UI components)
+import "@waystation/frontend/vscode-extension";
+import "@waystation/frontend/vscode-extension/style.css";
 ```
 
 ### Available Exports
 
-The following modules are exported from `@waystation/shared`:
+The following modules are exported from `@waystation/frontend`:
 
-- `utils` - Utility functions (dispatch, debounce, event constants)
-- `ws-flow-page` - Flow page component
-- `ws-flow-list-page` - Flow list page component
-- `ws-marked` - Markdown renderer wrapper
-- `ws-hljs` - Syntax highlighter wrapper
-- `ws-svg` - SVG icon definitions
+#### Shared Components
+- `shared/utils` - Utility functions (dispatch, debounce, event constants)
+- `shared/ws-flow-page` - Flow page component
+- `shared/ws-flow-list-page` - Flow list page component
+- `shared/ws-marked` - Markdown renderer wrapper
+- `shared/ws-hljs` - Syntax highlighter wrapper
+- `shared/ws-svg` - SVG icon definitions
+
+#### VSCode Extension Bundle
+- `vscode-extension` - Complete VSCode extension frontend (includes routing, layout, and all UI components)
+- `vscode-extension/style.css` - VSCode extension styles
 
 ## Dependencies
 
-The shared code depends on:
+Both the shared components and the VSCode extension bundle depend on:
 
 - **mithril** - Frontend framework
 - **marked** - Markdown parser
 - **highlight.js** - Syntax highlighting
 - **overtype** - Rich text editor
 
-Make sure these are installed in projects using `@waystation/shared`.
+Make sure these are installed in projects using `@waystation/frontend`.
 
 ## License
 

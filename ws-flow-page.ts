@@ -4,10 +4,11 @@ import { SyntaxHighlighter } from "./ws-hljs";
 import OverType from "overtype";
 import { upSvg, downSvg, verticalDotsSvg, plusSvg } from "./ws-svg";
 import { debounce } from "./utils";
+import { Component } from "mithril-global";
 
 let skipRederaw = false;
 
-function dispatch(eventName, data) {
+function dispatch(eventName: string, data: any = null) {
   return globalThis.dispatchEvent(
     new CustomEvent(eventName, { detail: data || {} })
   );
@@ -301,7 +302,7 @@ const FlowMatchToolbar = {
                 {
                   onclick: (e) => {
                     dispatch(_events.action.createChildFlow, {
-                      match: { ...vnode.attrs.match },
+                      flowMatch: { ...vnode.attrs.match },
                     });
                   },
                 },
@@ -315,7 +316,7 @@ const FlowMatchToolbar = {
                 {
                   onclick: (e) => {
                     dispatch(_events.action.generateFlowMatchContent, {
-                      match: vnode.attrs.match,
+                      flowMatch: vnode.attrs.match,
                     });
                   },
                 },
@@ -411,7 +412,7 @@ function FlowMatch() {
             onclick: (e) => {
               skipRederaw = true;
               debounce((match) => {
-                dispatch(_events.action.clickFlowMatch, {  match: { ...match }  });
+                dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...match }  });
               }, 300)(vnode.attrs.match);
             },
           },
@@ -528,7 +529,7 @@ const FlowMatchInsertBetween = {
               [
                 m('button.btn btn-primary', {
                   onclick: () => {
-                    dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, match: { ...vnode.attrs.match }});
+                    dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.attrs.match }});
                     vnode.state.showDialog = false;
                   }
                 }, 'Match from cursor'),

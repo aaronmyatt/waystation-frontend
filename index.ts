@@ -3,6 +3,7 @@ import { Flow } from "./ws-flow-page";
 import { FlowList } from "./ws-flow-list-page";
 import "./style.css";
 import { dispatch, _events } from "./utils";
+import { Component, Vnode } from "mithril-global";
 
 const Logo = m(
   m.route.Link,
@@ -48,7 +49,7 @@ const ThemePicker = {
 };
 
 const Layout = {
-  view: (vnode) => {
+  view: (vnode: Vnode) => {
     return m("main.layout container mx-auto", [
       m(
         ".navbar",
@@ -81,12 +82,12 @@ const initData = () => {
     }
   }
 };
-const L = (child) => {
+const L = (child: Component) => {
   return {
     onmatch() {
       initData();
     },
-    render(vnode) {
+    render(vnode: Vnode) {
       return m(Layout, m(child, vnode.attrs));
     },
   };
@@ -103,7 +104,7 @@ m.route(document.body, "/", {
     },
   },
   "/flow/:id": {
-    onmatch(args, _requestedPath, _route) {
+    onmatch(args, _requestedPath, _route): Promise<void> {
       dispatch(_events.action.requestFlow, { flowId: args.id });     
 
       return new Promise((resolve, reject) => {

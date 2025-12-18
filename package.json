@@ -18,6 +18,7 @@
         "copy:assets": "cp index.html dist/ && sed -i.bak 's|\"\\./dist/bundle\\.css\"|\"./bundle.css\"|g; s|\"dist/bundle\\.js\"|\"./bundle.js\"|g' dist/index.html && rm dist/index.html.bak && (cp favicon.ico icon.svg icon.png site.webmanifest dist/ 2>/dev/null || true)"
     },
     "devDependencies": {
+        "@types/mithril-global": "^2.2.4",
         "@rollup/plugin-commonjs": "^28.0.1",
         "@rollup/plugin-node-resolve": "^15.3.1",
         "@rollup/plugin-typescript": "^12.1.2",

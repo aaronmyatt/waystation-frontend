@@ -14,6 +14,9 @@ function dispatch(eventName, data) {
 }
 
 const _events = {
+  flow: {
+    updated: "ws::flow::updated",
+  },
   action: {
     // flow actions
     export: "ws::action::export",
@@ -63,7 +66,7 @@ class FlowService {
   }
 
   dispatchUpdated(){
-    dispatch("ws::flow:updated", this._flow);
+    dispatch(_events.flow.updated, this._flow);
   }
 
   updateFlow(flow) {
@@ -189,7 +192,7 @@ const FlowToolbar = {
         "button.btn btn-sm btn-outline",
         {
           onclick: () => {
-            dispatch(_events.action.export, { ...globalThis.flowService.flow });
+            dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }});
           },
         },
         "Export"
@@ -212,7 +215,7 @@ const FlowToolbar = {
                 onclick: () => {
                   dispatch(
                     _events.action.generateFlowContent,
-                    { ...globalThis.flowService.flow }
+                    {flow: { ...globalThis.flowService.flow }}
                   );
                 },
               },
@@ -227,7 +230,7 @@ m(
                 onclick: () => {
                   dispatch(
                     _events.action.deleteFlow,
-                    { ...globalThis.flowService.flow }
+                    {flow: { ...globalThis.flowService.flow }}
                   );
                 },
               },
@@ -408,7 +411,7 @@ function FlowMatch() {
             onclick: (e) => {
               skipRederaw = true;
               debounce((match) => {
-                dispatch(_events.action.clickFlowMatch, {  ...match  });
+                dispatch(_events.action.clickFlowMatch, {  match: { ...match }  });
               }, 300)(vnode.attrs.match);
             },
           },

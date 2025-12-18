@@ -103,16 +103,20 @@ m.route(document.body, "/", {
     },
   },
   "/flow/:id": {
-    onmatch(args, requestedPath, route) {
+    onmatch(args, _requestedPath, _route) {
       dispatch(_events.action.requestFlow, { flowId: args.id });     
+
       return new Promise((resolve, reject) => {
+
+        // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
+        // adhoc reactivity
         const interval = setInterval(() => {
           if(globalThis.flowService.flow.id === args.id) {
             clearTimeout(timeout);
             clearInterval(interval);
             resolve();
           }
-        }, 100);
+        }, 50);
 
         const timeout = setTimeout(() => {
           clearInterval(interval);

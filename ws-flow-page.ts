@@ -189,7 +189,7 @@ const FlowToolbar = {
         "button.btn btn-sm btn-outline",
         {
           onclick: () => {
-            dispatch(_events.action.export, globalThis.flowService);
+            dispatch(_events.action.export, { ...globalThis.flowService.flow });
           },
         },
         "Export"
@@ -212,7 +212,7 @@ const FlowToolbar = {
                 onclick: () => {
                   dispatch(
                     _events.action.generateFlowContent,
-                    globalThis.flowService
+                    { ...globalThis.flowService.flow }
                   );
                 },
               },
@@ -227,7 +227,7 @@ m(
                 onclick: () => {
                   dispatch(
                     _events.action.deleteFlow,
-                    globalThis.flowService.flow
+                    { ...globalThis.flowService.flow }
                   );
                 },
               },
@@ -298,7 +298,7 @@ const FlowMatchToolbar = {
                 {
                   onclick: (e) => {
                     dispatch(_events.action.createChildFlow, {
-                      match: vnode.attrs.match,
+                      match: { ...vnode.attrs.match },
                     });
                   },
                 },
@@ -525,9 +525,7 @@ const FlowMatchInsertBetween = {
               [
                 m('button.btn btn-primary', {
                   onclick: () => {
-                    // NOTE: I'm accepting the awkwardness of using globalThis.flowService 
-                    // here since this action is exclusively handled by the vscode extension
-                    dispatch(_events.action.insertFlowMatchAfter, { flowId: globalThis.flowService.flow.id, match, index });
+                    dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, match: { ...vnode.attrs.match }});
                     vnode.state.showDialog = false;
                   }
                 }, 'Match from cursor'),

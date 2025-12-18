@@ -1,8 +1,8 @@
 import m from "mithril";
-import { Flow } from "./ws-flow-page";
-import { FlowList } from "./ws-flow-list-page";
+import { Flow } from "../shared/ws-flow-page";
+import { FlowList } from "../shared/ws-flow-list-page";
 import "./style.css";
-import { dispatch, _events } from "./utils";
+import { dispatch, _events } from "../shared/utils";
 
 const Logo = m(
   m.route.Link,

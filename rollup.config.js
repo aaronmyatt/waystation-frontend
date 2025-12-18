@@ -6,7 +6,7 @@ import postcss from 'rollup-plugin-postcss';
 const production = process.env.NODE_ENV === 'production';
 
 export default {
-  input: 'index.ts',
+  input: 'src/vscode-extension/index.ts',
   output: {
     file: 'dist/bundle.js',
     format: 'iife',

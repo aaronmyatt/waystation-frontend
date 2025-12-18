@@ -1,0 +1,24 @@
+{
+  "name": "@waystation/shared",
+  "version": "0.1.0",
+  "exports": {
+    "./utils": "./src/shared/utils.ts",
+    "./ws-flow-page": "./src/shared/ws-flow-page.ts",
+    "./ws-flow-list-page": "./src/shared/ws-flow-list-page.ts",
+    "./ws-marked": "./src/shared/ws-marked.ts",
+    "./ws-hljs": "./src/shared/ws-hljs.ts",
+    "./ws-svg": "./src/shared/ws-svg.ts"
+  },
+  "publish": {
+    "include": [
+      "src/shared/**/*.ts",
+      "README.md",
+      "LICENSE"
+    ],
+    "exclude": [
+      "src/vscode-extension/**",
+      "node_modules",
+      "dist"
+    ]
+  }
+}

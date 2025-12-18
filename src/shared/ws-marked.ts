@@ -86,7 +86,13 @@ export class MarkdownRenderer {
             const attrs = el.attributes;
             for (let i = attrs.length - 1; i >= 0; i--) {
                 const attrName = attrs[i].name.toLowerCase();
-                if (attrName.indexOf('on') === 0 || (attrName === 'href' && attrs[i].value.toLowerCase().indexOf('javascript:') === 0)) {
+                const attrValue = attrs[i].value.toLowerCase();
+                // Check for event handlers and dangerous URL schemes
+                const isDangerousUrl = attrName === 'href' && 
+                    (attrValue.indexOf('javascript:') === 0 || 
+                     attrValue.indexOf('data:') === 0 || 
+                     attrValue.indexOf('vbscript:') === 0);
+                if (attrName.indexOf('on') === 0 || isDangerousUrl) {
                     el.removeAttribute(attrName);
                 }
             }

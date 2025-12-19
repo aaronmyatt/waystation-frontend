@@ -11,9 +11,13 @@
   },
   "scripts": {
     "dev": "rollup -c -w",
+    "dev:web": "rollup -c rollup.web.config.js -w",
     "serve": "npm-run-all --parallel dev serve:http",
     "serve:http": "serve . -p 3000",
+    "serve:compare": "npm-run-all --parallel dev dev:web serve:http",
     "build": "rollup -c",
+    "build:web": "rollup -c rollup.web.config.js",
+    "build:all": "npm-run-all build build:web",
     "build:prod": "NODE_ENV=production rollup -c",
     "prepare": "husky"
   },

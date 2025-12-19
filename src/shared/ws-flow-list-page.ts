@@ -54,7 +54,7 @@ const FlowCard = {
   }
 }
 
-export const FlowList = {
+export const FlowList: m.Component = {
   oninit(){
     // Load initial data if available
     if (globalThis.__INITIAL_DATA__?.flows) {

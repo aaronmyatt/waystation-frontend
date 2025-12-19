@@ -1,6 +1,3 @@
 import m from 'mithril';
-export declare const FlowList: {
-    oninit(): void;
-    view(): m.Vnode<any, any>;
-};
+export declare const FlowList: m.Component;
 //# sourceMappingURL=ws-flow-list-page.d.ts.map

@@ -1,5 +1,5 @@
-export declare function dispatch(eventName: any, data: any): boolean;
-export declare function debounce(func: any, wait: any): (...args: any[]) => void;
+export declare function dispatch(eventName: string, data?: any): boolean;
+export declare function debounce(func: (...args: any[]) => void, wait: number): Function;
 export declare const _events: {
     action: {
         requestFlow: string;

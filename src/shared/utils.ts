@@ -1,12 +1,12 @@
-export function dispatch(eventName, data) {
+export function dispatch(eventName: string, data?: any): boolean {
   return globalThis.dispatchEvent(
     new CustomEvent(eventName, { detail: data || {} })
   );
 }
 
-export function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
+export function debounce(func: (...args: any[]) => void, wait: number): Function {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function executedFunction(...args: any[]) {
     const later = () => {
       clearTimeout(timeout);
       func(...args);

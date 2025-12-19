@@ -778,7 +778,7 @@ function FlowMatchDescriptionEditor() {
   };
 }
 
-export function Flow() {
+export function Flow(): m.Component {
   return {
     oninit(vnode) {
       vnode.state.flow = globalThis.flowService.flow;

@@ -195,3 +195,18 @@ Make sure these are installed in projects using `@waystation/frontend`.
 ## License
 
 See LICENSE file for details.
+
+## VSCode Settings
+Configure VSCode to ignore the `dist/` directory by adding the following to your `.vscode/settings.json`:
+
+```json
+  "files.exclude": {
+    "**/dist/**": true
+  },
+  "search.exclude": {
+    "**/dist/**": true
+  },
+  "files.watcherExclude": {
+    "**/dist/**": true
+  }
+```

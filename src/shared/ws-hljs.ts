@@ -1,13 +1,4 @@
 import hljs from 'highlight.js';
-// Import all themes - the bundler will handle CSS extraction
-import 'highlight.js/styles/default.css';
-import 'highlight.js/styles/github.css';
-import 'highlight.js/styles/github-dark.css';
-import 'highlight.js/styles/monokai.css';
-import 'highlight.js/styles/atom-one-dark.css';
-import 'highlight.js/styles/atom-one-light.css';
-import 'highlight.js/styles/vs.css';
-import 'highlight.js/styles/vs2015.css';
 
 interface SyntaxHighlighterConfig {
     autoDetect?: boolean;
@@ -54,7 +45,7 @@ export class SyntaxHighlighter {
     constructor(config: SyntaxHighlighterConfig = {}) {
         this.config = {
             autoDetect: config.autoDetect !== false,
-            theme: config.theme || 'default',
+            theme: config.theme || 'vs',
             languages: config.languages || [],
             hljsOptions: config.hljsOptions || {}
         };

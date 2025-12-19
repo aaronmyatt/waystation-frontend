@@ -67106,7 +67106,7 @@
 	    constructor(config = {}) {
 	        this.config = {
 	            autoDetect: config.autoDetect !== false,
-	            theme: config.theme || 'default',
+	            theme: config.theme || 'vs',
 	            languages: config.languages || [],
 	            hljsOptions: config.hljsOptions || {}
 	        };

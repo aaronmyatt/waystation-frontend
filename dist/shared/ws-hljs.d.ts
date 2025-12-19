@@ -1,11 +1,3 @@
-import 'highlight.js/styles/default.css';
-import 'highlight.js/styles/github.css';
-import 'highlight.js/styles/github-dark.css';
-import 'highlight.js/styles/monokai.css';
-import 'highlight.js/styles/atom-one-dark.css';
-import 'highlight.js/styles/atom-one-light.css';
-import 'highlight.js/styles/vs.css';
-import 'highlight.js/styles/vs2015.css';
 interface SyntaxHighlighterConfig {
     autoDetect?: boolean;
     theme?: string;

@@ -9,8 +9,7 @@
     "./shared/ws-marked": "./src/shared/ws-marked.ts",
     "./shared/ws-hljs": "./src/shared/ws-hljs.ts",
     "./shared/ws-svg": "./src/shared/ws-svg.ts",
-    "./vscode-extension": "./src/vscode-extension/index.ts",
-    "./vscode-extension/style.css": "./src/vscode-extension/style.css"
+    "./vscode-extension": "./src/vscode-extension/index.ts"
   },
   "publish": {
     "include": [

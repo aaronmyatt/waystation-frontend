@@ -316,6 +316,16 @@ window.addEventListener('ws::action::requestFlow', (e) => {
     globalThis.flowService.load(window.__INITIAL_DATA__.oneFlow);
   }, 1500); // Simulate async delay
 });
+
+window.addEventListener('ws::flow::updated', (e) => {
+  console.log('Received ws::flow::requestFlow event:', e.detail);
+  if(!e.detail.flow.id){
+    e.detail.flow.id = 'a04b3b6c-1d48-44bb-9ce4-2b955ef7b792';
+    setTimeout(() => {
+      globalThis.flowService.load(e.detail);
+    }, 150); // Simulate async delay
+  }
+});
 </script>
 <script src="dist/waystation-vscode.js"></script>
 

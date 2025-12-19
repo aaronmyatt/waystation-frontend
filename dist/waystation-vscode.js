@@ -71617,7 +71617,7 @@ ${blockSuffix}` : suffix;
 	const verticalDotsSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>`;
 	const plusSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
 
-	function dispatch$1(eventName, data) {
+	function dispatch(eventName, data) {
 	    return globalThis.dispatchEvent(new CustomEvent(eventName, { detail: data || {} }));
 	}
 	function debounce(func, wait) {
@@ -71631,21 +71631,20 @@ ${blockSuffix}` : suffix;
 	        timeout = setTimeout(later, wait);
 	    };
 	}
-	const _events$2 = {
+	const _events$1 = {
+	    flow: {
+	        updated: 'ws::flow::updated',
+	    },
 	    action: {
+	        refreshList: 'ws::action::refreshList',
 	        requestFlow: 'ws::action::requestFlow',
 	        actionError: 'ws::action::actionError',
 	    },
 	};
 
 	let skipRederaw = false;
-	function dispatch(eventName, data = null) {
-	    return globalThis.dispatchEvent(new CustomEvent(eventName, { detail: data || {} }));
-	}
-	const _events$1 = {
-	    flow: {
-	        updated: "ws::flow::updated",
-	    },
+	const _events = {
+	    flow: _events$1.flow,
 	    action: {
 	        // flow actions
 	        export: "ws::action::export",
@@ -71677,7 +71676,7 @@ ${blockSuffix}` : suffix;
 	        return this._flow?.matches || [];
 	    }
 	    dispatchUpdated() {
-	        dispatch(_events$1.flow.updated, this._flow);
+	        dispatch(_events.flow.updated, this._flow);
 	    }
 	    updateFlow(flow) {
 	        this._flow.flow = flow;
@@ -71762,7 +71761,8 @@ ${blockSuffix}` : suffix;
 	                    content_kind: "note",
 	                    note: {
 	                        name: "New Step",
-	                        description: "Click edit to describe this step",
+	                        description: `Click edit to describe this step. 
+Right click a line in your editor and choose '**Add Line**' to add a code match to this flow.`,
 	                    },
 	                    match: {
 	                        file_name: "",
@@ -71793,16 +71793,21 @@ ${blockSuffix}` : suffix;
 	        return m("ul.flow-toolbar.flex flex-wrap gap-2", [
 	            m("button.btn btn-sm btn-outline", {
 	                onclick: () => {
-	                    dispatch(_events$1.action.export, { flow: { ...globalThis.flowService.flow } });
+	                    dispatch(_events.action.export, { flow: { ...globalThis.flowService.flow } });
 	                },
 	            }, "Export"),
 	            m(".dropdown dropdown-end", m(".btn btn-xs btn-ghost text-primary", { tabIndex: 0 }, m("span.block size-4 text-primary", m.trust(verticalDotsSvg))), m("ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 shadow-sm", { tabIndex: -1 }, m("li", m("a", {
-	                onclick: () => {
-	                    dispatch(_events$1.action.generateFlowContent, { flow: { ...globalThis.flowService.flow } });
+	                onclick: (e) => {
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                    dispatch(_events.action.generateFlowContent, { flow: { ...globalThis.flowService.flow } });
 	                },
 	            }, "Generate Description")), m("li", m("a.text-error", {
-	                onclick: () => {
-	                    dispatch(_events$1.action.deleteFlow, { flow: { ...globalThis.flowService.flow } });
+	                onclick: (e) => {
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                    dispatch(_events.action.deleteFlow, { flow: { ...globalThis.flowService.flow } });
+	                    m.route.set("/");
 	                },
 	            }, "Delete Flow")))),
 	        ]);
@@ -71834,13 +71839,13 @@ ${blockSuffix}` : suffix;
 	            }, vnode.attrs.editing ? "Save" : "Edit"),
 	            m(".dropdown dropdown-end", m(".btn btn-xs btn-ghost text-primary", { tabIndex: 0 }, m("span.block size-4 text-primary", m.trust(verticalDotsSvg))), m("ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 p-2 shadow-sm", { tabIndex: -1 }, m("li", m("a", {
 	                onclick: (e) => {
-	                    dispatch(_events$1.action.createChildFlow, {
+	                    dispatch(_events.action.createChildFlow, {
 	                        flowMatch: { ...vnode.attrs.match },
 	                    });
 	                },
 	            }, "Create Child Flow")), m("li", m("a", {
 	                onclick: (e) => {
-	                    dispatch(_events$1.action.generateFlowMatchContent, {
+	                    dispatch(_events.action.generateFlowMatchContent, {
 	                        flowMatch: vnode.attrs.match,
 	                    });
 	                },
@@ -71908,7 +71913,7 @@ ${blockSuffix}` : suffix;
 	                    onclick: (e) => {
 	                        skipRederaw = true;
 	                        debounce((match) => {
-	                            dispatch(_events$1.action.clickFlowMatch, { flowMatch: { ...match } });
+	                            dispatch(_events.action.clickFlowMatch, { flowMatch: { ...match } });
 	                        }, 300)(vnode.attrs.match);
 	                    },
 	                }, m(".card-body", [
@@ -71999,7 +72004,7 @@ ${blockSuffix}` : suffix;
 	            m('.modal-action', [
 	                m('button.btn btn-primary', {
 	                    onclick: () => {
-	                        dispatch(_events$1.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.attrs.match } });
+	                        dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.attrs.match } });
 	                        vnode.state.showDialog = false;
 	                    }
 	                }, 'Match from cursor'),
@@ -72256,11 +72261,6 @@ ${blockSuffix}` : suffix;
 	    };
 	}
 
-	const _events = {
-	    action: {
-	        refreshList: 'ws::action::refreshList',
-	    },
-	};
 	class FlowListService {
 	    constructor() {
 	        this._flows = [];
@@ -72275,30 +72275,31 @@ ${blockSuffix}` : suffix;
 	}
 	globalThis.flowListService = new FlowListService();
 	function FlowDescriptionMd() {
-	    let description = '';
 	    return {
 	        oninit(vnode) {
-	            if (vnode.attrs.description)
-	                description = globalThis.marked.parse(vnode.attrs.description);
+	            vnode.state.description = globalThis.marked.parse(vnode.attrs.description || '');
 	        },
-	        view() {
-	            return m('.text-sm text-base-content/70 line-clamp-3', m.trust(description));
+	        onbeforeupdate(vnode) {
+	            if (vnode.attrs.description !== vnode.state.description) {
+	                vnode.state.description = globalThis.marked.parse(vnode.attrs.description || '');
+	            }
+	        },
+	        view(vnode) {
+	            return m('.text-sm text-base-content/70 line-clamp-3', m.trust(vnode.state.description));
 	        }
 	    };
 	}
 	const FlowCard = {
 	    view(vnode) {
-	        const description = vnode.attrs.flow.description || '';
-	        const children = [
+	        return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full', m('.card-body', [
 	            m('.card-title text-lg font-semibold text-primary', vnode.attrs.flow.name || ''),
-	            description && m(FlowDescriptionMd, { description }),
+	            m(FlowDescriptionMd, { description: vnode.attrs.flow.description }),
 	            m('.flex-1'),
 	            m('.card-actions justify-between', [
 	                m('.text-sm', `Created ${vnode.attrs.flow.updated_at}`),
 	                m('button.btn btn-sm btn-ghost', '> View')
 	            ])
-	        ];
-	        return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full', m('.card-body', children));
+	        ]));
 	    }
 	};
 	const FlowList = {
@@ -72307,15 +72308,14 @@ ${blockSuffix}` : suffix;
 	        if (globalThis.__INITIAL_DATA__?.flows) {
 	            globalThis.flowListService.load(globalThis.__INITIAL_DATA__.flows);
 	        }
-	        dispatch$1(_events.action.refreshList, {});
 	    },
 	    view() {
 	        return (m('.container mx-auto p-4', m('ul.grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3', globalThis.flowListService.flows.map(flow => {
-	            return (m('li.list-none', m(m.route.Link, {
+	            return (m('li.list-none', { key: flow.id }, m(m.route.Link, {
 	                href: '/flow/' + flow.id,
 	                class: 'no-underline hover:no-underline block h-full',
 	                onclick: () => {
-	                    dispatch$1(_events$2.action.requestFlow, { flowId: flow.id });
+	                    dispatch(_events$1.action.requestFlow, { flowId: flow.id });
 	                }
 	            }, [
 	                m(FlowCard, {
@@ -72381,21 +72381,48 @@ ${blockSuffix}` : suffix;
 	        }
 	    }
 	};
-	const L = (child) => {
-	    return {
+	m.route(document.body, "/", {
+	    "/": {
 	        onmatch() {
 	            initData();
+	            dispatch(_events$1.action.refreshList, {});
 	        },
 	        render(vnode) {
-	            return m(Layout, m(child, vnode.attrs));
+	            return m(Layout, m(FlowList, vnode.attrs));
 	        },
-	    };
-	};
-	m.route(document.body, "/", {
-	    "/": L(FlowList),
+	    },
 	    "/flow/new": {
 	        onmatch() {
 	            globalThis.flowService.reset();
+	            // Dispatch flow updated event to trigger backend save
+	            dispatch(_events$1.flow.updated, globalThis.flowService._flow);
+	            return new Promise((resolve, reject) => {
+	                // Check immediately for race condition (ID assigned before polling starts)
+	                if (globalThis.flowService.flow.id) {
+	                    const newId = globalThis.flowService.flow.id;
+	                    m.route.set(`/flow/${newId}`);
+	                    resolve();
+	                    return;
+	                }
+	                // TODO: use a proxy to intercept flowService.flow changes instead of polling?
+	                // adhoc reactivity - poll for ID assignment
+	                const interval = setInterval(() => {
+	                    if (globalThis.flowService.flow.id) {
+	                        clearTimeout(timeout);
+	                        clearInterval(interval);
+	                        const newId = globalThis.flowService.flow.id;
+	                        m.route.set(`/flow/${newId}`);
+	                        resolve();
+	                    }
+	                }, 50);
+	                const timeout = setTimeout(() => {
+	                    clearInterval(interval);
+	                    dispatch(_events$1.action.actionError, {
+	                        message: 'Failed to create flow: No ID assigned within 5 seconds'
+	                    });
+	                    reject('Failed to create flow: No ID assigned within 5 seconds');
+	                }, 5000);
+	            });
 	        },
 	        render(vnode) {
 	            return m(Layout, m(Flow, vnode.attrs));
@@ -72403,7 +72430,7 @@ ${blockSuffix}` : suffix;
 	    },
 	    "/flow/:id": {
 	        onmatch(args, _requestedPath, _route) {
-	            dispatch$1(_events$2.action.requestFlow, { flowId: args.id });
+	            dispatch(_events$1.action.requestFlow, { flowId: args.id });
 	            return new Promise((resolve, reject) => {
 	                // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
 	                // adhoc reactivity
@@ -72416,7 +72443,7 @@ ${blockSuffix}` : suffix;
 	                }, 50);
 	                const timeout = setTimeout(() => {
 	                    clearInterval(interval);
-	                    dispatch$1(_events$2.action.actionError, {
+	                    dispatch(_events$1.action.actionError, {
 	                        message: `Failed to load flow ${args.id} within 5 seconds`
 	                    });
 	                    reject(`Failed to load flow ${args.id} within 5 seconds`);

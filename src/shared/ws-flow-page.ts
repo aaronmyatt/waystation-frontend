@@ -3,20 +3,12 @@ import { MarkdownRenderer } from "./ws-marked";
 import { SyntaxHighlighter } from "./ws-hljs";
 import OverType from "overtype";
 import { upSvg, downSvg, verticalDotsSvg, plusSvg } from "./ws-svg";
-import { debounce } from "./utils";
+import { debounce, dispatch, _events as utilEvents } from "./utils";
 
 let skipRederaw = false;
 
-function dispatch(eventName: string, data: any = null) {
-  return globalThis.dispatchEvent(
-    new CustomEvent(eventName, { detail: data || {} })
-  );
-}
-
 const _events = {
-  flow: {
-    updated: "ws::flow::updated",
-  },
+  flow: utilEvents.flow,
   action: {
     // flow actions
     export: "ws::action::export",
@@ -160,7 +152,8 @@ class FlowService {
           content_kind: "note",
           note: {
             name: "New Step",
-            description: "Click edit to describe this step",
+            description: `Click edit to describe this step. 
+Right click a line in your editor and choose '**Add Line**' to add a code match to this flow.`,
           },
           match: {
             file_name: "",
@@ -211,12 +204,12 @@ const FlowToolbar = {
         m(
           "ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 shadow-sm",
           { tabIndex: -1 },
-          m(
-            "li",
-            m(
-              "a",
+          m("li",
+            m("a",
               {
-                onclick: () => {
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   dispatch(
                     _events.action.generateFlowContent,
                     {flow: { ...globalThis.flowService.flow }}
@@ -226,16 +219,17 @@ const FlowToolbar = {
               "Generate Description"
             )
           ),
-m(
-            "li",
-            m(
-              "a.text-error",
+          m("li",
+            m("a.text-error",
               {
-                onclick: () => {
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   dispatch(
                     _events.action.deleteFlow,
                     {flow: { ...globalThis.flowService.flow }}
                   );
+                  m.route.set("/");
                 },
               },
               "Delete Flow"

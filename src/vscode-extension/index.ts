@@ -83,7 +83,6 @@ const initData = () => {
 const L = (child) => {
   return {
     onmatch() {
-      initData();
     },
     render(vnode) {
       return m(Layout, m(child, vnode.attrs));
@@ -92,10 +91,51 @@ const L = (child) => {
 };
 
 m.route(document.body, "/", {
-  "/": L(FlowList),
-  "/flow/new": {
+  "/": {
     onmatch() {
+      initData();
+      dispatch(_events.action.refreshList, {});
+    },
+    render(vnode: Vnode) {
+      return m(Layout, m(FlowList, vnode.attrs));
+    },
+  },
+  "/flow/new": {
+    onmatch(): Promise<void> {
       globalThis.flowService.reset();
+      
+      // Dispatch flow updated event to trigger backend save
+      dispatch(_events.flow.updated, globalThis.flowService._flow);
+
+      return new Promise((resolve, reject) => {
+        // Check immediately for race condition (ID assigned before polling starts)
+        if (globalThis.flowService.flow.id) {
+          const newId = globalThis.flowService.flow.id;
+          m.route.set(`/flow/${newId}`);
+          resolve();
+          return;
+        }
+
+        // TODO: use a proxy to intercept flowService.flow changes instead of polling?
+        // adhoc reactivity - poll for ID assignment
+        const interval = setInterval(() => {
+          if (globalThis.flowService.flow.id) {
+            clearTimeout(timeout);
+            clearInterval(interval);
+            const newId = globalThis.flowService.flow.id;
+            m.route.set(`/flow/${newId}`);
+            resolve();
+          }
+        }, 50);
+
+        const timeout = setTimeout(() => {
+          clearInterval(interval);
+          dispatch(_events.action.actionError, { 
+            message: 'Failed to create flow: No ID assigned within 5 seconds' 
+          });
+          reject('Failed to create flow: No ID assigned within 5 seconds');
+        }, 5000);
+      });
     },
     render(vnode) {
       return m(Layout, m(Flow, vnode.attrs));

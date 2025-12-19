@@ -17,7 +17,11 @@ export function debounce(func: (...args: any[]) => void, wait: number): Function
 }
 
 export const _events = {
+  flow: {
+    updated: 'ws::flow::updated',
+  },
   action: {
+    refreshList: 'ws::action::refreshList',
     requestFlow: 'ws::action::requestFlow',
     actionError: 'ws::action::actionError',
   },

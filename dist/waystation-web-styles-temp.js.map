@@ -1,0 +1,1 @@
+{"version":3,"file":"waystation-web-styles-temp.js","sources":["../src/web/styles-entry.js"],"sourcesContent":["// Entry point for CSS bundling only\nimport './style.css';\n\n// Export something to prevent empty chunk warning\nexport default 'styles-loaded';\n"],"names":[],"mappings":"AAAA;;AAGA;AACA,kBAAe,eAAe;;;;"}

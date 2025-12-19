@@ -7,13 +7,16 @@ import { debounce } from "./utils";
 
 let skipRederaw = false;
 
-function dispatch(eventName, data) {
+function dispatch(eventName: string, data: any = null) {
   return globalThis.dispatchEvent(
     new CustomEvent(eventName, { detail: data || {} })
   );
 }
 
 const _events = {
+  flow: {
+    updated: "ws::flow::updated",
+  },
   action: {
     // flow actions
     export: "ws::action::export",
@@ -63,7 +66,7 @@ class FlowService {
   }
 
   dispatchUpdated(){
-    dispatch("ws::flow:updated", this._flow);
+    dispatch(_events.flow.updated, this._flow);
   }
 
   updateFlow(flow) {
@@ -177,6 +180,10 @@ class FlowService {
       matches: [],
     };
   }
+
+  redraw() {
+    m.redraw();
+  }
 }
 
 globalThis.flowService = new FlowService();
@@ -189,7 +196,7 @@ const FlowToolbar = {
         "button.btn btn-sm btn-outline",
         {
           onclick: () => {
-            dispatch(_events.action.export, { ...globalThis.flowService.flow });
+            dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }});
           },
         },
         "Export"
@@ -212,7 +219,7 @@ const FlowToolbar = {
                 onclick: () => {
                   dispatch(
                     _events.action.generateFlowContent,
-                    { ...globalThis.flowService.flow }
+                    {flow: { ...globalThis.flowService.flow }}
                   );
                 },
               },
@@ -227,7 +234,7 @@ m(
                 onclick: () => {
                   dispatch(
                     _events.action.deleteFlow,
-                    { ...globalThis.flowService.flow }
+                    {flow: { ...globalThis.flowService.flow }}
                   );
                 },
               },
@@ -298,7 +305,7 @@ const FlowMatchToolbar = {
                 {
                   onclick: (e) => {
                     dispatch(_events.action.createChildFlow, {
-                      match: { ...vnode.attrs.match },
+                      flowMatch: { ...vnode.attrs.match },
                     });
                   },
                 },
@@ -312,7 +319,7 @@ const FlowMatchToolbar = {
                 {
                   onclick: (e) => {
                     dispatch(_events.action.generateFlowMatchContent, {
-                      match: vnode.attrs.match,
+                      flowMatch: vnode.attrs.match,
                     });
                   },
                 },
@@ -408,7 +415,7 @@ function FlowMatch() {
             onclick: (e) => {
               skipRederaw = true;
               debounce((match) => {
-                dispatch(_events.action.clickFlowMatch, {  ...match  });
+                dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...match }  });
               }, 300)(vnode.attrs.match);
             },
           },
@@ -525,7 +532,7 @@ const FlowMatchInsertBetween = {
               [
                 m('button.btn btn-primary', {
                   onclick: () => {
-                    dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, match: { ...vnode.attrs.match }});
+                    dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.attrs.match }});
                     vnode.state.showDialog = false;
                   }
                 }, 'Match from cursor'),

@@ -181,6 +181,12 @@ The following modules are exported from `@waystation/frontend`:
 - `vscode-extension` - Complete VSCode extension frontend (includes routing, layout, and all UI components)
 - `vscode-extension/style.css` - VSCode extension styles (must be imported separately, see [CSS Styles](#css-styles))
 
+#### Prebuilt Dist Bundles (non-exported, nested-path access)
+These files are included in the published package and can be referenced by nested path (they are **not** export targets):
+
+- `dist/waystation-vscode.js`
+- `dist/waystation-vscode.js.map` (if present)
+
 ## Dependencies
 
 Both the shared components and the VSCode extension bundle depend on:

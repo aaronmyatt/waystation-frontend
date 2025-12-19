@@ -1,6 +1,7 @@
 {
   "name": "@waystation/frontend",
   "version": "0.1.0",
+  "license": "MIT",
   "exports": {
     "./shared/utils": "./src/shared/utils.ts",
     "./shared/ws-flow-page": "./src/shared/ws-flow-page.ts",

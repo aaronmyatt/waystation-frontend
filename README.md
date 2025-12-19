@@ -103,15 +103,8 @@ To use the Waystation components in your project:
 
 **Using Deno:**
 
-```typescript
-// Shared components
-import { dispatch, _events } from "jsr:@waystation/frontend/shared/utils";
-import { Flow } from "jsr:@waystation/frontend/shared/ws-flow-page";
-import { FlowList } from "jsr:@waystation/frontend/shared/ws-flow-list-page";
-
-// VSCode extension bundle (includes all UI components)
-import "jsr:@waystation/frontend/vscode-extension";
-import "jsr:@waystation/frontend/vscode-extension/style.css";
+```bash
+deno add jsr:@waystation/frontend
 ```
 
 **Using Node.js/npm:**
@@ -120,18 +113,57 @@ import "jsr:@waystation/frontend/vscode-extension/style.css";
 npx jsr add @waystation/frontend
 ```
 
-Then import in your code:
+### Quick Start (Recommended)
+
+The easiest way to use Waystation is to import the bundled JavaScript and CSS:
 
 ```typescript
-// Shared components
-import { dispatch, _events } from "@waystation/frontend/shared/utils";
-import { Flow } from "@waystation/frontend/shared/ws-flow-page";
-import { FlowList } from "@waystation/frontend/shared/ws-flow-list-page";
+// Import the complete VSCode extension bundle (includes all UI components)
+import "@waystation/frontend/vscode-extension";
+```
 
-// VSCode extension bundle (includes all UI components)
+```html
+<!-- Include the bundled styles -->
+<link rel="stylesheet" href="path/to/style.css">
+```
+
+Or if your bundler supports CSS imports:
+
+```typescript
 import "@waystation/frontend/vscode-extension";
 import "@waystation/frontend/vscode-extension/style.css";
 ```
+
+This gives you access to all Waystation components with a single import.
+
+### Individual Component Imports
+
+For advanced users who want more granular control, you can import specific shared components:
+
+<details>
+<summary>Click to expand advanced import options</summary>
+
+**Individual Component Imports:**
+
+```typescript
+// Utility functions
+import { dispatch, _events } from "@waystation/frontend/shared/utils";
+
+// Specific page components
+import { Flow } from "@waystation/frontend/shared/ws-flow-page";
+import { FlowList } from "@waystation/frontend/shared/ws-flow-list-page";
+
+// Markdown and syntax highlighting
+import { marked } from "@waystation/frontend/shared/ws-marked";
+import { hljs } from "@waystation/frontend/shared/ws-hljs";
+
+// SVG icons
+import { SVGDefs } from "@waystation/frontend/shared/ws-svg";
+```
+
+**Note:** When importing individual components, you may need to handle initialization and dependencies yourself. The bundled import (recommended above) handles this automatically.
+
+</details>
 
 ### Available Exports
 
@@ -147,7 +179,7 @@ The following modules are exported from `@waystation/frontend`:
 
 #### VSCode Extension Bundle
 - `vscode-extension` - Complete VSCode extension frontend (includes routing, layout, and all UI components)
-- `vscode-extension/style.css` - VSCode extension styles
+- `vscode-extension/style.css` - VSCode extension styles (must be imported separately, see [CSS Styles](#css-styles))
 
 ## Dependencies
 

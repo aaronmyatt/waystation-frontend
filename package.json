@@ -1,38 +1,40 @@
 {
-    "name": "waystation-fontend",
-    "version": "0.1.0",
-    "description": "Waystation Frontend",
-    "type": "module",
-    "dependencies": {
-        "highlight.js": "^11.8.0",
-        "marked": "^4.3.0",
-        "mithril": "^2.0.4",
-        "overtype": "^2.0.1"
-    },
-    "scripts": {
-        "dev": "rollup -c -w",
-        "serve": "npm-run-all --parallel dev serve:http",
-        "serve:http": "serve . -p 3000",
-        "build": "rollup -c && npm run copy:assets",
-        "build:prod": "NODE_ENV=production rollup -c && npm run copy:assets",
-        "copy:assets": "cp index.html dist/ && sed -i.bak 's|\"\\./dist/bundle\\.css\"|\"./bundle.css\"|g; s|\"dist/bundle\\.js\"|\"./bundle.js\"|g' dist/index.html && rm dist/index.html.bak && (cp favicon.ico icon.svg icon.png site.webmanifest dist/ 2>/dev/null || true)"
-    },
-    "devDependencies": {
-        "@types/mithril-global": "^2.2.4",
-        "@rollup/plugin-commonjs": "^28.0.1",
-        "@rollup/plugin-node-resolve": "^15.3.1",
-        "@rollup/plugin-typescript": "^12.1.2",
-        "@tailwindcss/postcss": "^4.1.17",
-        "autoprefixer": "^10.4.22",
-        "daisyui": "^5.5.11",
-        "npm-run-all": "^4.1.5",
-        "postcss": "^8.5.6",
-        "rollup": "^4.28.1",
-        "rollup-plugin-postcss": "^4.0.2",
-        "serve": "^14.2.4",
-        "tailwindcss": "^4.1.17",
-        "tslib": "^2.8.1",
-        "typescript": "^5.7.2",
-        "wright": "*"
-    }
+  "name": "waystation-fontend",
+  "version": "0.1.0",
+  "description": "Waystation Frontend",
+  "type": "module",
+  "dependencies": {
+    "highlight.js": "^11.8.0",
+    "marked": "^4.3.0",
+    "mithril": "^2.0.4",
+    "overtype": "^2.0.1"
+  },
+  "scripts": {
+    "dev": "rollup -c -w",
+    "serve": "npm-run-all --parallel dev serve:http",
+    "serve:http": "serve . -p 3000",
+    "build": "rollup -c && npm run copy:assets",
+    "build:prod": "NODE_ENV=production rollup -c && npm run copy:assets",
+    "copy:assets": "cp index.html dist/ && sed -i.bak 's|\"\\./dist/waystation-vscode\\.css\"|\"./waystation-vscode.css\"|g; s|\"dist/waystation-vscode\\.js\"|\"./waystation-vscode.js\"|g' dist/index.html && rm dist/index.html.bak && (cp favicon.ico icon.svg icon.png site.webmanifest dist/ 2>/dev/null || true)",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/mithril-global": "^2.2.4",
+    "autoprefixer": "^10.4.22",
+    "daisyui": "^5.5.11",
+    "husky": "^9.1.7",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.5.6",
+    "rollup": "^4.28.1",
+    "rollup-plugin-postcss": "^4.0.2",
+    "serve": "^14.2.4",
+    "tailwindcss": "^4.1.17",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2",
+    "wright": "*"
+  }
 }

@@ -8,14 +8,14 @@ const production = process.env.NODE_ENV === 'production';
 export default {
   input: 'src/vscode-extension/index.ts',
   output: {
-    file: 'dist/bundle.js',
+    file: 'dist/waystation-vscode.js',
     format: 'iife',
     name: 'WaystationApp',
     sourcemap: !production
   },
   plugins: [
     postcss({
-      extract: 'bundle.css',
+      extract: 'waystation-vscode.css',
       minimize: production,
       sourceMap: !production
     }),

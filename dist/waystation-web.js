@@ -71631,7 +71631,7 @@ ${blockSuffix}` : suffix;
 	        timeout = setTimeout(later, wait);
 	    };
 	}
-	const _events$1 = {
+	const _events$2 = {
 	    flow: {
 	        updated: 'ws::flow::updated',
 	    },
@@ -71643,8 +71643,8 @@ ${blockSuffix}` : suffix;
 	};
 
 	let skipRederaw = false;
-	const _events = {
-	    flow: _events$1.flow,
+	const _events$1 = {
+	    flow: _events$2.flow,
 	    action: {
 	        // flow actions
 	        export: "ws::action::export",
@@ -71676,7 +71676,7 @@ ${blockSuffix}` : suffix;
 	        return this._flow?.matches || [];
 	    }
 	    dispatchUpdated() {
-	        dispatch(_events.flow.updated, this._flow);
+	        dispatch(_events$1.flow.updated, this._flow);
 	    }
 	    updateFlow(flow) {
 	        this._flow.flow = flow;
@@ -71793,20 +71793,20 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	        return m("ul.flow-toolbar.flex flex-wrap gap-2", [
 	            m("button.btn btn-sm btn-outline", {
 	                onclick: () => {
-	                    dispatch(_events.action.export, { flow: { ...globalThis.flowService.flow } });
+	                    dispatch(_events$1.action.export, { flow: { ...globalThis.flowService.flow } });
 	                },
 	            }, "Export"),
 	            m(".dropdown dropdown-end", m(".btn btn-xs btn-ghost text-primary", { tabIndex: 0 }, m("span.block size-4 text-primary", m.trust(verticalDotsSvg))), m("ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 shadow-sm", { tabIndex: -1 }, m("li", m("a", {
 	                onclick: (e) => {
 	                    e.preventDefault();
 	                    e.stopPropagation();
-	                    dispatch(_events.action.generateFlowContent, { flow: { ...globalThis.flowService.flow } });
+	                    dispatch(_events$1.action.generateFlowContent, { flow: { ...globalThis.flowService.flow } });
 	                },
 	            }, "Generate Description")), m("li", m("a.text-error", {
 	                onclick: (e) => {
 	                    e.preventDefault();
 	                    e.stopPropagation();
-	                    dispatch(_events.action.deleteFlow, { flow: { ...globalThis.flowService.flow } });
+	                    dispatch(_events$1.action.deleteFlow, { flow: { ...globalThis.flowService.flow } });
 	                    m.route.set("/");
 	                },
 	            }, "Delete Flow")))),
@@ -71839,13 +71839,13 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	            }, vnode.attrs.editing ? "Save" : "Edit"),
 	            m(".dropdown dropdown-end", m(".btn btn-xs btn-ghost text-primary", { tabIndex: 0 }, m("span.block size-4 text-primary", m.trust(verticalDotsSvg))), m("ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 p-2 shadow-sm", { tabIndex: -1 }, m("li", m("a", {
 	                onclick: (e) => {
-	                    dispatch(_events.action.createChildFlow, {
+	                    dispatch(_events$1.action.createChildFlow, {
 	                        flowMatch: { ...vnode.attrs.match },
 	                    });
 	                },
 	            }, "Create Child Flow")), m("li", m("a", {
 	                onclick: (e) => {
-	                    dispatch(_events.action.generateFlowMatchContent, {
+	                    dispatch(_events$1.action.generateFlowMatchContent, {
 	                        flowMatch: vnode.attrs.match,
 	                    });
 	                },
@@ -71913,7 +71913,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	                    onclick: (e) => {
 	                        skipRederaw = true;
 	                        debounce((match) => {
-	                            dispatch(_events.action.clickFlowMatch, { flowMatch: { ...match } });
+	                            dispatch(_events$1.action.clickFlowMatch, { flowMatch: { ...match } });
 	                        }, 300)(vnode.attrs.match);
 	                    },
 	                }, m(".card-body", [
@@ -72004,7 +72004,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	            m('.modal-action', [
 	                m('button.btn btn-primary', {
 	                    onclick: () => {
-	                        dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.attrs.match } });
+	                        dispatch(_events$1.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.attrs.match } });
 	                        vnode.state.showDialog = false;
 	                    }
 	                }, 'Match from cursor'),
@@ -72315,7 +72315,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	                href: '/flow/' + flow.id,
 	                class: 'no-underline hover:no-underline block h-full',
 	                onclick: () => {
-	                    dispatch(_events$1.action.requestFlow, { flowId: flow.id });
+	                    dispatch(_events$2.action.requestFlow, { flowId: flow.id });
 	                }
 	            }, [
 	                m(FlowCard, {
@@ -72324,6 +72324,221 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	            ])));
 	        }))));
 	    }
+	};
+
+	const _events = {
+	    auth: {
+	        login: 'ws::auth::login',
+	        register: 'ws::auth::register',
+	    },
+	};
+	class AuthService {
+	    constructor() {
+	        this._state = {
+	            loading: false,
+	            error: '',
+	            success: '',
+	        };
+	    }
+	    get loading() {
+	        return this._state.loading;
+	    }
+	    get error() {
+	        return this._state.error;
+	    }
+	    get success() {
+	        return this._state.success;
+	    }
+	    setLoading(loading) {
+	        this._state.loading = loading;
+	        m.redraw();
+	    }
+	    setError(error) {
+	        this._state.error = error;
+	        this._state.success = '';
+	        m.redraw();
+	    }
+	    setSuccess(success) {
+	        this._state.success = success;
+	        this._state.error = '';
+	        m.redraw();
+	    }
+	    clearMessages() {
+	        this._state.error = '';
+	        this._state.success = '';
+	        m.redraw();
+	    }
+	    reset() {
+	        this._state = {
+	            loading: false,
+	            error: '',
+	            success: '',
+	        };
+	        m.redraw();
+	    }
+	}
+	globalThis.authService = new AuthService();
+	const Auth = {
+	    oninit(vnode) {
+	        vnode.state.mode = 'login'; // 'login' or 'register'
+	        vnode.state.email = '';
+	        vnode.state.password = '';
+	        vnode.state.passwordConfirm = '';
+	        vnode.state.validationError = '';
+	    },
+	    view(vnode) {
+	        const isLogin = vnode.state.mode === 'login';
+	        const validateForm = () => {
+	            vnode.state.validationError = '';
+	            if (!vnode.state.email) {
+	                vnode.state.validationError = 'Email is required';
+	                return false;
+	            }
+	            if (!vnode.state.email.includes('@')) {
+	                vnode.state.validationError = 'Please enter a valid email address';
+	                return false;
+	            }
+	            if (!vnode.state.password) {
+	                vnode.state.validationError = 'Password is required';
+	                return false;
+	            }
+	            if (!isLogin) {
+	                if (vnode.state.password.length < 8) {
+	                    vnode.state.validationError = 'Password must be at least 8 characters';
+	                    return false;
+	                }
+	                if (vnode.state.password !== vnode.state.passwordConfirm) {
+	                    vnode.state.validationError = 'Passwords do not match';
+	                    return false;
+	                }
+	            }
+	            return true;
+	        };
+	        const handleSubmit = (e) => {
+	            e.preventDefault();
+	            if (!validateForm()) {
+	                return;
+	            }
+	            globalThis.authService.clearMessages();
+	            const formData = {
+	                email: vnode.state.email,
+	                password: vnode.state.password,
+	            };
+	            if (isLogin) {
+	                dispatch(_events.auth.login, formData);
+	            }
+	            else {
+	                dispatch(_events.auth.register, formData);
+	            }
+	        };
+	        const resetForm = () => {
+	            vnode.state.email = '';
+	            vnode.state.password = '';
+	            vnode.state.passwordConfirm = '';
+	            vnode.state.validationError = '';
+	            globalThis.authService.reset();
+	        };
+	        const toggleMode = () => {
+	            resetForm();
+	            vnode.state.mode = isLogin ? 'register' : 'login';
+	        };
+	        return m('.auth-component.container mx-auto p-4 max-w-md', [
+	            m('.card bg-base-100 shadow-xl border border-base-300', [
+	                m('.card-body', [
+	                    // Title
+	                    m('h2.card-title text-2xl font-bold text-center justify-center mb-4', isLogin ? 'Sign In' : 'Create Account'),
+	                    // Error Alert
+	                    (vnode.state.validationError || globalThis.authService.error) &&
+	                        m('.alert alert-error mb-4', [
+	                            m('svg.stroke-current flex-shrink-0 h-6 w-6', { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24' }, m('path', {
+	                                'stroke-linecap': 'round',
+	                                'stroke-linejoin': 'round',
+	                                'stroke-width': '2',
+	                                d: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
+	                            })),
+	                            m('span', vnode.state.validationError || globalThis.authService.error),
+	                        ]),
+	                    // Success Alert
+	                    globalThis.authService.success &&
+	                        m('.alert alert-success mb-4', [
+	                            m('svg.stroke-current flex-shrink-0 h-6 w-6', { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24' }, m('path', {
+	                                'stroke-linecap': 'round',
+	                                'stroke-linejoin': 'round',
+	                                'stroke-width': '2',
+	                                d: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+	                            })),
+	                            m('span', globalThis.authService.success),
+	                        ]),
+	                    // Form
+	                    m('form', { onsubmit: handleSubmit }, [
+	                        // Email Field
+	                        m('.form-control mb-4', [
+	                            m('label.label', m('span.label-text', 'Email')),
+	                            m('input.input input-bordered', {
+	                                type: 'email',
+	                                placeholder: 'you@example.com',
+	                                value: vnode.state.email,
+	                                oninput: (e) => {
+	                                    vnode.state.email = e.target.value;
+	                                    vnode.state.validationError = '';
+	                                },
+	                                disabled: globalThis.authService.loading,
+	                                required: true,
+	                            }),
+	                        ]),
+	                        // Password Field
+	                        m('.form-control mb-4', [
+	                            m('label.label', m('span.label-text', 'Password')),
+	                            m('input.input input-bordered', {
+	                                type: 'password',
+	                                placeholder: isLogin ? 'Enter your password' : 'At least 8 characters',
+	                                value: vnode.state.password,
+	                                oninput: (e) => {
+	                                    vnode.state.password = e.target.value;
+	                                    vnode.state.validationError = '';
+	                                },
+	                                disabled: globalThis.authService.loading,
+	                                required: true,
+	                            }),
+	                        ]),
+	                        // Confirm Password Field (Register only)
+	                        !isLogin &&
+	                            m('.form-control mb-4', [
+	                                m('label.label', m('span.label-text', 'Confirm Password')),
+	                                m('input.input input-bordered', {
+	                                    type: 'password',
+	                                    placeholder: 'Re-enter your password',
+	                                    value: vnode.state.passwordConfirm,
+	                                    oninput: (e) => {
+	                                        vnode.state.passwordConfirm = e.target.value;
+	                                        vnode.state.validationError = '';
+	                                    },
+	                                    disabled: globalThis.authService.loading,
+	                                    required: true,
+	                                }),
+	                            ]),
+	                        // Submit Button
+	                        m('.form-control mt-6', [
+	                            m('button.btn btn-primary', {
+	                                type: 'submit',
+	                                disabled: globalThis.authService.loading,
+	                                class: globalThis.authService.loading ? 'loading' : '',
+	                            }, isLogin ? 'Sign In' : 'Create Account'),
+	                        ]),
+	                    ]),
+	                    // Divider
+	                    m('.divider', 'OR'),
+	                    // Toggle Mode Link
+	                    m('.text-center', [
+	                        m('span.text-sm', isLogin ? "Don't have an account? " : 'Already have an account? '),
+	                        m('a.link link-primary text-sm', {
+	                            onclick: toggleMode,
+	                        }, isLogin ? 'Sign Up' : 'Sign In'),
+	                    ]),
+	                ]),
+	            ]),
+	        ]);
+	    },
 	};
 
 	const Logo = m(m.route.Link, { href: "/" }, m(".text-xl md:text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors duration-200", m("span.bg-black text-white px-2 md:px-3 py-1 border-2 border-black shadow-lg transform hover:scale-105 transition-transform duration-200 font-mono tracking-wider text-sm md:text-base", "WAYSTATION")));
@@ -72362,6 +72577,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	                m(".navbar-end gap-2", [
 	                    m(m.route.Link, { href: "/flow/new", class: "btn btn-ghost" }, "New Flow"),
 	                    m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
+	                    m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
 	                    m(ThemePicker)
 	                ]),
 	            ]),
@@ -72385,7 +72601,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	    "/": {
 	        onmatch() {
 	            initData();
-	            dispatch(_events$1.action.refreshList, {});
+	            dispatch(_events$2.action.refreshList, {});
 	        },
 	        render(vnode) {
 	            return m(Layout, m(FlowList, vnode.attrs));
@@ -72395,7 +72611,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	        onmatch() {
 	            globalThis.flowService.reset();
 	            // Dispatch flow updated event to trigger backend save
-	            dispatch(_events$1.flow.updated, globalThis.flowService._flow);
+	            dispatch(_events$2.flow.updated, globalThis.flowService._flow);
 	            return new Promise((resolve, reject) => {
 	                // Check immediately for race condition (ID assigned before polling starts)
 	                if (globalThis.flowService.flow.id) {
@@ -72417,7 +72633,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	                }, 50);
 	                const timeout = setTimeout(() => {
 	                    clearInterval(interval);
-	                    dispatch(_events$1.action.actionError, {
+	                    dispatch(_events$2.action.actionError, {
 	                        message: 'Failed to create flow: No ID assigned within 5 seconds'
 	                    });
 	                    reject('Failed to create flow: No ID assigned within 5 seconds');
@@ -72430,7 +72646,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	    },
 	    "/flow/:id": {
 	        onmatch(args, _requestedPath, _route) {
-	            dispatch(_events$1.action.requestFlow, { flowId: args.id });
+	            dispatch(_events$2.action.requestFlow, { flowId: args.id });
 	            return new Promise((resolve, reject) => {
 	                // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
 	                // adhoc reactivity
@@ -72443,7 +72659,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	                }, 50);
 	                const timeout = setTimeout(() => {
 	                    clearInterval(interval);
-	                    dispatch(_events$1.action.actionError, {
+	                    dispatch(_events$2.action.actionError, {
 	                        message: `Failed to load flow ${args.id} within 5 seconds`
 	                    });
 	                    reject(`Failed to load flow ${args.id} within 5 seconds`);
@@ -72454,6 +72670,12 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 	            return m(Layout, m(Flow, vnode.attrs));
 	        },
 	    },
+	    "/auth": {
+	        render(vnode) {
+	            return m(Layout, m(Auth, vnode.attrs));
+	        },
+	    },
 	});
 
 })();
+//# sourceMappingURL=waystation-web.js.map

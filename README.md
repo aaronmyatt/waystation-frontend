@@ -2,6 +2,14 @@
 
 A multi-target frontend framework for Waystation, supporting web, VSCode extensions, and browser extensions.
 
+## 📚 Architecture Documentation
+
+For a deep understanding of the client-agnostic architecture:
+
+- **[ARCHITECTURE_QUICK_REFERENCE.md](./ARCHITECTURE_QUICK_REFERENCE.md)** - Quick visual overview and developer guide
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Comprehensive architecture documentation with detailed diagrams
+- **[ARCHITECTURE_ENHANCEMENTS.md](./ARCHITECTURE_ENHANCEMENTS.md)** - Proposed improvements and alternative patterns
+
 ## Project Structure
 
 ```

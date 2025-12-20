@@ -81,7 +81,8 @@ export const Auth: m.Component = {
         return false;
       }
       
-      if (!vnode.state.email.includes('@')) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(vnode.state.email)) {
         vnode.state.validationError = 'Please enter a valid email address';
         return false;
       }
@@ -106,7 +107,7 @@ export const Auth: m.Component = {
       return true;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: Event) => {
       e.preventDefault();
       
       if (!validateForm()) {

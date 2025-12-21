@@ -1,1 +1,1 @@
-{"version":3,"file":"ws-auth.d.ts","sourceRoot":"","sources":["../../src/shared/ws-auth.ts"],"names":[],"mappings":"AAAA,OAAO,CAAC,MAAM,SAAS,CAAA;AAgEvB,eAAO,MAAM,IAAI,EAAE,CAAC,CAAC,SAsMpB,CAAC"}
+{"version":3,"file":"ws-auth.d.ts","sourceRoot":"","sources":["../../src/shared/ws-auth.ts"],"names":[],"mappings":"AAAA,OAAO,CAAC,MAAM,SAAS,CAAA;AAgEvB,eAAO,MAAM,IAAI,EAAE,CAAC,CAAC,SAoNpB,CAAC"}

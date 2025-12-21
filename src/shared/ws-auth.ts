@@ -142,7 +142,7 @@ export const Auth: m.Component = {
     };
 
     return m('.auth-component.container mx-auto p-4 max-w-md', [
-      m('.card bg-base-100 shadow-xl border border-base-300', [
+      m('.card w-full bg-base-100 shadow-xl border border-base-300', [
         m('.card-body', [
           // Title
           m('h2.card-title text-2xl font-bold text-center justify-center mb-4',
@@ -186,53 +186,66 @@ export const Auth: m.Component = {
           // Form
           m('form', { onsubmit: handleSubmit }, [
             // Email Field
-            m('.form-control mb-4', [
-              m('label.label', m('span.label-text', 'Email')),
-              m('input.input input-bordered', {
-                type: 'email',
-                placeholder: 'you@example.com',
-                value: vnode.state.email,
-                oninput: (e) => {
-                  vnode.state.email = e.target.value;
-                  vnode.state.validationError = '';
-                },
-                disabled: globalThis.authService.loading,
-                required: true,
-              }),
-            ]),
-
-            // Password Field
-            m('.form-control mb-4', [
-              m('label.label', m('span.label-text', 'Password')),
-              m('input.input input-bordered', {
-                type: 'password',
-                placeholder: isLogin ? 'Enter your password' : 'At least 8 characters',
-                value: vnode.state.password,
-                oninput: (e) => {
-                  vnode.state.password = e.target.value;
-                  vnode.state.validationError = '';
-                },
-                disabled: globalThis.authService.loading,
-                required: true,
-              }),
-            ]),
-
-            // Confirm Password Field (Register only)
-            !isLogin &&
-              m('.form-control mb-4', [
-                m('label.label', m('span.label-text', 'Confirm Password')),
-                m('input.input input-bordered', {
-                  type: 'password',
-                  placeholder: 'Re-enter your password',
-                  value: vnode.state.passwordConfirm,
-                  oninput: (e) => {
-                    vnode.state.passwordConfirm = e.target.value;
+            m('.mb-4', [
+              m('label.input w-full', 
+                [
+                  m('input', {
+                      type: 'email',
+                      placeholder: 'you@example.com',
+                      value: vnode.state.email,
+                      oninput: (e) => {
+                    vnode.state.email = e.target.value;
                     vnode.state.validationError = '';
                   },
                   disabled: globalThis.authService.loading,
                   required: true,
                 }),
+                m('span.label', 'Email'),
               ]),
+            ]),
+
+
+
+            // Password Field
+            m('.mb-4', [
+              m('label.input w-full', 
+                [
+                  m('input', {
+                    type: 'password',
+                    placeholder: isLogin ? 'Enter your password' : 'At least 8 characters',
+                    value: vnode.state.password,
+                    oninput: (e) => {
+                      vnode.state.password = e.target.value;
+                      vnode.state.validationError = '';
+                    },
+                    disabled: globalThis.authService.loading,
+                    required: true,
+                  }),
+                  m('span.label', 'Password'),
+                ]),
+            ]),
+
+            // Confirm Password Field (Register only)
+            !isLogin &&
+              m('.mb-4', [
+                m('label.input w-full', 
+                  [
+                    
+                    m('input', {
+                      type: 'password',
+                      placeholder: 'Re-enter your password',
+                      value: vnode.state.passwordConfirm,
+                      oninput: (e) => {
+                        vnode.state.passwordConfirm = e.target.value;
+                        vnode.state.validationError = '';
+                      },
+                      disabled: globalThis.authService.loading,
+                      required: true,
+                    }),
+                    m('span.label', 'Confirm Password'),
+                  ]),
+              ]),
+
 
             // Submit Button
             m('.form-control mt-6', [
@@ -242,6 +255,7 @@ export const Auth: m.Component = {
                 class: globalThis.authService.loading ? 'loading' : '',
               }, isLogin ? 'Sign In' : 'Create Account'),
             ]),
+
           ]),
 
           // Divider

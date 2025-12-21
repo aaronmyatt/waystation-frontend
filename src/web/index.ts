@@ -103,6 +103,11 @@ m.route(document.body, "/", {
       return m(Layout, m(FlowList, vnode.attrs));
     },
   },
+  "/auth": {
+    render(vnode) {
+      return m(Layout, m(Auth, vnode.attrs));
+    },
+  },
   "/flow/new": {
     onmatch(): Promise<void> {
       globalThis.flowService.reset();
@@ -171,11 +176,6 @@ m.route(document.body, "/", {
     },
     render(vnode) {
       return m(Layout, m(Flow, vnode.attrs));
-    },
-  },
-  "/auth": {
-    render(vnode) {
-      return m(Layout, m(Auth, vnode.attrs));
     },
   },
 });

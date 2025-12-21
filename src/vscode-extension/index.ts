@@ -1,6 +1,7 @@
 import m from "mithril";
 import { Flow } from "../shared/ws-flow-page";
 import { FlowList } from "../shared/ws-flow-list-page";
+import { Auth } from "../shared/ws-auth";
 import { dispatch, _events } from "../shared/utils";
 
 const Logo = m(
@@ -60,6 +61,7 @@ const Layout = {
               "New Flow"
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
+            m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
             m(ThemePicker)
           ]),
         ]
@@ -90,6 +92,10 @@ const L = (child) => {
   };
 };
 
+// This repo primarily serves pre-bundled IIFE scripts (no module script tags).
+// Set the prefix explicitly so visiting /#!/auth works reliably.
+m.route.prefix = "#!";
+
 m.route(document.body, "/", {
   "/": {
     onmatch() {
@@ -98,6 +104,11 @@ m.route(document.body, "/", {
     },
     render(vnode: Vnode) {
       return m(Layout, m(FlowList, vnode.attrs));
+    },
+  },
+  "/auth": {
+    render(vnode) {
+      return m(Layout, m(Auth, vnode.attrs));
     },
   },
   "/flow/new": {

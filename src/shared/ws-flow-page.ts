@@ -2,7 +2,7 @@ import m from "mithril";
 import { MarkdownRenderer } from "./ws-marked";
 import { SyntaxHighlighter } from "./ws-hljs";
 import OverType from "overtype";
-import { upSvg, downSvg, verticalDotsSvg, plusSvg } from "./ws-svg";
+import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg } from "./ws-svg";
 import { dispatch, _events as utilEvents } from "./utils";
 
 let skipRederaw = false;
@@ -274,7 +274,7 @@ const FlowMatchToolbar = {
         ),
 
         m(
-          "button.btn btn-xs btn-outline",
+          "button.btn btn-xs btn-outline hidden sm:inline-flex",
           {
             onclick: (e) => {
               vnode.attrs.editCb && vnode.attrs.editCb(e);
@@ -283,56 +283,60 @@ const FlowMatchToolbar = {
           vnode.attrs.editing ? "Save" : "Edit"
         ),
         m(
-          ".dropdown dropdown-end",
+          "details.dropdown dropdown-end",
           m(
-            ".btn btn-xs btn-ghost text-primary",
-            { tabIndex: 0 },
+            "summary.btn btn-xs btn-ghost text-primary",
             m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
           ),
           m(
-            "ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 p-2 shadow-sm",
-            { tabIndex: -1 },
-            m(
-              "li",
-              m(
-                "a",
-                {
-                  onclick: (e) => {
-                    dispatch(_events.action.createChildFlow, {
-                      flowMatch: { ...vnode.attrs.match },
-                    });
+            "ul.menu dropdown-content bg-base-200 rounded-box w-52 p-2 shadow-sm",
+            [
+              m("li",
+                m("a",
+                  {
+                    class: "sm:hidden",
+                    onclick: (e) => {
+                      vnode.attrs.editCb && vnode.attrs.editCb(e);
+                    },
                   },
-                },
-                "Create Child Flow"
-              )
-            ),
-            m(
-              "li",
-              m(
-                "a",
-                {
-                  onclick: (e) => {
-                    dispatch(_events.action.generateFlowMatchContent, {
-                      flowMatch: vnode.attrs.match,
-                    });
+                  vnode.attrs.editing ? "Save" : "Edit"
+                )
+              ),
+              m("li",
+                m("a",
+                  {
+                    onclick: (e) => {
+                      dispatch(_events.action.createChildFlow, {
+                        flowMatch: { ...vnode.attrs.match },
+                      });
+                    },
                   },
-                },
-                "Generate Description"
-              )
-            ),
-            m(
-              "li",
-              m(
-                "a.text-error",
-                {
-                  onclick: (e) => {
-                    globalThis.flowService.deleteFlowMatch(vnode.attrs.match);
+                  "Create Child Flow"
+                )
+              ),
+              m("li",
+                m("a",
+                  {
+                    onclick: (e) => {
+                      dispatch(_events.action.generateFlowMatchContent, {
+                        flowMatch: vnode.attrs.match,
+                      });
+                    },
                   },
-                },
-                "Delete Match"
+                  "Generate Description"
+                )
+              ),
+              m("li",
+                m("a.text-error",
+                  {
+                    onclick: (e) => {
+                      globalThis.flowService.deleteFlowMatch(vnode.attrs.match);
+                    },
+                  },
+                  "Delete Match"
+                )
               )
-            )
-          )
+          ])
         ),
       ]
     );
@@ -385,6 +389,7 @@ function FlowMatch() {
   let editing = false;
   let title = "";
   let description = "";
+  let open = true;
   return {
     oninit(vnode) {
       title =
@@ -396,6 +401,23 @@ function FlowMatch() {
         vnode.attrs.match.note?.description ||
         vnode.attrs.match.step_content?.body ||
         "";
+
+      if( window.innerWidth < 680 ){
+        open = false;
+      }
+
+      // register resize listener to handle collapse state
+      window.addEventListener('resize', () => {
+        if( window.innerWidth < 680 ){
+          open = false;
+        } else {
+          open = true;
+        }
+        m.redraw();
+      });
+    },
+    onremove(){
+      window.removeEventListener('resize', () => {});
     },
     view(vnode) {
       return m.fragment([
@@ -411,7 +433,8 @@ function FlowMatch() {
               dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...vnode.attrs.match }  });
             },
           },
-          m(".card-body overflow-hidden", [
+          // NOTE: previous overflow-hidden, why?
+          m(".card-body", [
             // title & toolbar
             m(".flex justify-between items-baseline gap-4", [
               editing
@@ -437,6 +460,15 @@ function FlowMatch() {
                     },
                     title
                   ),
+              m(
+                "div.flex-shrink-0 sm:hidden",
+                { onclick: (e) => { 
+                    e.stopPropagation(); 
+                    open = !open;
+                  } 
+                },
+                [m("span.block size-4 text-primary", open ? m.trust(chevronUpSvg) : m.trust(chevronDownSvg))]
+              ),
               m(
                 ".toolbar-wrapper flex-shrink-0",
                 m(FlowMatchToolbar, {
@@ -470,13 +502,21 @@ function FlowMatch() {
                 })
               ),
             ]),
-            m(FlowMatchDescriptionEditor, {
-              description,
-              togglePreview: !editing,
-              onKeydown: (e) => { description = e.target.value; }
-            }),
-            vnode.attrs.match.content_kind === "match" &&
-              m(FlowMatchCodeBlock, { match: vnode.attrs.match }),
+            // Collapsible description on small screens
+            m(".collapse", 
+              {
+                class: open ? "collapse-open" : "collapse-close sm:collapse-open",
+              },
+              [
+                m(".collapse-content p-0", [
+                  m(FlowMatchDescriptionEditor, {
+                    description,
+                    togglePreview: !editing,
+                    onKeydown: (e) => { description = e.target.value; }
+                  }),
+                  vnode.attrs.match.content_kind === "match" && m(FlowMatchCodeBlock, { match: vnode.attrs.match }),
+                ])
+            ]),
           ])
         ),
         m(FlowMatchInsertBetween, { match: vnode.attrs.match, index: vnode.attrs.index }),

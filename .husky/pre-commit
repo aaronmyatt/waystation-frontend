@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Check if jsr.json and package.json versions match
 JSR_VERSION=$(grep '"version"' jsr.json | head -1 | sed 's/.*"version": "\(.*\)".*/\1/')
 PKG_VERSION=$(grep '"version"' package.json | head -1 | sed 's/.*"version": "\(.*\)".*/\1/')

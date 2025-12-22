@@ -16,10 +16,13 @@
     "serve:http": "serve . -p 3000",
     "serve:compare": "npm-run-all --parallel dev dev:web serve:http",
     "build": "rollup -c",
-    "build:web": "rollup -c rollup.web.config.js",
+    "build:web": "rollup -c rollup.config.js",
     "build:all": "npm-run-all build build:web",
     "build:all:prod": "NODE_ENV=production npm-run-all build build:web",
     "build:prod": "NODE_ENV=production rollup -c",
+    "bump:major": "node bump-version.js major",
+    "bump:minor": "node bump-version.js minor",
+    "bump:patch": "node bump-version.js patch",
     "prepare": "husky"
   },
   "devDependencies": {

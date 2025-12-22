@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'jsr.json'
+      - 'src/**'
+      - 'index.html'
+      - 'web.html'
+      - 'rollup*.js'
+      - 'tailwind.config.js'
+      - 'postcss.config.cjs'
   workflow_dispatch:
 
 permissions:

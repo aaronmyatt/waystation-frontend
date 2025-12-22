@@ -1,0 +1,74 @@
+name: Publish to JSR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'jsr.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      should_publish: ${{ steps.check.outputs.should_publish }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check version change
+        id: check
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(grep '"version"' jsr.json | head -1 | sed 's/.*"version": "\(.*\)".*/\1/')
+          echo "Current version: $CURRENT_VERSION"
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          # Get previous version (if commit exists)
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            PREV_VERSION=$(git show HEAD~1:jsr.json | grep '"version"' | head -1 | sed 's/.*"version": "\(.*\)".*/\1/' || echo "0.0.0")
+            echo "Previous version: $PREV_VERSION"
+            
+            if [ "$CURRENT_VERSION" != "$PREV_VERSION" ]; then
+              echo "Version changed from $PREV_VERSION to $CURRENT_VERSION"
+              echo "should_publish=true" >> $GITHUB_OUTPUT
+            else
+              echo "Version unchanged"
+              echo "should_publish=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            # First commit, always publish
+            echo "First commit, will publish"
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+          fi
+
+  publish:
+    needs: check-version
+    if: needs.check-version.outputs.should_publish == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundles
+        run: npm run build:all:prod
+
+      - name: Publish to JSR
+        run: npx jsr publish

@@ -4,3 +4,12 @@ node_modules
 .DS_Store
 .aider*
 dist/
+*.fuse_hidden*
+
+# Temporary build files
+dist/waystation-vscode-styles-temp.js
+dist/waystation-web-styles-temp.js
+
+# Generated TypeScript declarations (can be regenerated)
+dist/**/*.d.ts
+dist/**/*.d.ts.map

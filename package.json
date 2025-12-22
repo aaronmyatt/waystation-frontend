@@ -4,6 +4,7 @@
   "description": "Waystation Frontend",
   "type": "module",
   "dependencies": {
+    "axios": "^1.13.2",
     "highlight.js": "^11.8.0",
     "marked": "^4.3.0",
     "mithril": "^2.0.4",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-typescript": "^12.1.2",
     "@tailwindcss/postcss": "^4.1.17",

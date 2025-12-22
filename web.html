@@ -107,5 +107,119 @@
     </script>
 
     <script src="dist/waystation-web.js"></script>
+
+    <!-- Flow API event listeners - must run AFTER bundle loads -->
+    <script>
+      // Wait for API client to be available from bundle
+      window.addEventListener('load', function() {
+        // Flow List - Refresh/Fetch all flows
+        globalThis.addEventListener('ws::action::refreshList', async (event) => {
+        console.log('Refresh list event received');
+        try {
+          const response = await globalThis.api.flows.list();
+          const flows = response.data.rows;
+
+          // Update the flow list service
+          if (globalThis.flowListService) {
+            globalThis.flowListService.load(flows);
+          }
+          console.log(`Loaded ${flows.length} flows`);
+        } catch (error) {
+          console.error('Error fetching flows:', error);
+        }
+      });
+
+      // Fetch Single Flow
+      globalThis.addEventListener('ws::action::requestFlow', async (event) => {
+        console.log('Request flow event received:', event.detail.flowId);
+        const { flowId } = event.detail;
+
+        try {
+          const response = await globalThis.api.flows.get(flowId);
+          const flowData = response.data;
+
+          // Transform API response to match FlowService structure
+          const transformedData = {
+            flow: flowData,
+            matches: [] // TODO: Fetch matches separately or include in API response
+          };
+
+          // Update the flow service
+          if (globalThis.flowService) {
+            globalThis.flowService.load(transformedData);
+          }
+          console.log('Flow loaded:', flowId);
+        } catch (error) {
+          console.error('Error fetching flow:', error);
+        }
+      });
+
+      // Create/Update Flow
+      globalThis.addEventListener('ws::flow::updated', async (event) => {
+        console.log('Flow updated event received');
+        const flowData = event.detail;
+
+        // Extract flow fields (backend expects flat structure)
+        const flowFields = flowData.flow || {
+          id: flowData.id,
+          name: flowData.name,
+          description: flowData.description,
+          git_repo_root: flowData.git_repo_root,
+          git_commit_sha: flowData.git_commit_sha,
+          git_branch: flowData.git_branch,
+          parent_flow_id: flowData.parent_flow_id,
+          parent_flow_match_id: flowData.parent_flow_match_id,
+          archived: flowData.archived
+        };
+
+        try {
+          let response;
+          if (flowFields.id) {
+            // Update existing flow
+            response = await globalThis.api.flows.update(flowFields.id, flowFields);
+            console.log('Flow updated:', flowFields.id);
+          } else {
+            // Create new flow
+            response = await globalThis.api.flows.create(flowFields);
+            const createdFlow = response.data.rows?.[0];
+
+            // Update the flow service with the new ID
+            if (globalThis.flowService && createdFlow) {
+              // Transform to match FlowService structure
+              const transformedData = {
+                flow: createdFlow,
+                matches: []
+              };
+              globalThis.flowService.load(transformedData);
+            }
+            console.log('Flow created:', createdFlow?.id);
+          }
+        } catch (error) {
+          console.error('Error saving flow:', error);
+        }
+      });
+
+      // Delete Flow
+      globalThis.addEventListener('ws::action::deleteFlow', async (event) => {
+        console.log('Delete flow event received:', event.detail.flowId);
+        const { flowId } = event.detail;
+
+        try {
+          await globalThis.api.flows.delete(flowId);
+          console.log('Flow deleted:', flowId);
+
+          // Refresh the flow list
+          const response = await globalThis.api.flows.list();
+          if (globalThis.flowListService) {
+            globalThis.flowListService.load(response.data.rows);
+          }
+        } catch (error) {
+          console.error('Error deleting flow:', error);
+        }
+      });
+
+        console.log('Flow API event listeners ready');
+      });
+    </script>
   </body>
 </html>

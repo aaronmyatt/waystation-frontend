@@ -343,25 +343,79 @@ const FlowMatchToolbar = {
   },
 };
 
-function FlowMatchCodeBlock() {
-  let code = "";
+// Helper function to dedent code by removing common leading whitespace
+function dedentCode(code: string): string {
+  if (!code) return code;
+  
+  const lines = code.split('\n');
+  
+  // Find the minimum indentation (ignoring empty lines)
+  const minIndent = lines.reduce((min, line) => {
+    if (line.trim().length === 0) return min; // Skip empty lines
+    const match = line.match(/^(\s*)/);
+    const indent = match ? match[1].length : 0;
+    return min === null ? indent : Math.min(min, indent);
+  }, null as number | null);
+  
+  if (minIndent === null || minIndent === 0) return code;
+  
+  // Remove the minimum indentation from all lines
+  return lines.map(line => {
+    if (line.trim().length === 0) return line; // Preserve empty lines
+    return line.slice(minIndent);
+  }).join('\n');
+}
+
+// Base component that accepts language and code attributes
+function HighlightedCodeBlock() {
+  let highlightedCode = "";
   let language = "";
   return {
     oninit(vnode) {
-      const match = vnode.attrs.match.match;
-      const meta = JSON.parse(match.grep_meta);
-      const lines = meta.context_lines.join("\n");
-      language = globalThis.syntaxHighlighter.pathExtension(match.file_name);
-      code = globalThis.syntaxHighlighter.highlightCode(lines, language);
+      language = vnode.attrs.language || "";
+      const code = dedentCode(vnode.attrs.code || "");
+      highlightedCode = globalThis.syntaxHighlighter.highlightCode(code, language);
     },
     view() {
       return m(
         ".code.card bg-base-200 p-1",
         m(
           "pre.overflow-x-auto",
-          m("code", { class: `language-${language}` }, m.trust(code))
+          m("code", { class: `language-${language}` }, m.trust(highlightedCode))
         )
       );
+    },
+  };
+}
+
+function FlowMatchCodeBlock() {
+  return {
+    view(vnode) {
+      const match = vnode.attrs.match.match;
+      const meta = JSON.parse(match.grep_meta);
+      const lines = meta.context_lines
+        
+        .join("\n");
+      const language = globalThis.syntaxHighlighter.pathExtension(match.file_name);
+      
+      return m(HighlightedCodeBlock, {
+        code: lines,
+        language: language,
+      });
+    },
+  };
+}
+
+function FlowMatchCodeLine() {
+  return {
+    view(vnode) {
+      const match = vnode.attrs.match.match;
+      const language = globalThis.syntaxHighlighter.pathExtension(match.file_name);
+      
+      return m(HighlightedCodeBlock, {
+        code: (match.line || "").trimStart(),
+        language: language,
+      });
     },
   };
 }
@@ -423,7 +477,7 @@ function FlowMatch() {
       return m.fragment([
         m(
           // peer: allows the next sibling to style itself based on this element's hover state
-          ".match.card bg-base-100 shadow-md border border-base-300 peer",
+          ".match.card bg-base-100 shadow-md border border-base-300 peer mb-1 sm:mb-0",
           {
             class:
               "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
@@ -455,7 +509,6 @@ function FlowMatch() {
                 : m(
                     "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
                     { 
-                      class: title === "" ? "h-1" : "",
                       style: "overflow-wrap: anywhere; word-break: break-word;"
                     },
                     title
@@ -502,6 +555,11 @@ function FlowMatch() {
                 })
               ),
             ]),
+            // match.repo_relative_file_path
+            vnode.attrs.match.match?.repo_relative_file_path && m(".text-sm link link-primary mb-1", vnode.attrs.match.match.repo_relative_file_path),
+            (!open && vnode.attrs.match.match?.line) && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
+              FlowMatchCodeLine, { match: vnode.attrs.match }
+            )),
             // Collapsible description on small screens
             m(".collapse", 
               {
@@ -533,11 +591,11 @@ const FlowMatchInsertBetween = {
     const match = vnode.attrs.match;
     const index = vnode.attrs.index;
     return m(
-      ".flex justify-center",
+      ".flex justify-center ",
       {
         // group: allows children to respond to this wrapper's hover state
         // peer-hover:[&>button]:opacity-100: shows button when preceding peer (FlowMatch) is hovered
-        class: `group peer-hover:[&>button]:opacity-100 peer-hover:[&>button]:my-4`,
+        class: `hidden sm:block group peer-hover:[&>button]:opacity-100 peer-hover:[&>button]:my-4`,
       },
       m(
         // opacity-0: hidden by default

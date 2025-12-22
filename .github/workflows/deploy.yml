@@ -40,7 +40,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build:all:prod
+        run: npm run build4prod
 
       - name: Copy assets to dist
         run: |

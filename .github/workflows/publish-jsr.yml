@@ -68,7 +68,7 @@ jobs:
         run: npm ci
 
       - name: Build production bundles
-        run: npm run build:all:prod
+        run: npm run build4prod
 
       - name: Publish to JSR
         run: npx jsr publish

@@ -54,7 +54,7 @@ npm run build
 Build for production:
 
 ```bash
-npm run build:prod
+npm run build4prod
 ```
 
 ### Development Mode

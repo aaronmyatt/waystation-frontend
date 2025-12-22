@@ -61,7 +61,8 @@ const Layout = {
               "New Flow"
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
-            m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
+            // TODO: retain the link, but trigger a prompt/modal to guide the user to use the command palette instead
+            // m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
             m(ThemePicker)
           ]),
         ]
@@ -104,11 +105,6 @@ m.route(document.body, "/", {
     },
     render(vnode: Vnode) {
       return m(Layout, m(FlowList, vnode.attrs));
-    },
-  },
-  "/auth": {
-    render(vnode) {
-      return m(Layout, m(Auth, vnode.attrs));
     },
   },
   "/flow/new": {

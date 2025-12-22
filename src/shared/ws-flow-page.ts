@@ -3,7 +3,7 @@ import { MarkdownRenderer } from "./ws-marked";
 import { SyntaxHighlighter } from "./ws-hljs";
 import OverType from "overtype";
 import { upSvg, downSvg, verticalDotsSvg, plusSvg } from "./ws-svg";
-import { debounce, dispatch, _events as utilEvents } from "./utils";
+import { dispatch, _events as utilEvents } from "./utils";
 
 let skipRederaw = false;
 
@@ -408,35 +408,37 @@ function FlowMatch() {
             style: `--card-p: 1rem;`,
             onclick: (e) => {
               skipRederaw = true;
-              debounce((match) => {
-                dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...match }  });
-              }, 300)(vnode.attrs.match);
+              dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...vnode.attrs.match }  });
             },
           },
-          m(".card-body", [
+          m(".card-body overflow-hidden", [
             // title & toolbar
-            m(".flex justify-between", [
+            m(".flex justify-between items-baseline gap-4", [
               editing
                 ? m(
-                    "h2.text-lg flex-1 font-semibold text-secondary",
+                    "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
                     {
                       onclick: (e) => {
                         e.stopPropagation();
                       },
                     },
-                    m("input.input input-bordered", {
-                      value: title,
-                      placeholder: "##Title",
-                      oninput: (e) => { title = e.target.value;},
+                    m(TitleInput, {
+                      title: title,
+                      cb: (newTitle) => {
+                        title = newTitle;
+                      },
                     })
                   )
                 : m(
-                    "h2.text-lg flex-1 font-semibold text-secondary",
-                    { class: title === "" ? "h-1" : "" },
+                    "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
+                    { 
+                      class: title === "" ? "h-1" : "",
+                      style: "overflow-wrap: anywhere; word-break: break-word;"
+                    },
                     title
                   ),
               m(
-                ".toolbar-wrapper",
+                ".toolbar-wrapper flex-shrink-0",
                 m(FlowMatchToolbar, {
                   editing,
                   match: vnode.attrs.match,
@@ -772,6 +774,36 @@ function FlowMatchDescriptionEditor() {
   };
 }
 
+function TitleInput() {
+  let title = "";
+  return {
+    resize(vnode){
+      vnode.dom.style.height = "auto";
+      vnode.dom.style.height = vnode.dom.scrollHeight + "px";
+    },
+    oninit(vnode) {
+      title = vnode.attrs.title || "";
+    },
+    view(vnode){
+      return (
+        m("textarea.title w-full break-words", {
+          value: title,
+          name: "flow title",
+          style: "word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;",
+          oncreate: (vnode) => this.resize(vnode),
+          oninput: (e) => {
+            const name = e.target.value;
+            if (name === title) return;
+            title = name;
+            vnode.attrs.cb && vnode.attrs.cb(name);
+            this.resize(vnode);
+          },
+        })
+      )
+    }
+  };
+}
+
 export function Flow(): m.Component {
   return {
     oninit(vnode) {
@@ -793,22 +825,20 @@ export function Flow(): m.Component {
     view(vnode) {
       return m(".flow.container mx-auto p-4 max-w-5xl", [
         // title & toolbar
-        m(".flex justify-between items-baseline", [
+        m(".flex justify-between items-baseline gap-4", [
           m(
-            "h1.text-2xl flex-1 font-bold text-base-content",
-            m("input.title w-full", {
-              value: this.flow.name,
-              name: "flow title",
-              oninput: (e) => {
-                const name = e.target.value;
+            "h1.text-2xl font-bold text-base-content min-w-0 flex-grow break-words overflow-wrap",
+            m(TitleInput, {
+              title: vnode.state.flow.name,
+              cb: (newTitle) => {
                 globalThis.flowService.updateFlow({
-                  ...vnode.state.flow,
-                  name,
+                  ...globalThis.flowService.flow,
+                  name: newTitle,
                 });
               },
             })
           ),
-          m(".toolbar-wrapper", m(FlowToolbar)),
+          m(".toolbar-wrapper flex-shrink-0", m(FlowToolbar)),
         ]),
         m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
         m(FlowMatchList, {

@@ -1,6 +1,6 @@
 {
   "name": "waystation-fontend",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Waystation Frontend",
   "type": "module",
   "dependencies": {

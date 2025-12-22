@@ -1,6 +1,6 @@
 {
   "name": "@waystation/frontend",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "exports": {
     "./shared/utils": "./src/shared/utils.ts",
@@ -22,7 +22,8 @@
       "LICENSE"
     ],
     "exclude": [
-      "node_modules"
+      "node_modules",
+      "!dist"
     ]
   }
 }

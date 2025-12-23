@@ -1,3 +1,4 @@
+import { MarkdownRenderer } from './ws-marked'
 import m from 'mithril'
 import { _events as _sharedEvents, dispatch } from './utils'
 
@@ -20,16 +21,17 @@ class FlowListService {
   }
 }
 
+const marked = new MarkdownRenderer();
 globalThis.flowListService = new FlowListService();
 
 function FlowDescriptionMd(){
   return {
     oninit(vnode){
-        vnode.state.description = globalThis.marked.parse(vnode.attrs.description || '')
+        vnode.state.description = marked.parse(vnode.attrs.description || '')
     },
     onbeforeupdate(vnode){
       if(vnode.attrs.description !== vnode.state.description){
-        vnode.state.description = globalThis.marked.parse(vnode.attrs.description || '')
+        vnode.state.description = marked.parse(vnode.attrs.description || '')
       }
     },
     view(vnode){

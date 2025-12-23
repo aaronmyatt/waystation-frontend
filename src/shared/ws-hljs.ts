@@ -1,4 +1,5 @@
 import hljs from 'highlight.js';
+import m from 'mithril';
 
 interface SyntaxHighlighterConfig {
     autoDetect?: boolean;
@@ -30,7 +31,7 @@ interface HighlighterConfig {
  *   languages: ['javascript', 'python', 'html']
  * });
  */
-export class SyntaxHighlighter {
+class SyntaxHighlighter {
     private config: HighlighterConfig;
     private _initialized: boolean;
 
@@ -275,4 +276,84 @@ export class SyntaxHighlighter {
     
     return extension;
    }
+}
+
+const syntaxHighlighter = new SyntaxHighlighter({
+    autoDetect: true,
+    theme: 'vs',
+    languages: [],
+    hljsOptions: {}
+});
+
+// Helper function to dedent code by removing common leading whitespace
+function dedentCode(code: string): string {
+  if (!code) return code;
+  
+  const lines = code.split('\n');
+  
+  // Find the minimum indentation (ignoring empty lines)
+  const minIndent = lines.reduce((min, line) => {
+    if (line.trim().length === 0) return min; // Skip empty lines
+    const match = line.match(/^(\s*)/);
+    const indent = match ? match[1].length : 0;
+    return min === null ? indent : Math.min(min, indent);
+  }, null as number | null);
+  
+  if (minIndent === null || minIndent === 0) return code;
+  
+  // Remove the minimum indentation from all lines
+  return lines.map(line => {
+    if (line.trim().length === 0) return line; // Preserve empty lines
+    return line.slice(minIndent);
+  }).join('\n');
+}
+
+// Base component that accepts language and code attributes
+function HighlightedCodeBlock() {
+  let highlightedCode = "";
+  let language = "";
+  return {
+    oninit(vnode) {
+      language = syntaxHighlighter.pathExtension(vnode.attrs.path || "");
+      const code = dedentCode(vnode.attrs.code || "");
+      highlightedCode = syntaxHighlighter.highlightCode(code, language);
+    },
+    view() {
+      return m(
+        ".code.card bg-base-200 p-1",
+        m(
+          "pre.overflow-x-none",
+          m("code", { class: `language-${language}` }, m.trust(highlightedCode))
+        )
+      );
+    },
+  };
+}
+
+export function CodeBlock(): m.Component {
+  return {
+    view(vnode) {
+      const match = vnode.attrs.match.match;
+      const meta = JSON.parse(match.grep_meta);
+      const lines = meta.context_lines.join("\n");
+      
+      return m(HighlightedCodeBlock, {
+        code: lines,
+        path: match.file_name,
+      });
+    },
+  };
+}
+
+export function CodeLine(): m.Component {
+  return {
+    view(vnode) {
+      const match = vnode.attrs.match.match;
+      
+      return m(HighlightedCodeBlock, {
+        code: (match.line || "").trimStart(),
+        path: match.file_name,
+      });
+    },
+  };
 }

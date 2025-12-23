@@ -1,9 +1,8 @@
 import m from "mithril";
-import { MarkdownRenderer } from "./ws-marked";
-import { SyntaxHighlighter } from "./ws-hljs";
 import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg } from "./ws-svg";
 import { dispatch, _events as utilEvents } from "./utils";
 import { OvertypeBase } from "./ws-overtype";
+import { CodeBlock, CodeLine } from "./ws-hljs";
 
 let skipRederaw = false;
 
@@ -191,61 +190,67 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 }
 
 globalThis.flowService = new FlowService();
-globalThis.marked = new MarkdownRenderer();
-globalThis.syntaxHighlighter = new SyntaxHighlighter();
 const FlowToolbar = {
   view() {
-    return m("ul.flow-toolbar.flex flex-wrap gap-2", [
+    return m("ul.flow-toolbar flex flex-wrap gap-2", [
       m(
-        "button.btn btn-sm btn-outline",
+        "button.btn btn-sm btn-outline hidden sm:inline-flex",
         {
-          onclick: () => {
-            dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }});
-          },
+          onclick: () => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
         },
         "Export"
       ),
       m(
         ".dropdown dropdown-end",
         m(
-          ".btn btn-xs btn-ghost text-primary",
+          ".btn sm:btn-sm btn-ghost text-primary",
           { tabIndex: 0 },
           m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
         ),
         m(
           "ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 shadow-sm",
           { tabIndex: -1 },
-          m("li",
-            m("a",
-              {
-                onclick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  dispatch(
-                    _events.action.generateFlowContent,
-                    {flow: { ...globalThis.flowService.flow }}
-                  );
+          [
+            m("li",
+              m("a",
+                {
+                  onclick: (e) => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
                 },
-              },
-              "Generate Description"
-            )
-          ),
-          m("li",
-            m("a.text-error",
-              {
-                onclick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  dispatch(
-                    _events.action.deleteFlow,
-                    {flow: { ...globalThis.flowService.flow }}
-                  );
-                  m.route.set("/");
+                "Export"
+              )
+            ),
+            m("li",
+              m("a",
+                {
+                  onclick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dispatch(
+                      _events.action.generateFlowContent,
+                      {flow: { ...globalThis.flowService.flow }}
+                    );
+                  },
                 },
-              },
-              "Delete Flow"
+                "Generate Description"
+              )
+            ),
+            m("li",
+              m("a.text-error",
+                {
+                  onclick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dispatch(
+                      _events.action.deleteFlow,
+                      {flow: { ...globalThis.flowService.flow }}
+                    );
+                    m.route.set("/");
+                  },
+                },
+                "Delete Flow"
+              )
             )
-          )
+          ]
         ),
         
       ),
@@ -256,7 +261,7 @@ const FlowToolbar = {
 const FlowMatchToolbar = {
   view(vnode) {
     return m(
-      "ul.match-toolbar.flex flex-wrap gap-2",
+      "ul.match-toolbar.flex flex-wrap gap-1 sm:gap-2",
       {
         onclick: (e) => {
           e.stopPropagation();
@@ -367,83 +372,6 @@ const FlowMatchToolbar = {
   },
 };
 
-// Helper function to dedent code by removing common leading whitespace
-function dedentCode(code: string): string {
-  if (!code) return code;
-  
-  const lines = code.split('\n');
-  
-  // Find the minimum indentation (ignoring empty lines)
-  const minIndent = lines.reduce((min, line) => {
-    if (line.trim().length === 0) return min; // Skip empty lines
-    const match = line.match(/^(\s*)/);
-    const indent = match ? match[1].length : 0;
-    return min === null ? indent : Math.min(min, indent);
-  }, null as number | null);
-  
-  if (minIndent === null || minIndent === 0) return code;
-  
-  // Remove the minimum indentation from all lines
-  return lines.map(line => {
-    if (line.trim().length === 0) return line; // Preserve empty lines
-    return line.slice(minIndent);
-  }).join('\n');
-}
-
-// Base component that accepts language and code attributes
-function HighlightedCodeBlock() {
-  let highlightedCode = "";
-  let language = "";
-  return {
-    oninit(vnode) {
-      language = vnode.attrs.language || "";
-      const code = dedentCode(vnode.attrs.code || "");
-      highlightedCode = globalThis.syntaxHighlighter.highlightCode(code, language);
-    },
-    view() {
-      return m(
-        ".code.card bg-base-200 p-1",
-        m(
-          "pre.overflow-x-auto",
-          m("code", { class: `language-${language}` }, m.trust(highlightedCode))
-        )
-      );
-    },
-  };
-}
-
-function FlowMatchCodeBlock() {
-  return {
-    view(vnode) {
-      const match = vnode.attrs.match.match;
-      const meta = JSON.parse(match.grep_meta);
-      const lines = meta.context_lines
-        
-        .join("\n");
-      const language = globalThis.syntaxHighlighter.pathExtension(match.file_name);
-      
-      return m(HighlightedCodeBlock, {
-        code: lines,
-        language: language,
-      });
-    },
-  };
-}
-
-function FlowMatchCodeLine() {
-  return {
-    view(vnode) {
-      const match = vnode.attrs.match.match;
-      const language = globalThis.syntaxHighlighter.pathExtension(match.file_name);
-      
-      return m(HighlightedCodeBlock, {
-        code: (match.line || "").trimStart(),
-        language: language,
-      });
-    },
-  };
-}
-
 function FlowMatchList() {
   return {
     view(vnode) {
@@ -501,20 +429,19 @@ function FlowMatch() {
       return m.fragment([
         m(
           // peer: allows the next sibling to style itself based on this element's hover state
-          ".match.card bg-base-100 shadow-md border border-base-300 peer mb-1 sm:mb-0",
+          ".match card card-xs sm:card-md p-1 bg-base-100 shadow-md border border-base-300 peer mb-2 sm:mb-0",
           {
             class:
               "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
-            style: `--card-p: 1rem;`,
             onclick: (e) => {
               skipRederaw = true;
               dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...vnode.attrs.match }  });
             },
           },
           // NOTE: previous overflow-hidden, why?
-          m(".card-body", [
+          m(".card-body gap-0 space-y-2 sm:gap-2", [
             // title & toolbar
-            m(".flex justify-between items-baseline gap-4", [
+            m(".flex justify-between items-baseline gap-1 sm:gap-4", [
               editing
                 ? m(
                     "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
@@ -538,7 +465,7 @@ function FlowMatch() {
                     title
                   ),
               m(
-                "div.flex-shrink-0 sm:hidden",
+                ".btn btn-xs btn-circle flex-shrink-0 sm:hidden",
                 { onclick: (e) => { 
                     e.stopPropagation(); 
                     open = !open;
@@ -581,9 +508,16 @@ function FlowMatch() {
               ),
             ]),
             // match.repo_relative_file_path
-            vnode.attrs.match.match?.repo_relative_file_path && m(".text-sm link link-primary mb-1", vnode.attrs.match.match.repo_relative_file_path),
-            (!open && vnode.attrs.match.match?.line) && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
-              FlowMatchCodeLine, { match: vnode.attrs.match }
+            vnode.attrs.match.match?.repo_relative_file_path 
+              && m(".text-sm link link-primary mb-1", [
+                m('span', vnode.attrs.match.match.repo_relative_file_path),
+                m('span', {
+                  class: "text-base-content/70"
+                }, ' +'+vnode.attrs.match.match.line_no),
+              ]),
+            (!open && vnode.attrs.match.match?.line) 
+              && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
+              CodeLine, { match: vnode.attrs.match }
             )),
             // Collapsible description on small screens
             m(".collapse", 
@@ -597,7 +531,7 @@ function FlowMatch() {
                     togglePreview: !editing,
                     onKeydown: (e) => { description = e.target.value; }
                   }),
-                  vnode.attrs.match.content_kind === "match" && m(FlowMatchCodeBlock, { match: vnode.attrs.match }),
+                  vnode.attrs.match.content_kind === "match" && m(CodeBlock, { match: vnode.attrs.match }),
                 ])
             ]),
           ])
@@ -788,9 +722,9 @@ export function Flow(): m.Component {
       globalThis.flowService.clear();
     },
     view(vnode) {
-      return m(".flow.container mx-auto p-4 max-w-5xl", [
+      return m(".flow container mx-auto p-2 sm:p-4 max-w-5xl", [
         // title & toolbar
-        m(".flex justify-between items-baseline gap-4", [
+        m(".flex justify-between gap-4", [
           m(
             "h1.text-2xl font-bold text-base-content min-w-0 flex-grow break-words overflow-wrap",
             m(TitleInput, {
@@ -803,7 +737,9 @@ export function Flow(): m.Component {
               },
             })
           ),
-          m(".toolbar-wrapper flex-shrink-0", m(FlowToolbar)),
+          m(".toolbar-wrapper flex-shrink-0", {
+            class: '!z-[101]'
+          }, m(FlowToolbar)),
         ]),
         m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
         m(FlowMatchList, {

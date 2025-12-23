@@ -11,23 +11,26 @@ waystation-frontend/
 │   │   ├── utils.ts
 │   │   ├── ws-flow-page.ts
 │   │   ├── ws-flow-list-page.ts
-│   │   ├── ws-marked.ts
-│   │   ├── ws-hljs.ts
-│   │   ├── ws-svg.ts
-│   │   └── global.d.ts
-│   └── vscode-extension/ # VSCode extension specific code
+│   │   ├── ...
+│   ├── vscode-extension/ # VSCode extension specific code
+│   |   ├── index.ts
+│   |   └── style.css
+│   ├── web/ # Web application specific code
+│   |   ├── index.ts
+│   |   └── style.css
+│   └── chrome-extension/ # Chrome browser extension specific code (soon!)
 │       ├── index.ts
 │       └── style.css
-├── jsr.json             # JSR package configuration
-└── rollup.config.js     # Build configuration
+├── jsr.json                   # JSR package configuration
+└── rollup.(web.)config.js     # Build configuration(s)
 ```
 
 ## Build Targets
 
 This repository supports multiple build targets:
 
-- **VSCode Extension** - Currently implemented in `src/vscode-extension/`
-- **Web Application** - (Coming soon)
+- **VSCode Extension** - in `src/vscode-extension/`
+- **Web Application** - in `src/web/`
 - **Chrome Browser Extension** - (Coming soon)
 
 ## Development
@@ -69,30 +72,26 @@ Serve with HTTP server:
 
 ```bash
 npm run serve
+npm run compare (serves both web and vscode builds for comparison)
 ```
 
 ## JSR Package Distribution
 
 Both the shared code in `src/shared/` and the VSCode extension bundle in `src/vscode-extension/` are published to [JSR (JavaScript Registry)](https://jsr.io/) for use by other projects.
 
-### Publishing to JSR
+### Manually publishing to JSR
+Typically publishing is done via CI/CD, but to manually publish:
 
-1. **Install JSR CLI** (if not already installed):
-
-```bash
-npm install -g jsr
-```
-
-2. **Build the package**:
+1. **Build the package**:
 
 ```bash
-npm run build
+npm run build4prod
 ```
 
 3. **Publish to JSR**:
 
 ```bash
-jsr publish
+npx jsr publish
 ```
 
 This will publish the `@waystation/frontend` package to JSR based on the configuration in `jsr.json`.
@@ -176,6 +175,7 @@ The following modules are exported from `@waystation/frontend`:
 - `shared/ws-marked` - Markdown renderer wrapper
 - `shared/ws-hljs` - Syntax highlighter wrapper
 - `shared/ws-svg` - SVG icon definitions
+- `shared/ws-overtype` - Overtype rich text editor wrapper and components
 
 #### VSCode Extension Bundle
 - `vscode-extension` - Complete VSCode extension frontend (includes routing, layout, and all UI components)
@@ -186,6 +186,11 @@ These files are included in the published package and can be referenced by neste
 
 - `dist/waystation-vscode.js`
 - `dist/waystation-vscode.js.map` (if present)
+- `dist/waystation-vscode.css`
+
+- `dist/waystation-web.js`
+- `dist/waystation-web.js.map` (if present)
+- `dist/waystation-web.css`
 
 ## Dependencies
 
@@ -201,18 +206,3 @@ Make sure these are installed in projects using `@waystation/frontend`.
 ## License
 
 See LICENSE file for details.
-
-## VSCode Settings
-Configure VSCode to ignore the `dist/` directory by adding the following to your `.vscode/settings.json`:
-
-```json
-  "files.exclude": {
-    "**/dist/**": true
-  },
-  "search.exclude": {
-    "**/dist/**": true
-  },
-  "files.watcherExclude": {
-    "**/dist/**": true
-  }
-```

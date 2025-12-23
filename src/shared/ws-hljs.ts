@@ -322,7 +322,7 @@ function HighlightedCodeBlock() {
       return m(
         ".code.card bg-base-200 p-1",
         m(
-          "pre.overflow-x-auto",
+          "pre.overflow-x-none",
           m("code", { class: `language-${language}` }, m.trust(highlightedCode))
         )
       );

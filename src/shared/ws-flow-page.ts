@@ -192,57 +192,65 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 globalThis.flowService = new FlowService();
 const FlowToolbar = {
   view() {
-    return m("ul.flow-toolbar.flex flex-wrap gap-2", [
+    return m("ul.flow-toolbar flex flex-wrap gap-2", [
       m(
-        "button.btn btn-sm btn-outline",
+        "button.btn btn-sm btn-outline hidden sm:inline-flex",
         {
-          onclick: () => {
-            dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }});
-          },
+          onclick: () => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
         },
         "Export"
       ),
       m(
         ".dropdown dropdown-end",
         m(
-          ".btn btn-xs btn-ghost text-primary",
+          ".btn sm:btn-sm btn-ghost text-primary",
           { tabIndex: 0 },
           m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
         ),
         m(
           "ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 shadow-sm",
           { tabIndex: -1 },
-          m("li",
-            m("a",
-              {
-                onclick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  dispatch(
-                    _events.action.generateFlowContent,
-                    {flow: { ...globalThis.flowService.flow }}
-                  );
+          [
+            m("li",
+              m("a",
+                {
+                  onclick: (e) => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
                 },
-              },
-              "Generate Description"
-            )
-          ),
-          m("li",
-            m("a.text-error",
-              {
-                onclick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  dispatch(
-                    _events.action.deleteFlow,
-                    {flow: { ...globalThis.flowService.flow }}
-                  );
-                  m.route.set("/");
+                "Export"
+              )
+            ),
+            m("li",
+              m("a",
+                {
+                  onclick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dispatch(
+                      _events.action.generateFlowContent,
+                      {flow: { ...globalThis.flowService.flow }}
+                    );
+                  },
                 },
-              },
-              "Delete Flow"
+                "Generate Description"
+              )
+            ),
+            m("li",
+              m("a.text-error",
+                {
+                  onclick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dispatch(
+                      _events.action.deleteFlow,
+                      {flow: { ...globalThis.flowService.flow }}
+                    );
+                    m.route.set("/");
+                  },
+                },
+                "Delete Flow"
+              )
             )
-          )
+          ]
         ),
         
       ),
@@ -253,7 +261,7 @@ const FlowToolbar = {
 const FlowMatchToolbar = {
   view(vnode) {
     return m(
-      "ul.match-toolbar.flex flex-wrap gap-2",
+      "ul.match-toolbar.flex flex-wrap gap-1 sm:gap-2",
       {
         onclick: (e) => {
           e.stopPropagation();
@@ -421,20 +429,19 @@ function FlowMatch() {
       return m.fragment([
         m(
           // peer: allows the next sibling to style itself based on this element's hover state
-          ".match.card bg-base-100 shadow-md border border-base-300 peer mb-1 sm:mb-0",
+          ".match card card-xs sm:card-md p-1 bg-base-100 shadow-md border border-base-300 peer mb-2 sm:mb-0",
           {
             class:
               "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
-            style: `--card-p: 1rem;`,
             onclick: (e) => {
               skipRederaw = true;
               dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...vnode.attrs.match }  });
             },
           },
           // NOTE: previous overflow-hidden, why?
-          m(".card-body", [
+          m(".card-body gap-0 space-y-2 sm:gap-2", [
             // title & toolbar
-            m(".flex justify-between items-baseline gap-4", [
+            m(".flex justify-between items-baseline gap-1 sm:gap-4", [
               editing
                 ? m(
                     "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
@@ -458,7 +465,7 @@ function FlowMatch() {
                     title
                   ),
               m(
-                "div.flex-shrink-0 sm:hidden",
+                ".btn btn-xs btn-circle flex-shrink-0 sm:hidden",
                 { onclick: (e) => { 
                     e.stopPropagation(); 
                     open = !open;
@@ -715,7 +722,7 @@ export function Flow(): m.Component {
       globalThis.flowService.clear();
     },
     view(vnode) {
-      return m(".flow.container mx-auto p-4 max-w-5xl", [
+      return m(".flow container mx-auto p-2 sm:p-4 max-w-5xl", [
         // title & toolbar
         m(".flex justify-between gap-4", [
           m(
@@ -730,7 +737,9 @@ export function Flow(): m.Component {
               },
             })
           ),
-          m(".toolbar-wrapper flex-shrink-0", m(FlowToolbar)),
+          m(".toolbar-wrapper flex-shrink-0", {
+            class: '!z-[101]'
+          }, m(FlowToolbar)),
         ]),
         m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
         m(FlowMatchList, {

@@ -501,8 +501,15 @@ function FlowMatch() {
               ),
             ]),
             // match.repo_relative_file_path
-            vnode.attrs.match.match?.repo_relative_file_path && m(".text-sm link link-primary mb-1", vnode.attrs.match.match.repo_relative_file_path),
-            (!open && vnode.attrs.match.match?.line) && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
+            vnode.attrs.match.match?.repo_relative_file_path 
+              && m(".text-sm link link-primary mb-1", [
+                m('span', vnode.attrs.match.match.repo_relative_file_path),
+                m('span', {
+                  class: "text-base-content/70"
+                }, ' +'+vnode.attrs.match.match.line_no),
+              ]),
+            (!open && vnode.attrs.match.match?.line) 
+              && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
               CodeLine, { match: vnode.attrs.match }
             )),
             // Collapsible description on small screens

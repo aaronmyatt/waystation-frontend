@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
+  <title>Redirecting to Waystation Web...</title>
   <meta name="description" content="">
+  <meta http-equiv="refresh" content="0; url=/web">
 
   <meta property="og:title" content="">
   <meta property="og:type" content="">
@@ -17,15 +18,20 @@
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.png">
 
-  <link rel="manifest" href="site.webmanifest">
-  <meta name="theme-color" content="#fafafa">
-  <link href="./dist/waystation-vscode.css" rel="stylesheet">
+  <script>
+    // Fallback redirect if meta refresh doesn't work
+    window.location.href = '/web';
+  </script>
 </head>
 
 <body>
+  <p>Redirecting to Waystation Web...</p>
+  <p>If you are not redirected, <a href="/web">click here</a>.</p>
+
+  <!-- VSCode extension version is at /vscode (if needed) -->
 
 <script>
-// Define mock data globally before loading the app
+// Keep original mock data for backward compatibility
 window.__INITIAL_DATA__ = {
   flows: [
   {

@@ -16,6 +16,7 @@ declare global {
   var authService: any;
   var marked: any;
   var syntaxHighlighter: any;
+  var api: any;
 }
 
 export {};

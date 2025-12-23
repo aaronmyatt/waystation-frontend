@@ -3,6 +3,10 @@ import { Flow } from "../shared/ws-flow-page";
 import { FlowList } from "../shared/ws-flow-list-page";
 import { Auth } from "../shared/ws-auth";
 import { dispatch, _events } from "../shared/utils";
+import { api } from "../shared/api-client";
+
+// Make API client available globally
+globalThis.api = api;
 
 const Logo = m(
   m.route.Link,

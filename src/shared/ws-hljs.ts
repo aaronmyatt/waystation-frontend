@@ -330,7 +330,7 @@ function HighlightedCodeBlock() {
   };
 }
 
-export function CodeBlock() {
+export function CodeBlock(): m.Component {
   return {
     view(vnode) {
       const match = vnode.attrs.match.match;
@@ -345,7 +345,7 @@ export function CodeBlock() {
   };
 }
 
-export function CodeLine() {
+export function CodeLine(): m.Component {
   return {
     view(vnode) {
       const match = vnode.attrs.match.match;

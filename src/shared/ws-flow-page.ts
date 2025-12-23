@@ -1,9 +1,8 @@
 import m from "mithril";
-import { MarkdownRenderer } from "./ws-marked";
-import { SyntaxHighlighter } from "./ws-hljs";
 import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg } from "./ws-svg";
 import { dispatch, _events as utilEvents } from "./utils";
 import { OvertypeBase } from "./ws-overtype";
+import { CodeBlock, CodeLine } from "./ws-hljs";
 
 let skipRederaw = false;
 
@@ -191,8 +190,6 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 }
 
 globalThis.flowService = new FlowService();
-globalThis.marked = new MarkdownRenderer();
-globalThis.syntaxHighlighter = new SyntaxHighlighter();
 const FlowToolbar = {
   view() {
     return m("ul.flow-toolbar.flex flex-wrap gap-2", [
@@ -367,83 +364,6 @@ const FlowMatchToolbar = {
   },
 };
 
-// Helper function to dedent code by removing common leading whitespace
-function dedentCode(code: string): string {
-  if (!code) return code;
-  
-  const lines = code.split('\n');
-  
-  // Find the minimum indentation (ignoring empty lines)
-  const minIndent = lines.reduce((min, line) => {
-    if (line.trim().length === 0) return min; // Skip empty lines
-    const match = line.match(/^(\s*)/);
-    const indent = match ? match[1].length : 0;
-    return min === null ? indent : Math.min(min, indent);
-  }, null as number | null);
-  
-  if (minIndent === null || minIndent === 0) return code;
-  
-  // Remove the minimum indentation from all lines
-  return lines.map(line => {
-    if (line.trim().length === 0) return line; // Preserve empty lines
-    return line.slice(minIndent);
-  }).join('\n');
-}
-
-// Base component that accepts language and code attributes
-function HighlightedCodeBlock() {
-  let highlightedCode = "";
-  let language = "";
-  return {
-    oninit(vnode) {
-      language = vnode.attrs.language || "";
-      const code = dedentCode(vnode.attrs.code || "");
-      highlightedCode = globalThis.syntaxHighlighter.highlightCode(code, language);
-    },
-    view() {
-      return m(
-        ".code.card bg-base-200 p-1",
-        m(
-          "pre.overflow-x-auto",
-          m("code", { class: `language-${language}` }, m.trust(highlightedCode))
-        )
-      );
-    },
-  };
-}
-
-function FlowMatchCodeBlock() {
-  return {
-    view(vnode) {
-      const match = vnode.attrs.match.match;
-      const meta = JSON.parse(match.grep_meta);
-      const lines = meta.context_lines
-        
-        .join("\n");
-      const language = globalThis.syntaxHighlighter.pathExtension(match.file_name);
-      
-      return m(HighlightedCodeBlock, {
-        code: lines,
-        language: language,
-      });
-    },
-  };
-}
-
-function FlowMatchCodeLine() {
-  return {
-    view(vnode) {
-      const match = vnode.attrs.match.match;
-      const language = globalThis.syntaxHighlighter.pathExtension(match.file_name);
-      
-      return m(HighlightedCodeBlock, {
-        code: (match.line || "").trimStart(),
-        language: language,
-      });
-    },
-  };
-}
-
 function FlowMatchList() {
   return {
     view(vnode) {
@@ -583,7 +503,7 @@ function FlowMatch() {
             // match.repo_relative_file_path
             vnode.attrs.match.match?.repo_relative_file_path && m(".text-sm link link-primary mb-1", vnode.attrs.match.match.repo_relative_file_path),
             (!open && vnode.attrs.match.match?.line) && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
-              FlowMatchCodeLine, { match: vnode.attrs.match }
+              CodeLine, { match: vnode.attrs.match }
             )),
             // Collapsible description on small screens
             m(".collapse", 
@@ -597,7 +517,7 @@ function FlowMatch() {
                     togglePreview: !editing,
                     onKeydown: (e) => { description = e.target.value; }
                   }),
-                  vnode.attrs.match.content_kind === "match" && m(FlowMatchCodeBlock, { match: vnode.attrs.match }),
+                  vnode.attrs.match.content_kind === "match" && m(CodeBlock, { match: vnode.attrs.match }),
                 ])
             ]),
           ])

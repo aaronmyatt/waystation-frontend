@@ -25,6 +25,10 @@ const _events = {
     // dispatch match click events for the extension to handle
     clickFlowMatch: "ws::click::flowMatch",
   },
+  dialog: {
+    openInsertBetween: "ws::dialog::openInsertBetween",
+    closeInsertBetween: "ws::dialog::closeInsertBetween",
+  },
 };
 
 class FlowService {
@@ -35,7 +39,7 @@ class FlowService {
       content_kind: string;
       note?: { name: string; description: string };
       step_content?: { title: string; body: string };
-      match: {
+      match?: {
         file_name: string;
         grep_meta: string;
       };
@@ -116,10 +120,17 @@ class FlowService {
     }
   }
 
-  addNoteStep(match, index) {
+  addNoteStep(index: number) {
+    const match = {
+      flow_match_id: crypto.randomUUID(),
+      content_kind: 'note',
+      step_content: { title: 'New Note', body: '' },
+      match_id: undefined,
+      order_index: index + 1,
+    };
     const insertIndex = index + 1;
     this._flow.matches.splice(insertIndex, 0, match);
-    
+
     // Update order indexes for all matches after the insertion point
     for (let i = insertIndex + 1; i < this._flow.matches.length; i++) {
       const currentMatch = this._flow.matches[i];
@@ -301,6 +312,19 @@ const FlowMatchToolbar = {
                   },
                   vnode.attrs.editing ? "Save" : "Edit"
                 )
+              ),
+              m("li",
+                [m("a",
+                  {
+                    onclick: () => {
+                      dispatch(_events.dialog.openInsertBetween, {
+                        ...vnode.attrs
+                      })
+                    },
+                  },
+                  "Insert After"
+                ),
+              ]
               ),
               m("li",
                 m("a",
@@ -527,6 +551,7 @@ function FlowMatch() {
                 m(FlowMatchToolbar, {
                   editing,
                   match: vnode.attrs.match,
+                  index: vnode.attrs.index,
                   editCb: (e) => {
                     if( editing ){
                       editing = false;
@@ -583,13 +608,65 @@ function FlowMatch() {
   };
 }
 
-const FlowMatchInsertBetween = {
-  oninit(vnode){
-    vnode.state.showDialog = false;
+const InsertBetweenDialog = {
+  el: null,
+  close() {
+    this.el && this.el.close();
+  },
+  open() {
+    this.el && this.el.showModal();
+  },
+  oninit(vnode) {
+    addEventListener(_events.dialog.closeInsertBetween, () => this.close());
+    addEventListener(_events.dialog.openInsertBetween, (e) => {
+      Object.assign(vnode.state || {}, e.detail);
+      this.open() 
+    }
+  );
+  },
+  oncreate(vnode){
+    this.el = vnode.dom;
   },
   view(vnode) {
-    const match = vnode.attrs.match;
-    const index = vnode.attrs.index;
+    return m('dialog.modal',
+        {
+          class: vnode.state.showDialog ? 'modal-open' : '',
+        },
+        m(".modal-box",
+          [
+            m('form', { method: "dialog" },
+              m('button.btn btn-sm btn-circle btn-ghost absolute right-2 top-2', { onclick: this.close }, '✕')
+            ),
+            m('h4.font-bold', 'Add a Step'),
+            m('p.mb-4', 'Would you like to insert a text only note or a match from your editor cursor position/selection?'),
+            m('.modal-action',
+              [
+                m('button.btn btn-primary', {
+                  onclick: () => {
+                    dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.state.match }});
+                    this.close(); 
+                  }
+                }, 'Match from cursor'),
+                m('button.btn btn-secondary', {
+                  onclick: () => {
+                    console.log('Adding note step at index', vnode.state.index);
+                    globalThis.flowService.addNoteStep(vnode.state.index);
+                    this.close();
+                  }
+                }, 'Add Note')
+              ]
+            ),
+          ]
+        ),
+        m('form.modal-backdrop', { method: "dialog", onclick: () => { 
+          this.close();
+        } }, m('button', 'Close'))
+      );
+  }
+}
+
+const FlowMatchInsertBetween = {
+  view(vnode) {
     return m(
       ".flex justify-center ",
       {
@@ -604,51 +681,13 @@ const FlowMatchInsertBetween = {
         "button.btn btn-sm btn-outline w-full opacity-0 group-hover:opacity-100 group-hover:my-4 transition-opacity",
         {
           onclick: () => {
-            vnode.state.showDialog = true;
+            dispatch(_events.dialog.openInsertBetween, {
+              ...vnode.attrs
+            });
           },
         },
         m("span.text-primary block size-4", m.trust(plusSvg))
       ),
-      m('dialog.modal',
-        {
-          class: vnode.state.showDialog ? 'modal-open' : '',
-        },
-        m(".modal-box",
-          [
-            m('form', { method: "dialog" },
-              m('button.btn btn-sm btn-circle btn-ghost absolute right-2 top-2', {
-                onclick: () => { vnode.state.showDialog = false; }
-              }, '✕')
-            ),
-            m('h4.font-bold', 'Add a Step'),
-            m('p.mb-4', 'Would you like to insert a text only note or a match from your editor cursor position/selection?'),
-            m('.modal-action',
-              [
-                m('button.btn btn-primary', {
-                  onclick: () => {
-                    dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.attrs.match }});
-                    vnode.state.showDialog = false;
-                  }
-                }, 'Match from cursor'),
-                m('button.btn btn-secondary', {
-                  onclick: () => {
-                    console.log('Adding note step at index', index);
-                    globalThis.flowService.addNoteStep({
-                      flow_match_id: crypto.randomUUID(),
-                      content_kind: 'note',
-                      step_content: { title: 'New Note', body: '' },
-                      match_id: undefined,
-                      order_index: index + 1,
-                    }, index);
-                    vnode.state.showDialog = false;
-                  }
-                }, 'Add Note')
-              ]
-            ),
-          ]
-        ),
-        m('form.modal-backdrop', { method: "dialog", onclick: () => { vnode.state.showDialog = false; } }, m('button', 'Close'))
-      )
     );
   },
 };
@@ -942,6 +981,7 @@ export function Flow(): m.Component {
         m(FlowMatchList, {
           matches: vnode.state.matches,
         }),
+        m(InsertBetweenDialog)
       ]);
     },
   };

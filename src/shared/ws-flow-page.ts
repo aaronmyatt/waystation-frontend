@@ -544,7 +544,7 @@ function FlowMatch() {
                     open = !open;
                   } 
                 },
-                [m("span.block size-4 text-primary", open ? m.trust(chevronUpSvg) : m.trust(chevronDownSvg))]
+                [m("span.block size-4 text-primary", open ? m.trust(chevronDownSvg) : m.trust(chevronUpSvg))]
               ),
               m(
                 ".toolbar-wrapper flex-shrink-0",
@@ -791,7 +791,7 @@ function overtypeOptions(vnode) {
   return {
     value: vnode.attrs.value || "",
     placeholder: vnode.attrs.placeholder || "",
-    toolbar: vnode.attrs.toolbar || false,
+    toolbar: vnode.attrs.toolbar || true,
     onChange: vnode.attrs.onChange || (() => {}),
     onKeydown: vnode.attrs.onKeydown || (() => {}),
     autoResize: true,
@@ -834,6 +834,7 @@ const OvertypeBase = {
       options.fontFamily,
       "important"
     );
+    this.onupdate(vnode);
   },
   onremove(vnode) {
     for (const editor of vnode.state.editors) {
@@ -852,6 +853,15 @@ const OvertypeBase = {
         editor.setTheme(theme);
       }
     }
+  },
+  onupdate(vnode){
+      const overTypeToolbar = vnode.dom.querySelector(".overtype-toolbar");
+      // hide the toolbar in preview mode
+      if( vnode.attrs.preview ){
+        overTypeToolbar.hidden = true;
+      } else {
+        overTypeToolbar.hidden = false;
+      }
   },
   view(vnode) {
     return m(".inner-editor", {
@@ -898,8 +908,6 @@ function FlowMatchDescriptionEditor() {
           class: (vnode.attrs.togglePreview && !vnode.attrs.description) ? "hidden" : ""
         },
         [
-          !vnode.attrs.togglePreview &&
-            m("h3.text-md font-semibold mb-2", "Description"),
           m(OvertypeBase, {
             value: vnode.attrs.description,
             preview: vnode.attrs.togglePreview,

@@ -192,6 +192,12 @@ export const api = {
       apiClient.get(`/users/${username}/flows`),
   },
 
+  // Repos
+  repos: {
+    get: (name: string) =>
+      apiClient.get(`/repos/${name}`),
+  },
+
   // Status
   status: () =>
     apiClient.get('/status'),

@@ -1,6 +1,7 @@
 import m from "mithril";
 import { Flow } from "../shared/ws-flow-page";
 import { FlowList } from "../shared/ws-flow-list-page";
+import { TagsList } from "../shared/ws-tags-list-page";
 import { Auth } from "../shared/ws-auth";
 import { dispatch, _events } from "../shared/utils";
 import { api } from "../shared/api-client";
@@ -65,6 +66,7 @@ const Layout = {
               "New Flow"
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
+            m(m.route.Link, { href: "/tags", class: "btn btn-ghost" }, "Tags"),
             m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
             m(ThemePicker)
           ]),
@@ -110,6 +112,11 @@ m.route(document.body, "/", {
   "/auth": {
     render(vnode) {
       return m(Layout, m(Auth, vnode.attrs));
+    },
+  },
+  "/tags": {
+    render(vnode) {
+      return m(Layout, m(TagsList, vnode.attrs));
     },
   },
   "/flow/new": {

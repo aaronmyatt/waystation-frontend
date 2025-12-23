@@ -212,12 +212,8 @@
 
       // Tags List - Refresh/Fetch all tags
       globalThis.addEventListener('ws::action::refreshTagsList', async (event) => {
-        console.log('Refresh tags list event received');
-        console.log('Auth token:', localStorage.getItem('authToken'));
         try {
           const response = await globalThis.api.tags.list();
-          console.log('Tags API response:', response);
-          console.log('Tags API response.data:', response.data);
           const tags = response.data.tags;
 
           // Update the tags list service

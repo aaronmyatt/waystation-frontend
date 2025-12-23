@@ -160,14 +160,10 @@ class FlowService {
         {
           flow_match_id: crypto.randomUUID(),
           content_kind: "note",
-          note: {
-            name: "New Step",
-            description: `Click edit to describe this step. 
+          step_content: {
+            title: "New Note",
+            body: `Click edit to describe this step. 
 Right click a line in your editor and choose '**Add Line**' to add a code match to this flow.`,
-          },
-          match: {
-            file_name: "",
-            grep_meta: JSON.stringify({ context_lines: [] }),
           },
         },
       ],

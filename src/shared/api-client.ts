@@ -138,6 +138,18 @@ export const api = {
       apiClient.post('/flow_history', historyData),
   },
 
+  // Flow Aggregates
+  flowAggregates: {
+    create: (aggregateData: any) =>
+      apiClient.post('/flow_aggregates', aggregateData),
+
+    get: (id: string) =>
+      apiClient.get(`/flow_aggregates/${id}`),
+
+    update: (id: string, aggregateData: any) =>
+      apiClient.put(`/flow_aggregates/${id}`, aggregateData),
+  },
+
   // Tags
   tags: {
     list: () =>

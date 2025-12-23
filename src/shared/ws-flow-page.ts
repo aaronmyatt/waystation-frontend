@@ -717,7 +717,7 @@ export function Flow(): m.Component {
     view(vnode) {
       return m(".flow.container mx-auto p-4 max-w-5xl", [
         // title & toolbar
-        m(".flex justify-between items-baseline gap-4", [
+        m(".flex justify-between gap-4", [
           m(
             "h1.text-2xl font-bold text-base-content min-w-0 flex-grow break-words overflow-wrap",
             m(TitleInput, {

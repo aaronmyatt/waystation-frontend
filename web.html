@@ -193,8 +193,8 @@
 
       // Delete Flow
       globalThis.addEventListener('ws::action::deleteFlow', async (event) => {
-        console.log('Delete flow event received:', event.detail.flowId);
-        const { flowId } = event.detail;
+        console.log('Delete flow event received:', event.detail);
+        const { id: flowId } = event.detail.flow;
 
         try {
           await globalThis.api.flows.delete(flowId);

@@ -1,13 +1,10 @@
 import m from "mithril";
+import "../services";
 import { Flow } from "../pages/ws-flow";
-import { FlowList } from "../pages/ws-flow-list";
+import { Page as FlowsPage } from "../pages/ws-flows";
 import { TagsList } from "../pages/ws-tags-list";
 import { Auth } from "../pages/ws-auth";
 import { dispatch, _events } from "../shared/utils";
-import { api } from "../shared/api-client";
-
-// Make API client available globally
-globalThis.api = api;
 
 const Logo = m(
   m.route.Link,
@@ -66,7 +63,6 @@ const Layout = {
               "New Flow"
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
-            m(m.route.Link, { href: "/tags", class: "btn btn-ghost" }, "Tags"),
             m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
             m(ThemePicker)
           ]),
@@ -106,7 +102,7 @@ m.route(document.body, "/", {
       dispatch(_events.action.refreshList, {});
     },
     render(vnode: Vnode) {
-      return m(Layout, m(FlowList, vnode.attrs));
+      return m(Layout, m(FlowsPage, vnode.attrs));
     },
   },
   "/auth": {

@@ -4,7 +4,7 @@ import { Flow } from "../pages/ws-flow";
 import { Page as FlowsPage } from "../pages/ws-flows";
 import { TagsList } from "../pages/ws-tags-list";
 import { Auth } from "../pages/ws-auth";
-import { dispatch, _events } from "../shared/utils";
+import { dispatch, _events, storageKeys } from "../shared/utils";
 
 const Logo = m(
   m.route.Link,
@@ -29,7 +29,7 @@ const THEMES = [
 const ThemePicker = {
   oninit: () => {
     // Load saved theme from local storage
-    const savedTheme = localStorage.getItem("waystation-theme");
+    const savedTheme = localStorage.getItem(storageKeys.themeChoice);
     if (savedTheme) {
       document.documentElement.setAttribute("data-theme", savedTheme);
     }
@@ -41,7 +41,7 @@ const ThemePicker = {
       onchange: (e) => {
         const theme = e.target.value;
         document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("waystation-theme", theme);
+        localStorage.setItem(storageKeys.themeChoice, theme);
       },
     }, THEMES.map(theme => 
       m("option", { value: theme }, theme.charAt(0).toUpperCase() + theme.slice(1))
@@ -50,6 +50,12 @@ const ThemePicker = {
 };
 
 const Layout = {
+  oninit(vnode) {
+    this.onbeforeupdate(vnode)
+  },
+  onbeforeupdate(vnode) {
+    vnode.state.loggedIn = globalThis.authService.loggedIn;
+  },
   view: (vnode) => {
     return m("main.layout container mx-auto", [
       m(
@@ -63,7 +69,9 @@ const Layout = {
               "New Flow"
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
-            m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
+            !vnode.state.loggedIn && m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Login"),
+            vnode.state.loggedIn && m('button.btn btn-ghost', { onclick: () => dispatch(_events.auth.logout) },
+                                       "Logout"),
             m(ThemePicker)
           ]),
         ]

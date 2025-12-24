@@ -1,21 +1,35 @@
 import { api } from "../shared/api-client";
+import { storageKeys, _events } from "../shared/utils";
 
-// Listen for authentication events from the SPA
-globalThis.addEventListener("ws::auth::login", (event) => {
+
+globalThis.addEventListener(_events.auth.logout, (event) => {
+  console.log("Logout event received");
+  api.auth
+    .logout()
+    .catch((error) => {
+      console.error("Logout error:", error);
+    })
+    .finally(() => {
+      globalThis.authService.logout();
+    });
+})
+
+globalThis.addEventListener(_events.auth.login, (event) => {
   console.log("Login event received:", event.detail);
   const { email, password } = event.detail;
 
   // Make API call to backend
   api.auth
     .login(email, password)
-    .then((data) => {
+    .then(({data}) => {
+      debugger;
       if (data.error) {
         globalThis.authService?.setError(data.error);
-      } else if (data.message) {
-        globalThis.authService?.setSuccess(data.message);
-        // Store API token
-        if (data.api_token) {
-          localStorage.setItem("authToken", data.api_token);
+      } else if (data.api_token) {
+        localStorage.setItem(storageKeys.authToken, data.api_token);
+
+        if (data.message) {
+          globalThis.authService?.setSuccess(data.message);
         }
       }
     })
@@ -28,7 +42,7 @@ globalThis.addEventListener("ws::auth::login", (event) => {
     });
 });
 
-globalThis.addEventListener("ws::auth::register", (event) => {
+globalThis.addEventListener(_events.auth.register, (event) => {
   console.log("Register event received:", event.detail);
   const { email, password } = event.detail;
 
@@ -47,7 +61,7 @@ globalThis.addEventListener("ws::auth::register", (event) => {
         globalThis.authService?.setSuccess(data.message);
         // Store API token
         if (data.api_token) {
-          localStorage.setItem("authToken", data.api_token);
+          localStorage.setItem(storageKeys.authToken, data.api_token);
         }
       }
     })

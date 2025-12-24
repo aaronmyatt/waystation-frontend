@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import { storageKeys } from './utils';
 
 // API Client Configuration
 const API_BASE_URL = 'http://localhost:3001/api/v1';
@@ -15,7 +16,7 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor - add auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem(storageKeys.authToken);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,7 +33,7 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     // Handle 401 Unauthorized - clear token and redirect to auth
     if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
+      localStorage.removeItem(storageKeys.authToken);
       console.warn('Session expired. Please log in again.');
     }
     return Promise.reject(error);

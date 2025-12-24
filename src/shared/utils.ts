@@ -28,5 +28,11 @@ export const _events = {
   auth: {
     login: 'ws::auth::login',
     register: 'ws::auth::register',
+    logout: 'ws::auth::logout'
   },
+};
+
+export const storageKeys = {
+  authToken: 'ws::authToken',
+  themeChoice: 'ws::theme',
 };

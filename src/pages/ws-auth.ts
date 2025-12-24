@@ -1,5 +1,5 @@
 import m from 'mithril'
-import { _events, dispatch } from '../shared/utils'
+import { _events, dispatch, storageKeys } from '../shared/utils'
 
 class AuthService {
   _state = {
@@ -34,7 +34,9 @@ class AuthService {
   setSuccess(success: string) {
     this._state.success = success;
     this._state.error = '';
-    m.redraw();
+
+    m.route.set('/'); // Redirect to home on success
+    // m.redraw();
   }
 
   clearMessages() {
@@ -50,6 +52,21 @@ class AuthService {
       success: '',
     };
     m.redraw();
+  }
+
+  get loggedIn() {
+    const token = localStorage.getItem(storageKeys.authToken);
+    return !!token;
+  }
+
+  get loggedOut() {
+    return !this.loggedIn;
+  }
+
+  logout(){
+    localStorage.removeItem(storageKeys.authToken);
+    this.reset();
+    m.route.set('/');
   }
 }
 

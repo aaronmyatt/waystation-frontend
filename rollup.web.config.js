@@ -18,7 +18,34 @@ export default [
       format: 'iife',
       name: 'WaystationWebApp',
       sourcemap: !production,
-      
+    },
+    plugins: [
+      resolve({
+        browser: true,
+        preferBuiltins: false
+      }),
+      commonjs(),
+      json(),
+      typescript({
+        tsconfig: './tsconfig.json',
+        compilerOptions: {
+          noEmitOnError: false
+        }
+      })
+    ],
+  },
+
+  // Web Integration bundle
+  {
+    input: 'src/web/integration.ts',
+    watch: {
+      exclude: ['dist/**']
+    },
+    output: {
+      file: 'dist/waystation-integration.js',
+      format: 'iife',
+      name: 'WaystationIntegration',
+      sourcemap: !production,
     },
     plugins: [
       resolve({

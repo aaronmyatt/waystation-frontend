@@ -1,6 +1,6 @@
-import { MarkdownRenderer } from './ws-marked'
+import { MarkdownRenderer } from '../shared/ws-marked'
 import m from 'mithril'
-import { _events as _sharedEvents, dispatch } from './utils'
+import { _events as _sharedEvents, dispatch } from '../shared/utils'
 
 const _events = {
   action: {

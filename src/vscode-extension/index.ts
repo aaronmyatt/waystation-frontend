@@ -1,7 +1,6 @@
 import m from "mithril";
-import { Flow } from "../shared/ws-flow-page";
-import { FlowList } from "../shared/ws-flow-list-page";
-import { Auth } from "../shared/ws-auth";
+import { Flow } from "../pages/ws-flow";
+import { FlowList } from "../pages/ws-flow-list";
 import { dispatch, _events } from "../shared/utils";
 
 const Logo = m(

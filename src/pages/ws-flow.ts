@@ -1,8 +1,8 @@
 import m from "mithril";
-import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg } from "./ws-svg";
-import { dispatch, _events as utilEvents } from "./utils";
-import { OvertypeBase } from "./ws-overtype";
-import { CodeBlock, CodeLine } from "./ws-hljs";
+import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg } from "../shared/ws-svg";
+import { dispatch, _events as utilEvents } from "../shared/utils";
+import { OvertypeBase } from "../shared/ws-overtype";
+import { CodeBlock, CodeLine } from "../shared/ws-hljs";
 
 let skipRederaw = false;
 

@@ -1,5 +1,5 @@
 import m from 'mithril'
-import { _events, dispatch } from './utils'
+import { _events, dispatch } from '../shared/utils'
 
 const _tagsEvents = {
   action: {

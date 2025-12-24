@@ -4,8 +4,10 @@
   "license": "MIT",
   "exports": {
     "./shared/utils": "./src/shared/utils.ts",
-    "./shared/ws-flow-page": "./src/shared/ws-flow-page.ts",
-    "./shared/ws-flow-list-page": "./src/shared/ws-flow-list-page.ts",
+    "./pages/ws-flow": "./src/shared/ws-flow.ts",
+    "./pages/ws-flow-list": "./src/shared/ws-flow-list.ts",
+    "./pages/ws-tags-list": "./src/shared/ws-tags-list.ts",
+    "./pages/ws-auth": "./src/shared/ws-auth.ts",
     "./shared/ws-marked": "./src/shared/ws-marked.ts",
     "./shared/ws-hljs": "./src/shared/ws-hljs.ts",
     "./shared/ws-svg": "./src/shared/ws-svg.ts",

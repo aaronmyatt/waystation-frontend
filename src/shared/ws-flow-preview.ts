@@ -20,7 +20,7 @@ export function FlowPreview(): m.Component {
             syntaxHighlighter.highlightAll();
         },
         view(vnode){
-            return m('.p-4 prose', m.trust(marked.parse(vnode.state.markdown)));
+            return m('.p-4 prose max-w-none', m.trust(marked.parse(vnode.state.markdown)));
         }
   };
 }

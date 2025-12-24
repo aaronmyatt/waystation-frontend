@@ -25,4 +25,8 @@ export const _events = {
     requestFlow: 'ws::action::requestFlow',
     actionError: 'ws::action::actionError',
   },
+  auth: {
+    login: 'ws::auth::login',
+    register: 'ws::auth::register',
+  },
 };

@@ -1,12 +1,5 @@
 import m from 'mithril'
-import { _events as _sharedEvents, dispatch } from './utils'
-
-const _events = {
-  auth: {
-    login: 'ws::auth::login',
-    register: 'ws::auth::register',
-  },
-};
+import { _events, dispatch } from '../shared/utils'
 
 class AuthService {
   _state = {

@@ -9,7 +9,8 @@ export default {
     extend: {},
   },
   plugins: [
-    require("daisyui")
+    require("daisyui"),
+    require('@tailwindcss/typography'),
   ],
   // Tailwind v4 automatically removes unused classes in production
   // Content paths above are scanned to determine which classes to keep

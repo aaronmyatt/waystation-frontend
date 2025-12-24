@@ -1,6 +1,6 @@
 import m from "mithril";
 import "../services";
-import { Flow } from "../pages/ws-flow";
+import { FlowEditor } from "../shared/ws-flow-editor";
 import { FlowList } from "../shared/ws-flows-list";
 import { ThemePicker } from "../shared/ws-theme-picker";
 import { dispatch, _events } from "../shared/utils";
@@ -144,7 +144,7 @@ m.route(document.body, "/", {
       })
     },
     render(vnode) {
-      return m(Layout, m(Flow, vnode.attrs));
+      return m(Layout, m(FlowEditor, vnode.attrs));
     },
   },
 });

@@ -7,6 +7,7 @@
 @import 'highlight.js/styles/vs.css';
 @import 'highlight.js/styles/vs2015.css';
 @import "tailwindcss";
+
 @plugin "daisyui" {
     themes: all;
 };

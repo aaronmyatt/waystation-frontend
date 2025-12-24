@@ -284,6 +284,7 @@ const syntaxHighlighter = new SyntaxHighlighter({
     languages: [],
     hljsOptions: {}
 });
+export { syntaxHighlighter };
 
 // Helper function to dedent code by removing common leading whitespace
 function dedentCode(code: string): string {

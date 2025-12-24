@@ -28,7 +28,13 @@ export const Page: m.Component = {
                 this.activeTab = 'public';
                 dispatch(_events.action.refreshList, { filter: 'public' });
               }
-            }, 'Public')
+            }, 'Public'),
+            this.activeTab === 'public' 
+              && m('button.tab', {
+                onclick: () => {
+                  dispatch(_events.action.refreshList, { filter: 'public', username: globalThis.authService.user?.username });
+                }
+              }, '=|| Just mine')
           ]
         ),
         m(FlowList)

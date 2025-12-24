@@ -185,7 +185,7 @@ export const api = {
     get: (id: string) =>
       apiClient.get(`/public/flows/${id}`),
 
-    userFlows: (username: string) =>
+    userFlows: ({username}: {username: string}) =>
       apiClient.get(`/users/${username}/flows`),
   },
 

@@ -1,7 +1,7 @@
 import m from "mithril";
 import "../services";
-import { Flow } from "../pages/ws-flow";
 import { Page as FlowsPage } from "../pages/ws-flows";
+import { Page as FlowPage } from "../pages/ws-flow";
 import { TagsList } from "../pages/ws-tags-list";
 import { Auth } from "../pages/ws-auth";
 import { ThemePicker } from "../shared/ws-theme-picker";
@@ -136,31 +136,31 @@ m.route(document.body, "/", {
   },
   "/flow/:id": {
     onmatch(args, _requestedPath, _route): Promise<void> {
-      dispatch(_events.action.requestFlow, { flowId: args.id });     
+      
 
       return new Promise((resolve, reject) => {
+        resolve();
+        // // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
+        // // adhoc reactivity
+        // const interval = setInterval(() => {
+        //   if(globalThis.flowService.flow.id === args.id) {
+        //     clearTimeout(timeout);
+        //     clearInterval(interval);
+        //     resolve();
+        //   }
+        // }, 50);
 
-        // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
-        // adhoc reactivity
-        const interval = setInterval(() => {
-          if(globalThis.flowService.flow.id === args.id) {
-            clearTimeout(timeout);
-            clearInterval(interval);
-            resolve();
-          }
-        }, 50);
-
-        const timeout = setTimeout(() => {
-          clearInterval(interval);
-          dispatch(_events.action.actionError, { 
-            message: `Failed to load flow ${args.id} within 5 seconds` 
-          });
-          reject(`Failed to load flow ${args.id} within 5 seconds` );
-        }, 5000);
+        // const timeout = setTimeout(() => {
+        //   clearInterval(interval);
+        //   dispatch(_events.action.actionError, { 
+        //     message: `Failed to load flow ${args.id} within 5 seconds` 
+        //   });
+        //   reject(`Failed to load flow ${args.id} within 5 seconds` );
+        // }, 5000);
       })
     },
     render(vnode) {
-      return m(Layout, m(Flow, vnode.attrs));
+      return m(Layout, m(FlowPage, vnode.attrs));
     },
   },
 });

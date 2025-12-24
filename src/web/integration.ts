@@ -100,7 +100,7 @@ globalThis.addEventListener("ws::action::refreshList", async (event) => {
       promise = api.repos.list();
     } else if (customEvent.detail.filter === "public") {
       console.log("Fetching public flows");
-      promise = api.publicFlows.list();
+      promise = customEvent.detail.username ? api.publicFlows.userFlows({ username: customEvent.detail.username }) : api.publicFlows.list();
     } else {
       console.log("Fetching all flows");
       promise = api.flows.list();
@@ -130,6 +130,26 @@ globalThis.addEventListener("ws::action::requestFlow", async (event) => {
     // Update the flow service
     if (globalThis.flowService) {
       globalThis.flowService.load(flowData);
+    }
+    console.log("Flow loaded:", flowId);
+  } catch (error) {
+    console.error("Error fetching flow:", error);
+  }
+});
+
+// Fetch Single Flow
+globalThis.addEventListener(_events.flow.requestFlowPreview, async (event) => {
+  console.log("Request flow event received:", event.detail.flowId);
+  const { flowId } = event.detail;
+
+  try {
+    const response = await api.flows.get(flowId);
+    const flowData = response.data;
+    console.log("Fetched flow data:", flowData);
+
+    // Update the flow service
+    if (globalThis.flowService) {
+      globalThis.flowService.loadPreview(flowData);
     }
     console.log("Flow loaded:", flowId);
   } catch (error) {

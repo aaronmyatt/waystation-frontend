@@ -19,11 +19,30 @@ export function debounce(func: (...args: any[]) => void, wait: number): Function
 export const _events = {
   flow: {
     updated: 'ws::flow::updated',
+    requestFlowPreview: 'ws::flow::requestFlowPreview',
   },
   action: {
     refreshList: 'ws::action::refreshList',
     requestFlow: 'ws::action::requestFlow',
     actionError: 'ws::action::actionError',
+
+    export: "ws::action::export",
+    generateFlowContent: "ws::action::generateFlowContent",
+    deleteFlow: "ws::action::deleteFlow",
+
+    // flow match actions
+    generateFlowMatchContent: "ws::action::generateFlowMatchContent",
+    insertFlowMatchAfter: "ws::action::insertFlowMatchAfter",
+
+    // create a new flow with the current match as parent and first step
+    createChildFlow: "ws::action::createChildFlow",
+
+    // dispatch match click events for the extension to handle
+    clickFlowMatch: "ws::click::flowMatch",
+  },
+  dialog: {
+    openInsertBetween: "ws::dialog::openInsertBetween",
+    closeInsertBetween: "ws::dialog::closeInsertBetween",
   },
   auth: {
     login: 'ws::auth::login',

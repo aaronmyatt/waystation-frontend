@@ -10,4 +10,4 @@
 @plugin "daisyui" {
     themes: all;
 };
-
+@plugin "@tailwindcss/typography";

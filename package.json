@@ -9,6 +9,7 @@
     "marked": "^4.3.0",
     "mithril": "^2.0.4",
     "overtype": "^2.0.1"
+
   },
   "scripts": {
     "dev": "rollup -c rollup.config.js -w",
@@ -30,6 +31,7 @@
     "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-typescript": "^12.1.2",
     "@tailwindcss/postcss": "^4.1.17",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/mithril-global": "^2.2.4",
     "autoprefixer": "^10.4.22",
     "daisyui": "^5.5.11",

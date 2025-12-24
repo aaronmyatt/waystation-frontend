@@ -1,6 +1,7 @@
 import m from 'mithril'
 import { _events, dispatch } from '../shared/utils'
 import { FlowList } from '@waystation/shared/ws-flows-list'
+import { FlowSettingsModal } from '../shared/ws-flow-settings-modal';
 
 export const Page: m.Component = {
   activeTab: 'my-flows',
@@ -37,7 +38,8 @@ export const Page: m.Component = {
               }, '=|| Just mine')
           ]
         ),
-        m(FlowList)
+        m(FlowList),
+        m(FlowSettingsModal)
       ]
     )
   }

@@ -223,4 +223,18 @@ globalThis.addEventListener("ws::action::refreshTagsList", async (event) => {
   }
 });
 
+globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {
+  const customEvent = event as CustomEvent<{ flowId: string; flow: any }>;
+  console.log("Update single flow event received:", customEvent.detail);
+  const { flowId, flow } = customEvent.detail;
+
+  try {
+    const response = await api.flows.update(flowId, flow);
+    const updatedFlow = response.data;
+    console.log("Flow updated:", updatedFlow);
+  } catch (error) {
+    console.error("Error updating flow:", error);
+  }
+});
+
 console.log("Flow API event listeners ready");

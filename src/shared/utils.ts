@@ -20,6 +20,11 @@ export const _events = {
   flow: {
     updated: 'ws::flow::updated',
     requestFlowPreview: 'ws::flow::requestFlowPreview',
+    updateFlowSingular: "ws::action::updateFlow",
+  },
+  ui: {
+    openFlowSettingsModal: 'ws::ui::openFlowSettingsModal',
+    closeFlowSettingsModal: 'ws::ui::closeFlowSettingsModal',
   },
   action: {
     refreshList: 'ws::action::refreshList',

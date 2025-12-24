@@ -1,6 +1,7 @@
 import { MarkdownRenderer } from './ws-marked'
 import m from 'mithril'
 import { _events as _sharedEvents, dispatch } from './utils'
+import { cogSvg } from './ws-svg';
 
 const marked = new MarkdownRenderer();
 
@@ -23,15 +24,23 @@ function FlowDescriptionMd(){
 const FlowCard = {
   view(vnode){
     return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full', 
-      m('.card-body', 
-        [
-        m('.card-title text-lg font-semibold text-primary', vnode.attrs.flow.name || ''),
+      m('.card-body', [
+        m('.card-title text-lg font-semibold text-primary justify-between', [
+          m('span', vnode.attrs.flow.name || ''),
+          m('button.btn btn-circle btn-sm', {
+            onclick: (e: Event) => {
+              e.stopPropagation();
+              e.preventDefault();
+              dispatch(_sharedEvents.ui.openFlowSettingsModal, { flowId: vnode.attrs.flow.id });
+            }
+          }, m.trust(cogSvg))
+        ]),
         m(FlowDescriptionMd, { description: vnode.attrs.flow.description }),
         m('.flex-1'),
         m('.card-actions justify-between',
           [
             m('.text-sm', `Created ${vnode.attrs.flow.updated_at}`), 
-            m('button.btn btn-sm btn-ghost', '> View')
+            m('button.btn btn-sm btn-ghost', 'View >'),
           ])
       ])
     )

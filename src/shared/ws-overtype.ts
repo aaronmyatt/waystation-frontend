@@ -157,9 +157,11 @@ export const OvertypeBase = {
       if (vnode.attrs.preview) {
         editor.showPreviewMode();
         editor.setTheme(theme);
+        editor.setValue(vnode.attrs.value || "");
       } else {
         editor.showNormalEditMode();
         editor.setTheme(theme);
+        editor.setValue(vnode.attrs.value || "");
       }
     }
   },

@@ -34,10 +34,6 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('authToken');
       console.warn('Session expired. Please log in again.');
-      // Optionally redirect to auth page
-      if (window.location.hash !== '#!/auth') {
-        window.location.href = '/web#!/auth';
-      }
     }
     return Promise.reject(error);
   }
@@ -194,6 +190,8 @@ export const api = {
 
   // Repos
   repos: {
+    list: () =>
+      apiClient.get('/repos'),
     get: (name: string) =>
       apiClient.get(`/repos/${name}`),
   },

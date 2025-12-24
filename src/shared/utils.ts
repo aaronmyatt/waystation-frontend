@@ -33,6 +33,7 @@ export const _events = {
 };
 
 export const storageKeys = {
+  user: 'ws::user',
   authToken: 'ws::authToken',
   themeChoice: 'ws::theme',
 };

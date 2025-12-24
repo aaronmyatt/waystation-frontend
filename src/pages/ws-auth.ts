@@ -54,6 +54,19 @@ class AuthService {
     m.redraw();
   }
 
+  get user() {
+    const userJson = localStorage.getItem(storageKeys.user);
+    if (userJson) {
+      try {
+        return JSON.parse(userJson);
+      } catch (err) {
+        console.error("Failed to parse user data from localStorage:", err);
+        return null;
+      }
+    }
+    return null;
+  }
+
   get loggedIn() {
     const token = localStorage.getItem(storageKeys.authToken);
     return !!token;

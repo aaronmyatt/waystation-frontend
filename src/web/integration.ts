@@ -22,11 +22,11 @@ globalThis.addEventListener(_events.auth.login, (event) => {
   api.auth
     .login(email, password)
     .then(({data}) => {
-      debugger;
       if (data.error) {
         globalThis.authService?.setError(data.error);
       } else if (data.api_token) {
         localStorage.setItem(storageKeys.authToken, data.api_token);
+        localStorage.setItem(storageKeys.user, JSON.stringify(data.user || {}));
 
         if (data.message) {
           globalThis.authService?.setSuccess(data.message);
@@ -52,16 +52,17 @@ globalThis.addEventListener(_events.auth.register, (event) => {
   // Make API call to backend
   api.auth
     .register(email, password, username)
-    .then((data) => {
+    .then(({data}) => {
       if (data.errors) {
         globalThis.authService?.setError(data.errors.join(", "));
       } else if (data.error) {
         globalThis.authService?.setError(data.error);
-      } else if (data.message) {
-        globalThis.authService?.setSuccess(data.message);
+      } else if (data.api_token) {
+        localStorage.setItem(storageKeys.authToken, data.api_token);
+        localStorage.setItem(storageKeys.user, JSON.stringify(data.user || {}));
         // Store API token
-        if (data.api_token) {
-          localStorage.setItem(storageKeys.authToken, data.api_token);
+        if (data.message) {
+          globalThis.authService?.setSuccess(data.message);
         }
       }
     })

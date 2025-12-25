@@ -12,7 +12,8 @@
     "./shared/ws-hljs": "./src/shared/ws-hljs.ts",
     "./shared/ws-svg": "./src/shared/ws-svg.ts",
     "./vscode-extension": "./src/vscode-extension/index.ts",
-    "./web": "./src/web/index.ts"
+    "./web": "./src/web/index.ts",
+    "./web-integration": "./src/web/integration.ts"
   },
   "publish": {
     "include": [

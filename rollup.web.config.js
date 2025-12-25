@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
 import json from '@rollup/plugin-json';
+import replace from '@rollup/plugin-replace';
 
 const production = process.env.NODE_ENV === 'production';
 
@@ -20,6 +21,11 @@ export default [
       sourcemap: !production,
     },
     plugins: [
+      replace({
+        'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
+        'process.env.API_BASE_URL': JSON.stringify(production ? '/api' : 'http://localhost:3001/api'),
+        preventAssignment: true,
+      }),
       resolve({
         browser: true,
         preferBuiltins: false
@@ -48,6 +54,11 @@ export default [
       sourcemap: !production,
     },
     plugins: [
+      replace({
+        'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
+        'process.env.API_BASE_URL': JSON.stringify(production ? '/api' : 'http://localhost:3001/api'),
+        preventAssignment: true,
+      }),
       resolve({
         browser: true,
         preferBuiltins: false

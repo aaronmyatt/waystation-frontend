@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { storageKeys } from './utils';
 
 // API Client Configuration
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001/api';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

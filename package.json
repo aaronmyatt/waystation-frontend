@@ -1,6 +1,6 @@
 {
   "name": "waystation-fontend",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Waystation Frontend",
   "type": "module",
   "dependencies": {
@@ -9,7 +9,6 @@
     "marked": "^4.3.0",
     "mithril": "^2.0.4",
     "overtype": "^2.0.1"
-
   },
   "scripts": {
     "dev": "rollup -c rollup.config.js -w",

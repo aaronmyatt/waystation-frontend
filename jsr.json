@@ -3,14 +3,6 @@
   "version": "0.1.8",
   "license": "MIT",
   "exports": {
-    "./shared/utils": "./src/shared/utils.ts",
-    "./pages/ws-flow": "./src/shared/ws-flow.ts",
-    "./pages/ws-flow-list": "./src/shared/ws-flow-list.ts",
-    "./pages/ws-tags-list": "./src/shared/ws-tags-list.ts",
-    "./pages/ws-auth": "./src/shared/ws-auth.ts",
-    "./shared/ws-marked": "./src/shared/ws-marked.ts",
-    "./shared/ws-hljs": "./src/shared/ws-hljs.ts",
-    "./shared/ws-svg": "./src/shared/ws-svg.ts",
     "./vscode-extension": "./src/vscode-extension/index.ts",
     "./web": "./src/web/index.ts",
     "./web-integration": "./src/web/integration.ts"

@@ -1,6 +1,6 @@
 import m from 'mithril'
 import { _events, dispatch } from '../shared/utils'
-import { FlowList } from '@waystation/shared/ws-flows-list'
+import { FlowList } from '../shared/ws-flows-list'
 import { FlowSettingsModal } from '../shared/ws-flow-settings-modal';
 
 export const Page: m.Component = {

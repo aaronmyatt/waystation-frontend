@@ -1,7 +1,7 @@
 import m from "mithril";
 import { FlowEditor } from "../shared/ws-flow-editor";
 import { FlowPreview } from "../shared/ws-flow-preview";
-import { _events } from "@waystation/shared/utils";
+import { _events } from "../shared/utils";
 
 function updateQueryParam(param: string) {
   const url = new URL(window.location.href);

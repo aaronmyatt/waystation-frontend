@@ -101,8 +101,7 @@ function overtypeOptions(vnode) {
     value: vnode.attrs.value || "",
     placeholder: vnode.attrs.placeholder || "",
     toolbar: vnode.attrs.toolbar || true,
-    onChange: (editor) => {
-      const value = editor.getValue();
+    onChange: (value) => {
       vnode.attrs.onChange && vnode.attrs.onChange(value);
       vnode.attrs.onKeydown && vnode.attrs.onKeydown(value);
     },
@@ -171,10 +170,12 @@ export const OvertypeBase = {
   onupdate(vnode){
       const overTypeToolbar = vnode.dom.querySelector(".overtype-toolbar");
       // hide the toolbar in preview mode
-      if( vnode.attrs.preview ){
-        overTypeToolbar.hidden = true;
-      } else {
-        overTypeToolbar.hidden = false;
+      if( overTypeToolbar ){
+        if( vnode.attrs.preview ){
+          overTypeToolbar.hidden = true;
+        } else {
+          overTypeToolbar.hidden = false;
+        }
       }
   },
   view(vnode) {

@@ -345,7 +345,7 @@ function FlowMatch() {
                   m(FlowMatchDescriptionEditor, {
                     description,
                     togglePreview: !editing,
-                    onKeydown: (e) => { description = e.target.value; }
+                    onKeydown: (value) => { description = value; }
                   }),
                   vnode.attrs.match.content_kind === "match" && m(CodeBlock, { match: vnode.attrs.match }),
                 ])

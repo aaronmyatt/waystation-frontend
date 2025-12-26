@@ -111,8 +111,11 @@ m.route(document.body, "/", {
 
       globalThis.flowService.reset();
 
-      // Dispatch flow updated event to trigger backend save
-      dispatch(_events.flow.updated, globalThis.flowService._flow);
+      // Trigger a single initial save (debounced)
+      // Use setTimeout to ensure it happens after component initialization
+      setTimeout(() => {
+        dispatch(_events.flow.updated, globalThis.flowService._flow);
+      }, 100);
 
       return new Promise((resolve, reject) => {
         // Check immediately for race condition (ID assigned before polling starts)

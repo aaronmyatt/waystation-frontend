@@ -1,7 +1,6 @@
 import m from 'mithril';
 import { _events, dispatch } from './utils';
 import { MarkdownRenderer } from './ws-marked'
-import { syntaxHighlighter } from './ws-hljs';
 
 export function FlowPreview(): m.Component {
     const marked = new MarkdownRenderer({ enableSanitizer: false });
@@ -15,9 +14,6 @@ export function FlowPreview(): m.Component {
             if (globalThis.flowService.markdown !== vnode.state.markdown) {
                 vnode.state.markdown = globalThis.flowService.markdown || '';
             }
-        },
-        onupdate(){
-            syntaxHighlighter.highlightAll();
         },
         view(vnode){
             return m('.p-4 prose max-w-none', m.trust(marked.parse(vnode.state.markdown)));

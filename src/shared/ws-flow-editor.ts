@@ -212,6 +212,7 @@ function FlowMatch() {
   let title = "";
   let description = "";
   let open = true;
+
   return {
     oninit(vnode) {
       title =

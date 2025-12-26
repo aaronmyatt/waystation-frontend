@@ -101,8 +101,11 @@ function overtypeOptions(vnode) {
     value: vnode.attrs.value || "",
     placeholder: vnode.attrs.placeholder || "",
     toolbar: vnode.attrs.toolbar || true,
-    onChange: vnode.attrs.onChange || (() => {}),
-    onKeydown: vnode.attrs.onKeydown || (() => {}),
+    onChange: (editor) => {
+      const value = editor.getValue();
+      vnode.attrs.onChange && vnode.attrs.onChange(value);
+      vnode.attrs.onKeydown && vnode.attrs.onKeydown(value);
+    },
     autoResize: true,
     padding: vnode.attrs.padding || "4px",
     minHeight: vnode.attrs.minHeight || "40px",

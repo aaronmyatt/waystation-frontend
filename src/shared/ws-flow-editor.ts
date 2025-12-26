@@ -447,17 +447,16 @@ function FlowDescriptionEditor() {
     oninit(vnode){
       vnode.state.description = globalThis.flowService.flow.description
     },
-    onbeforeupdate(vnode){
-      vnode.state.description = globalThis.flowService.flow.description
-    },
     view(vnode) {
+      const canEdit = globalThis.flowService?.canEdit();
       return m(
         ".editor",
         m(OvertypeBase, {
-          value: vnode.state.description || "",
-          placeholder: "Enter description...",
+          value: globalThis.flowService.flow.description || "",
+          placeholder: canEdit ? "Enter description..." : "No description",
+          preview: !canEdit,
           onKeydown: (description) => {
-            if (description === vnode.state.description) return;
+            if (!canEdit) return;
             globalThis.flowService.updateFlow({
               ...globalThis.flowService.flow,
               description,
@@ -509,9 +508,11 @@ function TitleInput() {
         m("textarea.title w-full break-words", {
           value: title,
           name: "flow title",
+          readonly: vnode.attrs.readonly || false,
           style: "word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;",
           oncreate: (vnode) => this.resize(vnode),
           oninput: (e) => {
+            if (vnode.attrs.readonly) return;
             const name = e.target.value;
             if (name === title) return;
             title = name;
@@ -544,6 +545,7 @@ export function FlowEditor(): m.Component {
       globalThis.flowService.clear();
     },
     view(vnode) {
+      const canEdit = globalThis.flowService?.canEdit();
       return m(".flow", [
         // title & toolbar
         m(".flex justify-between gap-4", [
@@ -551,7 +553,9 @@ export function FlowEditor(): m.Component {
             "h1.text-2xl font-bold text-base-content min-w-0 flex-grow break-words overflow-wrap",
             m(TitleInput, {
               title: vnode.state.flow.name,
+              readonly: !canEdit,
               cb: (newTitle) => {
+                if (!canEdit) return;
                 globalThis.flowService.updateFlow({
                   ...globalThis.flowService.flow,
                   name: newTitle,

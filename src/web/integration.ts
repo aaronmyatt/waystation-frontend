@@ -123,7 +123,18 @@ globalThis.addEventListener("ws::action::requestFlow", async (event) => {
   const { flowId } = event.detail;
 
   try {
-    const response = await api.flowAggregates.get(flowId);
+    // Try to get flow aggregate (works for authenticated users and public flows)
+    const isLoggedIn = globalThis.authService?.loggedIn;
+
+    let response;
+    if (isLoggedIn) {
+      // Logged in users use regular flow aggregates endpoint
+      response = await api.flowAggregates.get(flowId);
+    } else {
+      // Non-logged in users use public flow aggregates endpoint
+      response = await api.publicFlowAggregates.get(flowId);
+    }
+
     const flowData = response.data;
     console.log("Fetched flow data:", flowData);
 
@@ -134,6 +145,10 @@ globalThis.addEventListener("ws::action::requestFlow", async (event) => {
     console.log("Flow loaded:", flowId);
   } catch (error) {
     console.error("Error fetching flow:", error);
+    // If flow not found or not authorized, clear the flow service
+    if (globalThis.flowService) {
+      globalThis.flowService.clear();
+    }
   }
 });
 

@@ -92,6 +92,8 @@ export const Auth: m.Component = {
     vnode.state.password = '';
     vnode.state.passwordConfirm = '';
     vnode.state.validationError = '';
+    vnode.state.showPassword = false;
+    vnode.state.showPasswordConfirm = false;
   },
   view(vnode) {
     const isLogin = vnode.state.mode === 'login';
@@ -231,10 +233,10 @@ export const Auth: m.Component = {
 
             // Password Field
             m('.mb-4', [
-              m('label.input w-full', 
+              m('label.input input-bordered flex items-center gap-2 w-full',
                 [
-                  m('input', {
-                    type: 'password',
+                  m('input.grow', {
+                    type: vnode.state.showPassword ? 'text' : 'password',
                     placeholder: isLogin ? 'Enter your password' : 'At least 8 characters',
                     value: vnode.state.password,
                     oninput: (e) => {
@@ -244,6 +246,13 @@ export const Auth: m.Component = {
                     disabled: globalThis.authService.loading,
                     required: true,
                   }),
+                  m('button.btn btn-ghost btn-sm btn-circle', {
+                    type: 'button',
+                    onclick: () => {
+                      vnode.state.showPassword = !vnode.state.showPassword;
+                    },
+                    tabIndex: -1,
+                  }, vnode.state.showPassword ? '🙈' : '👁️'),
                   m('span.label', 'Password'),
                 ]),
             ]),
@@ -251,11 +260,10 @@ export const Auth: m.Component = {
             // Confirm Password Field (Register only)
             !isLogin &&
               m('.mb-4', [
-                m('label.input w-full', 
+                m('label.input input-bordered flex items-center gap-2 w-full',
                   [
-                    
-                    m('input', {
-                      type: 'password',
+                    m('input.grow', {
+                      type: vnode.state.showPasswordConfirm ? 'text' : 'password',
                       placeholder: 'Re-enter your password',
                       value: vnode.state.passwordConfirm,
                       oninput: (e) => {
@@ -265,6 +273,13 @@ export const Auth: m.Component = {
                       disabled: globalThis.authService.loading,
                       required: true,
                     }),
+                    m('button.btn btn-ghost btn-sm btn-circle', {
+                      type: 'button',
+                      onclick: () => {
+                        vnode.state.showPasswordConfirm = !vnode.state.showPasswordConfirm;
+                      },
+                      tabIndex: -1,
+                    }, vnode.state.showPasswordConfirm ? '🙈' : '👁️'),
                     m('span.label', 'Confirm Password'),
                   ]),
               ]),

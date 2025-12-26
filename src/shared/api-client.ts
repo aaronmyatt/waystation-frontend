@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { storageKeys } from './utils';
 
 // API Client Configuration
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000/api/v1';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -187,6 +187,12 @@ export const api = {
 
     userFlows: ({username}: {username: string}) =>
       apiClient.get(`/users/${username}/flows`),
+  },
+
+  // Public Flow Aggregates (no auth required)
+  publicFlowAggregates: {
+    get: (id: string) =>
+      apiClient.get(`/public/flow_aggregates/${id}`),
   },
 
   // Repos

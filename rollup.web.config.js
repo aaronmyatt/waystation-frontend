@@ -23,7 +23,7 @@ export default [
     plugins: [
       replace({
         'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
-        'process.env.API_BASE_URL': JSON.stringify(production ? '/api' : 'http://localhost:3001/api'),
+        'process.env.API_BASE_URL': JSON.stringify(production ? '/api/v1' : 'http://localhost:4000/api/v1'),
         preventAssignment: true,
       }),
       resolve({
@@ -56,7 +56,7 @@ export default [
     plugins: [
       replace({
         'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
-        'process.env.API_BASE_URL': JSON.stringify(production ? '/api' : 'http://localhost:3001/api'),
+        'process.env.API_BASE_URL': JSON.stringify(production ? '/api/v1' : 'http://localhost:4000/api/v1'),
         preventAssignment: true,
       }),
       resolve({

@@ -7,16 +7,26 @@ export const Page: m.Component = {
   activeTab: 'my-flows',
 
   oninit() {
-    // Initial load
-    dispatch(_events.action.refreshList, {});
+    // Set default tab based on login status
+    const isLoggedIn = globalThis.authService?.loggedIn;
+    this.activeTab = isLoggedIn ? 'my-flows' : 'public';
+
+    // Initial load with appropriate filter
+    if (isLoggedIn) {
+      dispatch(_events.action.refreshList, {});
+    } else {
+      dispatch(_events.action.refreshList, { filter: 'public' });
+    }
   },
 
   view() {
+    const isLoggedIn = globalThis.authService?.loggedIn;
     return m('.container mx-auto p-4',
       [
         m('.tabs tabs-boxed mb-4',
           [
-            m('button.tab', {
+            // Only show "My Flows" tab if user is logged in
+            isLoggedIn && m('button.tab', {
               class: this.activeTab === 'my-flows' ? 'tab-active' : '',
               onclick: () => {
                 this.activeTab = 'my-flows';
@@ -30,7 +40,7 @@ export const Page: m.Component = {
                 dispatch(_events.action.refreshList, { filter: 'public' });
               }
             }, 'Public'),
-            this.activeTab === 'public' 
+            (this.activeTab === 'public' && isLoggedIn)
               && m('button.tab', {
                 onclick: () => {
                   dispatch(_events.action.refreshList, { filter: 'public', username: globalThis.authService.user?.username });

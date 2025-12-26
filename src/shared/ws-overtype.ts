@@ -101,8 +101,10 @@ function overtypeOptions(vnode) {
     value: vnode.attrs.value || "",
     placeholder: vnode.attrs.placeholder || "",
     toolbar: vnode.attrs.toolbar || true,
-    onChange: vnode.attrs.onChange || (() => {}),
-    onKeydown: vnode.attrs.onKeydown || (() => {}),
+    onChange: (value) => {
+      vnode.attrs.onChange && vnode.attrs.onChange(value);
+      vnode.attrs.onKeydown && vnode.attrs.onKeydown(value);
+    },
     autoResize: true,
     padding: vnode.attrs.padding || "4px",
     minHeight: vnode.attrs.minHeight || "40px",
@@ -168,10 +170,12 @@ export const OvertypeBase = {
   onupdate(vnode){
       const overTypeToolbar = vnode.dom.querySelector(".overtype-toolbar");
       // hide the toolbar in preview mode
-      if( vnode.attrs.preview ){
-        overTypeToolbar.hidden = true;
-      } else {
-        overTypeToolbar.hidden = false;
+      if( overTypeToolbar ){
+        if( vnode.attrs.preview ){
+          overTypeToolbar.hidden = true;
+        } else {
+          overTypeToolbar.hidden = false;
+        }
       }
   },
   view(vnode) {

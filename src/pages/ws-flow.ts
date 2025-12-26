@@ -13,10 +13,33 @@ export function Page(): m.Component {
   return {
     oninit(vnode) {
       const query = m.parseQueryString(window.location.search);
-      vnode.state.activeTab = query.tab || 'editor';
+      // Always default to preview first, will switch to editor after flow loads if user can edit
+      vnode.state.activeTab = query.tab || 'preview';
+      vnode.state.canEdit = globalThis.flowService?.canEdit();
+    },
+    onbeforeupdate(vnode) {
+      // Update canEdit state before rendering
+      vnode.state.canEdit = globalThis.flowService?.canEdit();
+    },
+    onupdate(vnode) {
+      // After flow loads, switch to editor tab if it's a new flow and no tab was specified
+      if (!m.parseQueryString(window.location.search).tab) {
+        const isNewFlow = globalThis.flowService?.isCreatingNew();
+        // Only auto-switch to editor for new flows
+        if (isNewFlow && vnode.state.activeTab === 'preview') {
+          vnode.state.activeTab = 'editor';
+        }
+      }
+
+      // If can't edit and trying to view editor tab, force to preview
+      if (!vnode.state.canEdit && vnode.state.activeTab === 'editor') {
+        vnode.state.activeTab = 'preview';
+      }
     },
     view(vnode) {
-      return m('.container mx-auto p-2 sm:p-4 max-w-5xl', 
+      const canEdit = vnode.state.canEdit;
+
+      return m('.container mx-auto p-2 sm:p-4 max-w-5xl',
         [
           m('.tabs tabs-boxed mb-4',
             [
@@ -27,17 +50,18 @@ export function Page(): m.Component {
                   updateQueryParam('preview');
                 }
               }, 'Preview'),
-              m('button.tab', {
+              // Only show Edit tab if user can edit this flow
+              canEdit ? m('button.tab', {
                 class: vnode.state.activeTab === 'editor' ? 'tab-active' : '',
                 onclick: () => {
                   vnode.state.activeTab = 'editor';
                   updateQueryParam('editor');
                 }
-              }, 'Edit'),
+              }, 'Edit') : null,
             ]
           ),
           vnode.state.activeTab === 'preview' ? m('.preview-container', m(FlowPreview, { id: vnode.attrs.id })) : null,
-          vnode.state.activeTab === 'editor' ? m(FlowEditor, { id: vnode.attrs.id }) : null
+          vnode.state.activeTab === 'editor' && canEdit ? m(FlowEditor, { id: vnode.attrs.id }) : null
       ]);
     },
   };

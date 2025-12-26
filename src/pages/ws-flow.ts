@@ -15,25 +15,29 @@ export function Page(): m.Component {
       const query = m.parseQueryString(window.location.search);
       // Always default to preview first, will switch to editor after flow loads if user can edit
       vnode.state.activeTab = query.tab || 'preview';
+      vnode.state.canEdit = globalThis.flowService?.canEdit();
+    },
+    onbeforeupdate(vnode) {
+      // Update canEdit state before rendering
+      vnode.state.canEdit = globalThis.flowService?.canEdit();
     },
     onupdate(vnode) {
-      // After flow loads, switch to editor tab if user can edit and no tab was specified
+      // After flow loads, switch to editor tab if it's a new flow and no tab was specified
       if (!m.parseQueryString(window.location.search).tab) {
-        const canEdit = globalThis.flowService?.canEdit();
         const isNewFlow = globalThis.flowService?.isCreatingNew();
-        // Only auto-switch to editor for new flows or owned flows
-        if (canEdit && isNewFlow && vnode.state.activeTab === 'preview') {
+        // Only auto-switch to editor for new flows
+        if (isNewFlow && vnode.state.activeTab === 'preview') {
           vnode.state.activeTab = 'editor';
         }
       }
-    },
-    view(vnode) {
-      const canEdit = globalThis.flowService?.canEdit();
 
       // If can't edit and trying to view editor tab, force to preview
-      if (!canEdit && vnode.state.activeTab === 'editor') {
+      if (!vnode.state.canEdit && vnode.state.activeTab === 'editor') {
         vnode.state.activeTab = 'preview';
       }
+    },
+    view(vnode) {
+      const canEdit = vnode.state.canEdit;
 
       return m('.container mx-auto p-2 sm:p-4 max-w-5xl',
         [

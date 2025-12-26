@@ -189,10 +189,12 @@ export const api = {
       apiClient.get(`/users/${username}/flows`),
   },
 
-  // Public Flow Aggregates (no auth required)
-  publicFlowAggregates: {
+  // Public Flows (no auth required)
+  publicFlows: {
     get: (id: string) =>
-      apiClient.get(`/public/flow_aggregates/${id}`),
+      apiClient.get(`/public/flows/${id}`),
+    list: () =>
+      apiClient.get('/public/flows'),
   },
 
   // Repos

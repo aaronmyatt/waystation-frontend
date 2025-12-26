@@ -34,8 +34,16 @@ const Layout = {
           m(".navbar-start", Logo),
           m(".navbar-end gap-2", [
             m(
-              m.route.Link,
-              { href: "/flow/new", class: "btn btn-ghost" },
+              "button.btn btn-ghost",
+              {
+                onclick: () => {
+                  if (vnode.state.loggedIn) {
+                    m.route.set("/flow/new");
+                  } else {
+                    m.route.set("/auth");
+                  }
+                }
+              },
               "New Flow"
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
@@ -95,8 +103,14 @@ m.route(document.body, "/", {
   },
   "/flow/new": {
     onmatch(): Promise<void> {
+      // Check if user is logged in
+      if (!globalThis.authService?.loggedIn) {
+        m.route.set("/auth");
+        return Promise.resolve();
+      }
+
       globalThis.flowService.reset();
-      
+
       // Dispatch flow updated event to trigger backend save
       dispatch(_events.flow.updated, globalThis.flowService._flow);
 

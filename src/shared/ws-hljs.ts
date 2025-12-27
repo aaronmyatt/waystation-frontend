@@ -67,7 +67,15 @@ export function CodeLine(): m.Component {
   };
 }
 
-// Stub for compatibility - no longer used but kept to avoid breaking imports
+// Minimal highlight.js integration for markdown preview
+// Flow editor uses the simplified SimpleCodeBlock component above
+import hljs from 'highlight.js';
+
 export const syntaxHighlighter = {
-  highlightAll: () => { /* no-op */ }
+  highlightAll: () => {
+    // Highlight code blocks in markdown preview
+    document.querySelectorAll('pre code:not(.hljs)').forEach((block) => {
+      hljs.highlightElement(block as HTMLElement);
+    });
+  }
 };

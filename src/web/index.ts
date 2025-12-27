@@ -111,11 +111,8 @@ m.route(document.body, "/", {
 
       globalThis.flowService.reset();
 
-      // Trigger a single initial save (debounced)
-      // Use setTimeout to ensure it happens after component initialization
-      setTimeout(() => {
-        dispatch(_events.flow.updated, globalThis.flowService._flow);
-      }, 100);
+      // Trigger initial save - the polling below will wait for the ID to be assigned
+      dispatch(_events.flow.updated, globalThis.flowService._flow);
 
       return new Promise((resolve, reject) => {
         // Check immediately for race condition (ID assigned before polling starts)

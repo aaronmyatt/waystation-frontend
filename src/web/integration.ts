@@ -194,14 +194,17 @@ const debouncedFlowUpdate = debounce(async (flowData) => {
     const savedFlow = response.data;
     console.log("Flow saved:", savedFlow);
 
-    // Update the flow service
-    if (globalThis.flowService) {
-      globalThis.flowService.load(savedFlow);
+    // Only update the ID for new flows (to enable routing)
+    // Don't reload the entire flow to avoid triggering update loops
+    if (globalThis.flowService && !flowData.id && savedFlow.flow?.id) {
+      globalThis.flowService._flow.flow.id = savedFlow.flow.id;
+      globalThis.flowService._flow.flow.user_id = savedFlow.flow.user_id;
+      // Don't call m.redraw() here - let the natural render cycle handle it
     }
   } catch (error) {
     console.error("Error saving flow:", error);
   }
-}, 500);
+}, 1500); // Increased from 500ms to 1500ms to reduce API calls
 
 globalThis.addEventListener("ws::flow::updated", (event) => {
   const customEvent = event as CustomEvent<any>;

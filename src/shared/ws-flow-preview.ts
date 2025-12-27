@@ -16,7 +16,8 @@ export function FlowPreview(): m.Component {
                 vnode.state.markdown = globalThis.flowService.markdown || '';
             }
         },
-        onupdate(){
+        onupdate() {
+            // Highlight code blocks in markdown preview
             syntaxHighlighter.highlightAll();
         },
         view(vnode){

@@ -42,23 +42,18 @@ globalThis.tagsListService = new TagsListService();
 
 const TagCard = {
   view(vnode) {
-    const tag = vnode.attrs.tag;
     return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full',
       m('.card-body',
         [
           m('.flex items-center gap-2',
             [
-              tag.color && m('.badge', {
-                style: `background-color: ${tag.color}; color: white;`
+              vnode.attrs.color && m('.badge', {
+                style: `background-color: ${vnode.attrs.color}; color: white;`
               }, ''),
-              m('.card-title text-lg font-semibold text-primary', tag.name || 'Untitled Tag'),
+              m('.card-title text-lg font-semibold text-primary', vnode.attrs.name || 'Untitled Tag'),
             ]
           ),
-          tag.slug && m('.text-sm text-base-content/70', `Slug: ${tag.slug}`),
-          m('.flex-1'),
-          m('.card-actions justify-end', [
-            m('button.btn btn-sm btn-ghost', 'Edit'),
-          ])
+          vnode.attrs.slug && m('.text-sm text-base-content/70', `Slug: ${vnode.attrs.slug}`)
         ]
       )
     );
@@ -87,7 +82,6 @@ export const TagsList: m.Component = {
   },
   view() {
     const tags = globalThis.tagsListService.tags;
-
     return m('.container mx-auto p-4', [
       m('h1.text-3xl font-bold mb-6', 'Tags'),
       m(SearchBar),
@@ -99,9 +93,9 @@ export const TagsList: m.Component = {
             'No tags yet. Create your first tag!'
         ) :
         m('ul.grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-          tags.map(tag =>
+          tags.map((tag) =>
             m('li.list-none', { key: tag.id },
-              m(TagCard, { tag })
+              m(TagCard, { ...tag, index })
             )
           )
         )

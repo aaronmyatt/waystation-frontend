@@ -3,6 +3,7 @@ import "../services";
 import { FlowEditor } from "../shared/ws-flow-editor";
 import { FlowList } from "../shared/ws-flows-list";
 import { ThemePicker } from "../shared/ws-theme-picker";
+import { DevLog } from "../shared/ws-dev-log";
 import { dispatch, _events } from "../shared/utils";
 
 const Logo = m(
@@ -67,7 +68,8 @@ const L = (child) => {
 // Set the prefix explicitly so visiting /#!/auth works reliably.
 m.route.prefix = "#!";
 
-m.route(document.body, "/", {
+const mountElement = document.getElementById("app") || document.querySelector("main") || document.body;
+m.route(mountElement, "/", {
   "/": {
     onmatch() {
       initData();
@@ -148,3 +150,16 @@ m.route(document.body, "/", {
     },
   },
 });
+
+// Mount DevLog component to a separate element
+const interval = setInterval(() => {
+  const devLogMount = document.getElementById("ws-dev-log-mount");
+  if (devLogMount) {
+    try {
+      m.mount(devLogMount, DevLog);
+      clearInterval(interval);
+    } catch(err){
+      console.error("Failed to mount DevLog:", err);
+    }
+  }
+}, 100);

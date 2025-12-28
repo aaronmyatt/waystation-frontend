@@ -103,7 +103,9 @@ function overtypeOptions(vnode) {
     toolbar: vnode.attrs.toolbar || true,
     onChange: (value) => {
       vnode.attrs.onChange && vnode.attrs.onChange(value);
-      vnode.attrs.onKeydown && vnode.attrs.onKeydown(value);
+    },
+    onKeydown: (event) => {
+      vnode.attrs.onKeydown && vnode.attrs.onKeydown(event);
     },
     autoResize: true,
     padding: vnode.attrs.padding || "4px",
@@ -124,19 +126,6 @@ export const OvertypeBase = {
     vnode.state.editors = OverType.init(vnode.dom, options);
     // Initialize current value to prevent first onbeforeupdate from triggering setValue
     vnode.state.currentValue = vnode.attrs.value || "";
-    for (const editor of vnode.state.editors) {
-      vnode.dom._overtype = editor;
-      if (vnode.attrs.preview) {
-        editor.showPreviewMode();
-      } else {
-        editor.showNormalEditMode();
-        // Focus the editor if it's in edit mode and empty (new note)
-        if (!vnode.attrs.value || vnode.attrs.value.trim() === '') {
-          setTimeout(() => editor.focus && editor.focus(), 100);
-        }
-      }
-      break;
-    }
 
     const overTypePreview = vnode.dom.querySelector(".overtype-preview");
     // match the preview styles to the editor options to prevent visual collapse
@@ -165,7 +154,6 @@ export const OvertypeBase = {
       options.minHeight,
       "important"
     );
-    this.onupdate(vnode);
   },
   onremove(vnode) {
     for (const editor of vnode.state.editors) {
@@ -173,59 +161,20 @@ export const OvertypeBase = {
     }
     vnode.state.editors = [];
   },
-  onbeforeupdate(vnode) {
-    const options = overtypeOptions(vnode);
-    const { theme } = options;
+  onupdate(vnode) {
     const newValue = vnode.attrs.value || "";
 
     // Only update if value actually changed to prevent triggering onChange unnecessarily
-    const currentValue = vnode.state.currentValue || "";
-    const valueChanged = newValue !== currentValue;
-
     for (const editor of vnode.state.editors) {
-      if (vnode.attrs.preview) {
-        editor.showPreviewMode();
-        editor.setTheme(theme);
-        if (valueChanged) {
-          editor.setValue(newValue);
-          vnode.state.currentValue = newValue;
-        }
-
-        // Apply preview styles to prevent collapse
-        const overTypePreview = vnode.dom.querySelector(".overtype-preview");
-        if (overTypePreview) {
-          overTypePreview.style.setProperty("font-size", options.fontSize, "important");
-          overTypePreview.style.setProperty("line-height", options.lineHeight, "important");
-          overTypePreview.style.setProperty("font-family", options.fontFamily, "important");
-          overTypePreview.style.setProperty("padding", options.padding, "important");
-          overTypePreview.style.setProperty("min-height", options.minHeight, "important");
-        }
-      } else {
-        editor.showNormalEditMode();
-        editor.setTheme(theme);
-        if (valueChanged) {
-          editor.setValue(newValue);
-          vnode.state.currentValue = newValue;
-        }
+      const currentValue = vnode.state.currentValue || "";
+      const valueChanged = newValue !== currentValue;
+      if (valueChanged) {
+        editor.setValue(newValue);
+        vnode.state.currentValue = newValue;
       }
     }
   },
-  onupdate(vnode){
-      const overTypeToolbar = vnode.dom.querySelector(".overtype-toolbar");
-      // hide the toolbar in preview mode
-      if( overTypeToolbar ){
-        if( vnode.attrs.preview ){
-          overTypeToolbar.hidden = true;
-        } else {
-          overTypeToolbar.hidden = false;
-        }
-      }
-  },
   view(vnode) {
-    return m(".inner-editor", {
-      onclick: (e) => {
-        !vnode.attrs.preview && e.stopPropagation();
-      },
-    });
+    return m(".inner-editor");
   },
 };

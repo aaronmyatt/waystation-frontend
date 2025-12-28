@@ -172,8 +172,9 @@ globalThis.addEventListener(_events.flow.requestFlowPreview, async (event) => {
 });
 
 // Create/Update Flow (debounced to prevent spam)
-const debouncedFlowUpdate = debounce(async (flowData) => {
-  console.log("Flow updated event received");
+const debouncedFlowUpdate = debounce(async () => {
+  const flowData = globalThis.flowService?._flow;
+  console.log("Flow updated event received", flowData);
   try {
     let promise;
     if (!flowData.id) {
@@ -187,10 +188,10 @@ const debouncedFlowUpdate = debounce(async (flowData) => {
 
     // Only update the ID for new flows (to enable routing)
     // Don't reload the entire flow to avoid triggering update loops
+    globalThis.flowService.load(savedFlow);
     if (globalThis.flowService && !flowData.id && savedFlow.flow?.id) {
       globalThis.flowService._flow.flow.id = savedFlow.flow.id;
       globalThis.flowService._flow.flow.user_id = savedFlow.flow.user_id;
-      // Don't call m.redraw() here - let the natural render cycle handle it
     }
   } catch (error) {
     console.error("Error saving flow:", error);
@@ -198,8 +199,7 @@ const debouncedFlowUpdate = debounce(async (flowData) => {
 }, 1500); // Increased from 500ms to 1500ms to reduce API calls
 
 globalThis.addEventListener("ws::flow::updated", (event) => {
-  const customEvent = event as CustomEvent<any>;
-  debouncedFlowUpdate(customEvent.detail);
+  debouncedFlowUpdate();
 });
 
 // Delete Flow

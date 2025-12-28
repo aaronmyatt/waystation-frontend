@@ -1,5 +1,5 @@
 import m from "mithril";
-import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg } from "../shared/ws-svg";
+import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg, githubSvg } from "../shared/ws-svg";
 import { dispatch, _events } from "../shared/utils";
 import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
@@ -39,8 +39,6 @@ const FlowToolbar = {
               m("a",
                 {
                   onclick: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
                     dispatch(
                       _events.action.generateFlowContent,
                       {flow: { ...globalThis.flowService.flow }}
@@ -54,8 +52,6 @@ const FlowToolbar = {
               m("a.text-error",
                 {
                   onclick: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
                     dispatch(
                       _events.action.deleteFlow,
                       {flow: { ...globalThis.flowService.flow }}
@@ -103,16 +99,6 @@ const FlowMatchToolbar = {
             },
           },
           m("span.text-primary block size-4", m.trust(downSvg))
-        ),
-
-        m(
-          "button.btn btn-xs btn-outline hidden sm:inline-flex",
-          {
-            onclick: (e) => {
-              vnode.attrs.editCb && vnode.attrs.editCb(e);
-            },
-          },
-          vnode.attrs.editing ? "Save" : "Edit"
         ),
         m(
           "details.dropdown dropdown-end",
@@ -259,28 +245,15 @@ function FlowMatch() {
           m(".card-body gap-0 space-y-2 sm:gap-2", [
             // title & toolbar
             m(".flex justify-between items-baseline gap-1 sm:gap-4", [
-              editing
-                ? m(
-                    "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
-                    {
-                      onclick: (e) => {
-                        e.stopPropagation();
-                      },
+              m(
+                  "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
+                  m(TitleInput, {
+                    title: title,
+                    cb: (newTitle) => {
+                      title = newTitle;
                     },
-                    m(TitleInput, {
-                      title: title,
-                      cb: (newTitle) => {
-                        title = newTitle;
-                      },
-                    })
-                  )
-                : m(
-                    "h2.card-title text-lg font-semibold text-secondary min-w-0 flex-grow",
-                    { 
-                      style: "overflow-wrap: anywhere; word-break: break-word;"
-                    },
-                    title
-                  ),
+                  })
+                ),
               m(
                 ".btn btn-xs btn-circle flex-shrink-0 sm:hidden",
                 { onclick: (e) => { 
@@ -296,9 +269,43 @@ function FlowMatch() {
                   editing,
                   match: vnode.attrs.match,
                   index: vnode.attrs.index,
-                  editCb: (e) => {
-                    if( editing ){
-                      editing = false;
+                })
+              ),
+            ]),
+
+            m('.flex flex-grow space-x-2', [
+              // match.git_repo_root
+            vnode.attrs.match.match?.git_repo_root 
+              && m(".text-sm link link-primary mb-1 flex items-center gap-1", [
+                m("span.block size-4", m.trust(githubSvg)),
+                m('span', vnode.attrs.match.match.git_repo_root),
+              ]),
+            // match.repo_relative_file_path
+            vnode.attrs.match.match?.repo_relative_file_path 
+              && m(".text-sm link link-primary mb-1", [
+                m('span', vnode.attrs.match.match.repo_relative_file_path),
+                m('span', {
+                  class: "text-base-content/70"
+                }, ' +'+vnode.attrs.match.match.line_no),
+              ]),
+            ]),
+            (!open && vnode.attrs.match.match?.line) 
+              && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
+              CodeLine, { match: vnode.attrs.match }
+            )),
+            // Collapsible description on small screens
+            m(".collapse", 
+              {
+                class: open ? "collapse-open" : "collapse-close sm:collapse-open",
+              },
+              [
+                m(".collapse-content p-0", [
+                  m(FlowMatchDescriptionEditor, {
+                    description,
+                    onChange: (value) => {
+                      if(value === description) return;
+                      description = value;
+                      
                       // save changes
                       const updatedMatch = { ...vnode.attrs.match };
 
@@ -316,37 +323,7 @@ function FlowMatch() {
                         };
                       }
                       globalThis.flowService.updateFlowMatch(updatedMatch);
-                      // m.redraw();
-                    } else {
-                      editing = true;
                     }
-                  },
-                })
-              ),
-            ]),
-            // match.repo_relative_file_path
-            vnode.attrs.match.match?.repo_relative_file_path 
-              && m(".text-sm link link-primary mb-1", [
-                m('span', vnode.attrs.match.match.repo_relative_file_path),
-                m('span', {
-                  class: "text-base-content/70"
-                }, ' +'+vnode.attrs.match.match.line_no),
-              ]),
-            (!open && vnode.attrs.match.match?.line) 
-              && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
-              CodeLine, { match: vnode.attrs.match }
-            )),
-            // Collapsible description on small screens
-            m(".collapse", 
-              {
-                class: open ? "collapse-open" : "collapse-close sm:collapse-open",
-              },
-              [
-                m(".collapse-content p-0", [
-                  m(FlowMatchDescriptionEditor, {
-                    description,
-                    togglePreview: !editing,
-                    onKeydown: (value) => { description = value; }
                   }),
                   vnode.attrs.match.content_kind === "match" && m(CodeBlock, { match: vnode.attrs.match }),
                 ])
@@ -474,13 +451,11 @@ function FlowMatchDescriptionEditor() {
     view(vnode) {
       return m(
         ".editor",
-        {
-          class: (vnode.attrs.togglePreview && !vnode.attrs.description) ? "hidden" : ""
-        },
         [
           m(OvertypeBase, {
             value: vnode.attrs.description,
             preview: vnode.attrs.togglePreview,
+            onChange: vnode.attrs.onChange || (() => {}),
             onKeydown: vnode.attrs.onKeydown || (() => {}),
           }),
         ]

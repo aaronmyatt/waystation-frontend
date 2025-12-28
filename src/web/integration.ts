@@ -1,7 +1,6 @@
 import { api } from "../shared/api-client";
 import { storageKeys, _events } from "../shared/utils";
 
-
 globalThis.addEventListener(_events.auth.logout, (event) => {
   console.log("Logout event received");
   api.auth
@@ -118,7 +117,7 @@ globalThis.addEventListener("ws::action::refreshList", async (event) => {
 });
 
 // Fetch Single Flow (for editing - requires aggregate structure)
-globalThis.addEventListener("ws::action::requestFlow", async (event) => {
+globalThis.addEventListener(_events.action.requestFlow, async (event) => {
   console.log("Request flow event received:", event.detail.flowId);
   const { flowId } = event.detail;
 

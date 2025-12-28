@@ -150,27 +150,11 @@ m.route(document.body, "/", {
   },
   "/flow/:id": {
     onmatch(args, _requestedPath, _route): Promise<void> {
-      
-
       return new Promise((resolve, reject) => {
         resolve();
-        // // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
-        // // adhoc reactivity
-        // const interval = setInterval(() => {
-        //   if(globalThis.flowService.flow.id === args.id) {
-        //     clearTimeout(timeout);
-        //     clearInterval(interval);
-        //     resolve();
-        //   }
-        // }, 50);
-
-        // const timeout = setTimeout(() => {
-        //   clearInterval(interval);
-        //   dispatch(_events.action.actionError, { 
-        //     message: `Failed to load flow ${args.id} within 5 seconds` 
-        //   });
-        //   reject(`Failed to load flow ${args.id} within 5 seconds` );
-        // }, 5000);
+        // TODO should we check against the backend to guarantee the user has access to this flow?
+        // The worse that can happen right now is that someone forces their way into editor mode with ?tab=editor
+        // but it'll throw 401 and the page will be blank
       })
     },
     render(vnode) {

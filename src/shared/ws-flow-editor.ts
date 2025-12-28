@@ -110,17 +110,6 @@ const FlowMatchToolbar = {
             "ul.menu dropdown-content bg-base-200 rounded-box w-52 p-2 shadow-sm",
             [
               m("li",
-                m("a",
-                  {
-                    class: "sm:hidden",
-                    onclick: (e) => {
-                      vnode.attrs.editCb && vnode.attrs.editCb(e);
-                    },
-                  },
-                  vnode.attrs.editing ? "Save" : "Edit"
-                )
-              ),
-              m("li",
                 [m("a",
                   {
                     onclick: () => {
@@ -194,7 +183,6 @@ function FlowMatchList() {
 }
 
 function FlowMatch() {
-  let editing = false;
   let title = "";
   let description = "";
   let open = true;
@@ -266,7 +254,6 @@ function FlowMatch() {
               m(
                 ".toolbar-wrapper flex-shrink-0",
                 m(FlowMatchToolbar, {
-                  editing,
                   match: vnode.attrs.match,
                   index: vnode.attrs.index,
                 })
@@ -426,15 +413,12 @@ function FlowDescriptionEditor() {
       vnode.state.description = globalThis.flowService.flow.description
     },
     view(vnode) {
-      const canEdit = globalThis.flowService?.canEdit();
       return m(
         ".editor",
         m(OvertypeBase, {
           value: globalThis.flowService.flow.description || "",
-          placeholder: canEdit ? "Enter description..." : "No description",
-          preview: !canEdit,
+          placeholder: "Enter description...",
           onKeydown: (description) => {
-            if (!canEdit) return;
             globalThis.flowService.updateFlow({
               ...globalThis.flowService.flow,
               description,
@@ -484,11 +468,9 @@ function TitleInput() {
         m("textarea.title w-full break-words", {
           value: title,
           name: "flow title",
-          readonly: vnode.attrs.readonly || false,
           style: "word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;",
           oncreate: (vnode) => this.resize(vnode),
           oninput: (e) => {
-            if (vnode.attrs.readonly) return;
             const name = e.target.value;
             if (name === title) return;
             title = name;
@@ -504,7 +486,6 @@ function TitleInput() {
 export function FlowEditor(): m.Component {
   return {
     oninit(vnode) {
-      dispatch(_events.action.requestFlow, { flowId: vnode.attrs.id });     
       vnode.state.flow = globalThis.flowService.flow;
       vnode.state.matches = globalThis.flowService.matches;
     },
@@ -521,7 +502,6 @@ export function FlowEditor(): m.Component {
       globalThis.flowService.clear();
     },
     view(vnode) {
-      const canEdit = globalThis.flowService?.canEdit();
       return m(".flow", [
         // title & toolbar
         m(".flex justify-between gap-4", [
@@ -529,9 +509,7 @@ export function FlowEditor(): m.Component {
             "h1.text-2xl font-bold text-base-content min-w-0 flex-grow break-words overflow-wrap",
             m(TitleInput, {
               title: vnode.state.flow.name,
-              readonly: !canEdit,
               cb: (newTitle) => {
-                if (!canEdit) return;
                 globalThis.flowService.updateFlow({
                   ...globalThis.flowService.flow,
                   name: newTitle,

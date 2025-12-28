@@ -189,14 +189,6 @@ export const api = {
       apiClient.get(`/users/${username}/flows`),
   },
 
-  // Public Flows (no auth required)
-  publicFlows: {
-    get: (id: string) =>
-      apiClient.get(`/public/flows/${id}`),
-    list: () =>
-      apiClient.get('/public/flows'),
-  },
-
   // Repos
   repos: {
     list: () =>

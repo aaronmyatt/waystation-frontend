@@ -156,16 +156,7 @@ globalThis.addEventListener(_events.flow.requestFlowPreview, async (event) => {
   const { flowId } = event.detail;
 
   try {
-    const isLoggedIn = globalThis.authService?.loggedIn;
-    let response;
-
-    if (isLoggedIn) {
-      // Logged in users can get flow aggregate which includes markdown
-      response = await api.flowAggregates.get(flowId);
-    } else {
-      // Non-logged in users use public flows endpoint
-      response = await api.publicFlows.get(flowId);
-    }
+    const response = await api.flows.get(flowId);
 
     const flowData = response.data;
     console.log("Fetched flow preview data:", flowData);

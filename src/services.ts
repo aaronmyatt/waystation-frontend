@@ -137,6 +137,7 @@ class FlowService {
   }
 
   loadPreview(flowPreview: any) {
+    this._flow = { flow: flowPreview, matches: [] };
     this.markdown = flowPreview.markdown || "";
     m.redraw();
   }

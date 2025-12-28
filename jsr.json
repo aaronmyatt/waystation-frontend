@@ -1,6 +1,6 @@
 {
   "name": "@waystation/frontend",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "license": "MIT",
   "exports": {
     "./vscode-extension": "./src/vscode-extension/index.ts",

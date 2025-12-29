@@ -11,7 +11,6 @@ export function FlowPreview(): m.Component {
         oninit(vnode) {
             vnode.state.flow = globalThis.flowService.flow;
             vnode.state.markdown = globalThis.flowService.markdown || '';
-            dispatch(_events.flow.requestFlowPreview, { flowId: vnode.attrs.id });
         },
         onbeforeupdate(vnode) {
             if (globalThis.flowService.markdown !== vnode.state.markdown) {

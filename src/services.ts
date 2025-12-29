@@ -188,7 +188,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
   }
 
   canEdit(): boolean {
-    return this.isCreatingNew() || this.isOwnedByCurrentUser();
+    return this.isOwnedByCurrentUser();
   }
 }
 

@@ -48,7 +48,7 @@ const FlowCard = {
 }
 
 export const FlowList: m.Component = {
-  view(){
+  view(vnode){
     if (globalThis.flowListService.flows.length === 0) {
       return m('.container mx-auto p-4', m('p.text-center text-lg text-base-content/70', 'No flows found.'));
     } else {
@@ -59,11 +59,8 @@ export const FlowList: m.Component = {
             m('li.list-none',
               { key: flow.id },
               m(m.route.Link, { 
-                href: '/flow/' + flow.id,
+                href: vnode.attrs.activeTab === 'public' ? '/flow/' + flow.id + '/preview' : '/flow/' + flow.id,
                 class: 'no-underline hover:no-underline block h-full',
-                onclick: () => {
-                  dispatch(_sharedEvents.action.requestFlow, { flowId: flow.id });
-                }
               }, [
                 m(FlowCard, { 
                   flow

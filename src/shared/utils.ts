@@ -1,3 +1,16 @@
+
+export function updateQueryParam(param: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('tab', param);
+  window.history.replaceState({}, '', url.toString());
+}
+
+export function removeQueryParam(param: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.delete(param);
+  window.history.replaceState({}, '', url.toString());
+}
+
 export function dispatch(eventName: string, data?: any): boolean {
   return globalThis.dispatchEvent(
     new CustomEvent(eventName, { detail: data || {} })

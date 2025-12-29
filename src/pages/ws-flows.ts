@@ -48,7 +48,7 @@ export const Page: m.Component = {
               }, '=|| Just mine')
           ]
         ),
-        m(FlowList),
+        m(FlowList, {activeTab: this.activeTab}),
         m(FlowSettingsModal)
       ]
     )

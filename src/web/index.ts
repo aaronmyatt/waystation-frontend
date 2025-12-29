@@ -2,6 +2,7 @@ import m from "mithril";
 import "../services";
 import { Page as FlowsPage } from "../pages/ws-flows";
 import { Page as FlowPage } from "../pages/ws-flow";
+import { FlowPreview } from "../shared/ws-flow-preview";
 import { TagsList } from "../pages/ws-tags-list";
 import { Auth } from "../pages/ws-auth";
 import { ThemePicker } from "../shared/ws-theme-picker";
@@ -21,39 +22,41 @@ const Logo = m(
 
 const Layout = {
   oninit(vnode) {
-    this.onbeforeupdate(vnode)
+    this.onbeforeupdate(vnode);
   },
   onbeforeupdate(vnode) {
     vnode.state.loggedIn = globalThis.authService.loggedIn;
   },
   view: (vnode) => {
     return m("main.layout container mx-auto", [
-      m(
-        ".navbar",
-        [
-          m(".navbar-start", Logo),
-          m(".navbar-end gap-2", [
-            m(
-              "button.btn btn-ghost",
-              {
-                onclick: () => {
-                  if (vnode.state.loggedIn) {
-                    m.route.set("/flow/new");
-                  } else {
-                    m.route.set("/auth");
-                  }
+      m(".navbar", [
+        m(".navbar-start", Logo),
+        m(".navbar-end gap-2", [
+          m(
+            "button.btn btn-ghost",
+            {
+              onclick: () => {
+                if (vnode.state.loggedIn) {
+                  m.route.set("/flow/new");
+                } else {
+                  m.route.set("/auth");
                 }
               },
-              "New Flow"
+            },
+            "New Flow"
+          ),
+          m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
+          !vnode.state.loggedIn &&
+            m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Login"),
+          vnode.state.loggedIn &&
+            m(
+              "button.btn btn-ghost",
+              { onclick: () => dispatch(_events.auth.logout) },
+              "Logout"
             ),
-            m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
-            !vnode.state.loggedIn && m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Login"),
-            vnode.state.loggedIn && m('button.btn btn-ghost', { onclick: () => dispatch(_events.auth.logout) },
-                                       "Logout"),
-            m(ThemePicker)
-          ]),
-        ]
-      ),
+          m(ThemePicker),
+        ]),
+      ]),
       m("section.mt-10", vnode.children),
       //end
     ]);
@@ -73,8 +76,7 @@ const initData = () => {
 
 const L = (child) => {
   return {
-    onmatch() {
-    },
+    onmatch() {},
     render(vnode) {
       return m(Layout, m(child, vnode.attrs));
     },
@@ -137,10 +139,10 @@ m.route(document.body, "/", {
 
         const timeout = setTimeout(() => {
           clearInterval(interval);
-          dispatch(_events.action.actionError, { 
-            message: 'Failed to create flow: No ID assigned within 5 seconds' 
+          dispatch(_events.action.actionError, {
+            message: "Failed to create flow: No ID assigned within 5 seconds",
           });
-          reject('Failed to create flow: No ID assigned within 5 seconds');
+          reject("Failed to create flow: No ID assigned within 5 seconds");
         }, 5000);
       });
     },
@@ -150,15 +152,58 @@ m.route(document.body, "/", {
   },
   "/flow/:id": {
     onmatch(args, _requestedPath, _route): Promise<void> {
+      dispatch(_events.action.requestFlow, { flowId: args.id });
+
       return new Promise((resolve, reject) => {
-        resolve();
-        // TODO should we check against the backend to guarantee the user has access to this flow?
-        // The worse that can happen right now is that someone forces their way into editor mode with ?tab=editor
-        // but it'll throw 401 and the page will be blank
-      })
+        // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
+        // adhoc reactivity
+        const interval = setInterval(() => {
+          if (globalThis.flowService.flow.id === args.id) {
+            clearTimeout(timeout);
+            clearInterval(interval);
+            resolve();
+          }
+        }, 50);
+
+        const timeout = setTimeout(() => {
+          clearInterval(interval);
+          dispatch(_events.action.actionError, {
+            message: `Failed to load flow ${args.id} within 5 seconds`,
+          });
+          reject(`Failed to load flow ${args.id} within 5 seconds`);
+        }, 5000);
+      });
     },
     render(vnode) {
       return m(Layout, m(FlowPage, vnode.attrs));
+    },
+  },
+  "/flow/:id/preview": {
+    onmatch(args, _requestedPath, _route): Promise<void> {
+      dispatch(_events.flow.requestFlowPreview, { flowId: args.id });
+
+      return new Promise((resolve, reject) => {
+        // TODO: use a proxy to inctercept flowService.flow changes instead of polling?
+        // adhoc reactivity
+        const interval = setInterval(() => {
+          if (globalThis.flowService.flow.id === args.id) {
+            clearTimeout(timeout);
+            clearInterval(interval);
+            resolve();
+          }
+        }, 50);
+
+        const timeout = setTimeout(() => {
+          clearInterval(interval);
+          dispatch(_events.action.actionError, {
+            message: `Failed to load flow ${args.id} within 5 seconds`,
+          });
+          reject(`Failed to load flow ${args.id} within 5 seconds`);
+        }, 5000);
+      });
+    },
+    render(vnode) {
+      return m(Layout, m(FlowPreview, vnode.attrs));
     },
   },
 });

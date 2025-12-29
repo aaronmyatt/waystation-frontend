@@ -281,7 +281,7 @@ function FlowMatch() {
             m('.flex flex-grow space-x-2', [
               // match.git_repo_root
             vnode.attrs.match.match?.git_repo_root 
-              && m(".text-sm link link-primary mb-1 flex items-center gap-1", [
+              && m(".hidden sm:flex text-sm link link-primary mb-1 flex items-center gap-1", [
                 m("span.block size-4", m.trust(githubSvg)),
                 m('span', vnode.attrs.match.match.git_repo_root),
               ]),

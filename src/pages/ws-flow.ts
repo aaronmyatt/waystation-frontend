@@ -1,7 +1,7 @@
 import m from "mithril";
 import { FlowEditor } from "../shared/ws-flow-editor";
 import { FlowPreview } from "../shared/ws-flow-preview";
-import { _events, dispatch } from "@waystation/shared/utils";
+import { _events, dispatch } from "../shared/utils";
 
 export function Page(): m.Component {
   return {

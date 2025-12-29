@@ -50,7 +50,7 @@ function overtypeOptions(vnode) {
       selection: addAlpha(getCSSVar('--color-base-200'), 0.4) || "rgba(244, 211, 94, 0.4)",
       listMarker: getCSSVar('--color-warning') || "#ee964b",
       rawLine: getCSSVar('--color-neutral-content') || "#5a7a9b",
-      border: getCSSVar('--color-base-300') || "#e0e0e0",
+      border: getCSSVar('--color-primary') || "#e0e0e0",
       hoverBg: getCSSVar('--color-base-200') || "#f0f0f0",
       primary: getCSSVar('--color-primary') || "#0d3b66",
       // Toolbar colors
@@ -90,7 +90,7 @@ function overtypeOptions(vnode) {
       hoverBg: getCSSVar('--color-base-200') || "#fff4d6",
       primary: getCSSVar('--color-primary') || "#1a4d2e",
       // Toolbar colors
-      toolbarBg: getCSSVar('--color-base-100') || "#fffcf5",
+      toolbarBg: getCSSVar('--color-primary-content') || "#fffcf5",
       toolbarIcon: getCSSVar('--color-base-content') || "#1a4d2e",
       toolbarHover: getCSSVar('--color-base-200') || "#fff8e7",
       toolbarActive: getCSSVar('--color-primary') || "#ffe082",
@@ -175,6 +175,7 @@ export const OvertypeBase = {
     }
   },
   view(vnode) {
-    return m(".inner-editor");
+    return m(".inner-editor border border-base-300 focus-within:border-primary", {
+    });
   },
 };

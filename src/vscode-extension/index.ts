@@ -146,7 +146,7 @@ m.route(mountElement, "/", {
       })
     },
     render(vnode) {
-      return m(Layout, m(FlowEditor, vnode.attrs));
+      return m(Layout, m('.container max-w-6xl mx-auto', m(FlowEditor, vnode.attrs)));
     },
   },
 });

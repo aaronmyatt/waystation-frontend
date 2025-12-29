@@ -49,7 +49,6 @@ export const Page: m.Component = {
           ]
         ),
         m(FlowList, {activeTab: this.activeTab}),
-        m(FlowSettingsModal)
       ]
     )
   }

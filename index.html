@@ -24,7 +24,7 @@
   <div id="ws-dev-log-mount"></div>
 <script>
 // Keep original mock data for backward compatibility
-window.__INITIAL_DATA__ = {
+globalThis.__INITIAL_DATA__ = {
   flows: [
   {
     "id": "a04b3b6c-1d48-44bb-9ce4-2b955ef7b792",
@@ -305,6 +305,9 @@ window.__INITIAL_DATA__ = {
     }
   ],
   "isDirty": false
+  },
+  features: {
+    "settings-modal": false
   }
 };
 

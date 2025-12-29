@@ -1,6 +1,31 @@
 import m from "mithril";
 import { _events, dispatch } from "./shared/utils";
 
+class FeatureToggleService {
+  private features: Record<string, boolean> = {
+    "settings-modal": true,
+  };
+
+  constructor() {
+    // initialize from window global if available
+    if (globalThis.__INITIAL_DATA__?.features) {
+      this.features = {
+        ...this.features,
+        ...globalThis.__INITIAL_DATA__.features,
+      };
+    }
+  }
+
+
+  isEnabled(featureName: string): boolean {
+    return !!this.features[featureName];
+  }
+
+  setFeature(featureName: string, isEnabled: boolean) {
+    this.features[featureName] = isEnabled;
+  }
+}
+
 class FlowListService {
   _flows = []
   
@@ -194,8 +219,11 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 
 globalThis.flowService = new FlowService();
 globalThis.flowListService = new FlowListService();
+globalThis.featureToggleService = new FeatureToggleService();
+
 export {
   FlowListService,
-  FlowService
+  FlowService,
+  FeatureToggleService
 };
 

@@ -14,6 +14,7 @@ declare global {
   var flowService: any;
   var flowListService: any;
   var tagsListService: any;
+  var featureToggleService: any;
   var authService: any;
   var marked: any;
   var syntaxHighlighter: any;

@@ -2,6 +2,7 @@ import { MarkdownRenderer } from './ws-marked'
 import m from 'mithril'
 import { _events as _sharedEvents, dispatch } from './utils'
 import { cogSvg } from './ws-svg';
+import { FlowSettingsModal } from './ws-flow-settings-modal';
 
 const marked = new MarkdownRenderer();
 
@@ -22,12 +23,15 @@ function FlowDescriptionMd(){
 }
 
 const FlowCard = {
+  oninit(vnode){
+    vnode.state.settingsModalEnabled = globalThis.featureToggleService.isEnabled('settings-modal');
+  },
   view(vnode){
     return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full', 
       m('.card-body', [
         m('.card-title text-lg font-semibold text-primary justify-between', [
           m('span', vnode.attrs.flow.name || ''),
-          m('button.btn btn-circle btn-sm', {
+          vnode.state.settingsModalEnabled && m('button.btn btn-circle btn-sm', {
             onclick: (e: Event) => {
               e.stopPropagation();
               e.preventDefault();
@@ -53,7 +57,7 @@ export const FlowList: m.Component = {
       return m('.container mx-auto p-4', m('p.text-center text-lg text-base-content/70', 'No flows found.'));
     } else {
       return (
-      m('.container mx-auto p-4', 
+      m('.container mx-auto p-4', [
         m('ul.grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3', 
           globalThis.flowListService.flows.map(flow => 
             m('li.list-none',
@@ -67,8 +71,9 @@ export const FlowList: m.Component = {
                 })
               ])
             )
-          ))
-        )
+          )),
+          m(FlowSettingsModal)
+        ])
       );
     }
   } 

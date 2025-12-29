@@ -216,6 +216,22 @@ function FlowMatch() {
     onremove(){
       window.removeEventListener('resize', () => {});
     },
+    updateMatch(match) {
+      if (match.content_kind === "match") {
+        match.note = {
+          ...match.note,
+          name: title,
+          description: description,
+        };
+      } else if (match.content_kind === "note") {
+        match.step_content = {
+          ...match.step_content,
+          title: title,
+          body: description,
+        };
+      }
+      globalThis.flowService.updateFlowMatch(match);
+    },
     view(vnode) {
       return m.fragment([
         m(
@@ -239,6 +255,8 @@ function FlowMatch() {
                     title: title,
                     cb: (newTitle) => {
                       title = newTitle;
+                      const updatedMatch = { ...vnode.attrs.match };
+                      this.updateMatch(updatedMatch)
                     },
                   })
                 ),
@@ -292,24 +310,9 @@ function FlowMatch() {
                     onChange: (value) => {
                       if(value === description) return;
                       description = value;
-                      
-                      // save changes
-                      const updatedMatch = { ...vnode.attrs.match };
 
-                      if (updatedMatch.content_kind === "match") {
-                        updatedMatch.note = {
-                          ...updatedMatch.note,
-                          name: title,
-                          description: description,
-                        };
-                      } else if (updatedMatch.content_kind === "note") {
-                        updatedMatch.step_content = {
-                          ...updatedMatch.step_content,
-                          title: title,
-                          body: description,
-                        };
-                      }
-                      globalThis.flowService.updateFlowMatch(updatedMatch);
+                      const updatedMatch = { ...vnode.attrs.match };
+                      this.updateMatch(updatedMatch)
                     }
                   }),
                   vnode.attrs.match.content_kind === "match" && m(CodeBlock, { match: vnode.attrs.match }),
@@ -418,7 +421,9 @@ function FlowDescriptionEditor() {
         m(OvertypeBase, {
           value: globalThis.flowService.flow.description || "",
           placeholder: "Enter description...",
-          onKeydown: (description) => {
+          onChange: (description) => {
+            if(vnode.state.description === description) return;
+            vnode.state.description = description;
             globalThis.flowService.updateFlow({
               ...globalThis.flowService.flow,
               description,

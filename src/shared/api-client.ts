@@ -149,8 +149,8 @@ export const api = {
 
   // Tags
   tags: {
-    list: () =>
-      apiClient.get('/tags'),
+    list: (params?: { query?: string; page?: number; per_page?: number }) =>
+      apiClient.get('/tags', { params }),
 
     create: (tagData: any) =>
       apiClient.post('/tags', tagData),

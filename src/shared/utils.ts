@@ -40,6 +40,7 @@ export const _events = {
     closeFlowSettingsModal: 'ws::ui::closeFlowSettingsModal',
   },
   action: {
+    refreshTagsList: 'ws::action::refreshTagsList',
     refreshList: 'ws::action::refreshList',
     requestFlow: 'ws::action::requestFlow',
     actionError: 'ws::action::actionError',

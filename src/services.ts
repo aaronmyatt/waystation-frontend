@@ -1,6 +1,53 @@
 import m from "mithril";
 import { _events, dispatch } from "./shared/utils";
 
+class TagsListService {
+  _tags = []
+  _searchQuery = ''
+  _pagination = {
+    per_page: 100,
+    page: 1,
+  };
+
+  get tags() {
+    if (!this._searchQuery) {
+      return this._tags;
+    }
+    // Filter tags based on search query
+    const query = this._searchQuery.toLowerCase();
+    return this._tags.filter(tag =>
+      tag.name?.toLowerCase().startsWith(query) ||
+      tag.slug?.toLowerCase().startsWith(query)
+    );
+  }
+
+  get searchQuery() {
+    return this._searchQuery;
+  }
+
+  setSearchQuery(query: string) {
+    this._searchQuery = query;
+    dispatch(_events.action.refreshTagsList, {
+      params: {
+        per_page: this._pagination.per_page,
+        page: this._pagination.page,
+        query: this._searchQuery,
+      }
+    });
+  }
+
+  load(tags) {
+    this._tags = tags.rows;
+    this._pagination = {
+      per_page: tags.per_page,
+      page: tags.page,
+    };
+    m.redraw();
+  }
+}
+
+globalThis.tagsListService = new TagsListService();
+
 class FeatureToggleService {
   private features: Record<string, boolean> = {
     "settings-modal": true,

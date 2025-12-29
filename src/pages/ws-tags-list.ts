@@ -1,45 +1,6 @@
 import m from 'mithril'
 import { _events, dispatch } from '../shared/utils'
 
-const _tagsEvents = {
-  action: {
-    refreshTagsList: 'ws::action::refreshTagsList',
-  },
-};
-
-class TagsListService {
-  _tags = []
-  _searchQuery = ''
-
-  get tags() {
-    if (!this._searchQuery) {
-      return this._tags;
-    }
-    // Filter tags based on search query
-    const query = this._searchQuery.toLowerCase();
-    return this._tags.filter(tag =>
-      tag.name?.toLowerCase().includes(query) ||
-      tag.slug?.toLowerCase().includes(query)
-    );
-  }
-
-  get searchQuery() {
-    return this._searchQuery;
-  }
-
-  setSearchQuery(query: string) {
-    this._searchQuery = query;
-    m.redraw();
-  }
-
-  load(tags) {
-    this._tags = tags;
-    m.redraw();
-  }
-}
-
-globalThis.tagsListService = new TagsListService();
-
 const TagCard = {
   view(vnode) {
     return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full',
@@ -78,7 +39,11 @@ const SearchBar = {
 export const TagsList: m.Component = {
   oninit() {
     // Trigger refresh on mount
-    dispatch(_tagsEvents.action.refreshTagsList, {});
+    dispatch(_events.action.refreshTagsList, {
+      params: {
+        per_page: 100, page: 1, 
+      }
+    });
   },
   view() {
     const tags = globalThis.tagsListService.tags;
@@ -95,7 +60,7 @@ export const TagsList: m.Component = {
         m('ul.grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
           tags.map((tag) =>
             m('li.list-none', { key: tag.id },
-              m(TagCard, { ...tag, index })
+              m(TagCard, { ...tag })
             )
           )
         )

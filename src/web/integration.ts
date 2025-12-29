@@ -219,17 +219,18 @@ globalThis.addEventListener("ws::action::deleteFlow", async (event) => {
   }
 });
 
-// Tags List - Refresh/Fetch all tags
-globalThis.addEventListener("ws::action::refreshTagsList", async (event) => {
+// Tags List - Refresh/Fetch all tags (debounced)
+const debouncedRefreshTagsList = debounce(async (event) => {
   try {
-    const response = await api.tags.list();
-    const tags = response.data.tags;
+    const params = (event as CustomEvent<{ params?: any }>).detail.params || {};
+    const response = await api.tags.list(params);
+    const tags = response.data;
 
     // Update the tags list service
     if (globalThis.tagsListService) {
       globalThis.tagsListService.load(tags);
     }
-    console.log(`Loaded ${tags.length} tags`, tags);
+    console.log(`Loaded ${tags.rows.length} tags`, tags);
   } catch (error: any) {
     console.error("Error fetching tags:", error);
     console.error("Error response:", error.response);
@@ -237,6 +238,10 @@ globalThis.addEventListener("ws::action::refreshTagsList", async (event) => {
       console.error("Authentication failed - please log in again");
     }
   }
+}, 500); // 500ms debounce, adjust as needed
+
+globalThis.addEventListener("ws::action::refreshTagsList", (event) => {
+  debouncedRefreshTagsList(event);
 });
 
 globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {

@@ -507,9 +507,6 @@ export function FlowEditor(): m.Component {
       vnode.state.flow = globalThis.flowService.flow;
       vnode.state.matches = globalThis.flowService.matches;
     },
-    onremove() {
-      globalThis.flowService.clear();
-    },
     view(vnode) {
       return m(".flow", [
         // title & toolbar

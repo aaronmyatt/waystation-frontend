@@ -1,6 +1,7 @@
 import m from "mithril";
 import { FlowEditor } from "../shared/ws-flow-editor";
 import { FlowPreview } from "../shared/ws-flow-preview";
+import { _events, dispatch } from "@waystation/shared/utils";
 
 export function Page(): m.Component {
   return {
@@ -22,9 +23,7 @@ export function Page(): m.Component {
       globalThis.flowService.clear();
     },
     view(vnode) {
-      const canEdit = vnode.state.canEdit;
-
-      return m('.container mx-auto p-2 sm:p-4 max-w-5xl',
+      return m('.container mx-auto p-2 sm:p-4 max-w-6xl',
         [
           m('.tabs tabs-boxed mb-4',
             [
@@ -32,19 +31,21 @@ export function Page(): m.Component {
                 class: vnode.state.activeTab === 'preview' ? 'tab-active' : '',
                 onclick: () => {
                   vnode.state.activeTab = 'preview';
+                  dispatch(_events.flow.requestFlowPreview, { flowId: vnode.attrs.id });
                 }
               }, 'Preview'),
               // Only show Edit tab if user can edit this flow
-              canEdit ? m('button.tab', {
+              m('button.tab', {
                 class: vnode.state.activeTab === 'editor' ? 'tab-active' : '',
                 onclick: () => {
                   vnode.state.activeTab = 'editor';
+                  dispatch(_events.action.requestFlow, { flowId: vnode.attrs.id });
                 }
-              }, 'Edit') : null,
+              }, 'Edit'),
             ]
           ),
           vnode.state.activeTab === 'preview' ? m('.preview-container', m(FlowPreview, { id: vnode.attrs.id })) : null,
-          (vnode.state.activeTab === 'editor' && canEdit) ? m(FlowEditor, { id: vnode.attrs.id }) : null
+          vnode.state.activeTab === 'editor' ? m(FlowEditor, { id: vnode.attrs.id }) : null
       ]);
     },
   };

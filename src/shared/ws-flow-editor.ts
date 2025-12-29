@@ -468,12 +468,16 @@ function TitleInput() {
         title = vnode.attrs.title || "";
       }
     },
+    onupdate(vnode) {
+      this.resize(vnode);
+    },
     view(vnode){
       return (
-        m("textarea.title w-full break-words", {
+        m("textarea.title w-full break-words border-b border-dashed border-primary", {
           value: title,
           name: "flow title",
-          style: "word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;",
+          rows: 1,
+          style: "word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; overflow: hidden; resize: none;",
           oncreate: (vnode) => this.resize(vnode),
           oninput: (e) => {
             const name = e.target.value;

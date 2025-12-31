@@ -21,29 +21,29 @@ export function TagsInput() {
     view(vnode) {
       return m(
         ".tag-badge-list",
-        [vnode.state.flowTags.length > 0 && 
-          m('ul.flex.flex-wrap',
+        [
+          m('div.flex.flex-wrap.items-center.gap-2', [
             vnode.state.flowTags.map((option) =>
               m(
-                ".badge badge-lg badge-primary m-1 flex items-center",
-                
-                [m('span',option.label),
-                  m('button.btn btn-sm btn-circle btn-ghost ml-2', {
+                "span.badge.badge-lg.badge-primary.shadow-sm.flex.items-center.gap-2.border.border-primary/20",
+                [
+                  m('span.font-medium', option.label),
+                  m('button.btn.btn-ghost.btn-xs.btn-circle', {
                     onclick: () => {
                       vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.value !== option.value);
                       m.redraw();
                     }
-                  }, '×')
+                  }, '✕')
                 ]
               )
-            )
-          ),
-          vnode.state.options === 0 && m(".text-sm text-base-content/70", "Loading tags..."),
-          !vnode.state.toggleAdd && m('button.btn btn-sm btn-outline mt-2', {
+            ),
+            !vnode.state.toggleAdd && m('button.btn.btn-sm.btn-outline', {
               onclick: () => {
                 vnode.state.toggleAdd = true;
               }
-          }, 'Add Tag'),
+            }, 'Add Tag'),
+          ]),
+          vnode.state.options === 0 && m(".text-sm text-base-content/70", "Loading tags..."),
           vnode.state.toggleAdd && m('div.mt-2',
             [
               m('input.input input-bordered w-full mb-2', {

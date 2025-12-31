@@ -2,6 +2,8 @@ import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import postcss from 'rollup-plugin-postcss';
+import json from '@rollup/plugin-json';
+import replace from '@rollup/plugin-replace';
 
 const production = process.env.NODE_ENV === 'production';
 
@@ -19,8 +21,19 @@ export default [
       sourcemap: !production
     },
     plugins: [
-      resolve(),
+      replace({
+        'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
+        'process.env.API_BASE_URL': JSON.stringify(production ? '/api/v1' : 'http://localhost:4000/api/v1'),
+        preventAssignment: true,
+      }),
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+        extensions: ['.mjs', '.js', '.json', '.node', '.ts'],
+        mainFields: ['module', 'jsnext:main', 'jsnext'],
+      }),
       commonjs(),
+      json(),
       typescript({
         tsconfig: './tsconfig.json',
         compilerOptions: {

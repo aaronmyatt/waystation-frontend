@@ -28,7 +28,9 @@ export default [
       }),
       resolve({
         browser: true,
-        preferBuiltins: false
+        preferBuiltins: false,
+        extensions: ['.mjs', '.js', '.json', '.node', '.ts'],
+        mainFields: ['module', 'jsnext:main', 'jsnext'],
       }),
       commonjs(),
       json(),
@@ -61,7 +63,9 @@ export default [
       }),
       resolve({
         browser: true,
-        preferBuiltins: false
+        preferBuiltins: false,
+        extensions: ['.mjs', '.js', '.json', '.node', '.ts'],
+        mainFields: ['module', 'jsnext:main', 'jsnext'],
       }),
       commonjs(),
       json(),

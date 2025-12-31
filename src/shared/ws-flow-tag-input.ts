@@ -58,26 +58,21 @@ export function TagsInput() {
                   });
                 },
               }),
-              m('ul.flex.flex-wrap',
-                vnode.state.choices.map((option) =>
-                  m(
-                    ".badge badge-lg mr-2 mb-2",
-                    {
+              m('.dropdown dropdown-open w-full', [
+                m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto', { tabindex: 0 },
+                  vnode.state.choices.map((option) =>
+                    m('button.btn btn-ghost btn-sm w-full justify-start text-left', {
                       onclick: () => {
-                        // Add tag logic here
-                        // vnode.state.toggleAdd = false;
-                        // m.redraw();
                         if (!vnode.state.flowTags.find((o) => o.value === option.value)) {
                           vnode.state.flowTags.push(option);
                           vnode.state.toggleAdd = false;
                           m.redraw();
                         }
                       }
-                    },
-                    option.label
+                    }, option.label)
                   )
                 )
-              )
+              ])
           ]
       )]);
     },

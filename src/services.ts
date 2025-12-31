@@ -25,14 +25,14 @@ class TagsListService {
     return this._searchQuery;
   }
 
-  setSearchQuery(query: string) {
+  search(query: string, pagination: { per_page: number; page: number }) {
     this._searchQuery = query;
     dispatch(_events.action.refreshTagsList, {
-      params: {
+      params: Object.assign({}, pagination, {
         per_page: this._pagination.per_page,
         page: this._pagination.page,
         query: this._searchQuery,
-      }
+      })
     });
   }
 

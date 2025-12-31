@@ -152,14 +152,14 @@ export const api = {
     list: (params?: { query?: string; page?: number; per_page?: number }) =>
       apiClient.get('/tags', { params }),
 
-    create: (tagData: any) =>
-      apiClient.post('/tags', tagData),
+    create: (tagData: any, flow_id: string) =>
+      apiClient.post('/tags', {...tagData, flow_id }),
 
-    update: (id: string, tagData: any) =>
-      apiClient.put(`/tags/${id}`, tagData),
+    update: (id: string, tagData: any, flow_id: string) =>
+      apiClient.put(`/tags/${id}`, {...tagData, flow_id }),
 
-    delete: (id: string) =>
-      apiClient.delete(`/tags/${id}`),
+    delete: (id: string, flow_id: string) =>
+      apiClient.delete(`/tags/${id}`, { data: {flow_id} }),
   },
 
   // Flow Tags

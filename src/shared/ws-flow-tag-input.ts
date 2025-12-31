@@ -21,16 +21,13 @@ export function TagsInput() {
       vnode.state.toggleAdd = false;
       vnode.state.flowTags = [];
       vnode.state.choices = [];
+      vnode.state.flowId = vnode.attrs?.flow?.id;
+      if (vnode.state.flowId) {
 
-      const flowId = vnode.attrs?.flowId || vnode.attrs?.flow_id;
-      if (flowId) {
-        api.flowTags.get(flowId)
+        api.flowTags.get(vnode.state.flowId)
           .then(({ data }) => {
             const tags = data.tags || [];
-            vnode.state.flowTags = tags.map((tag: any) => ({
-              value: tag.id,
-              label: tag.name,
-            }));
+            vnode.state.flowTags = tags;
             m.redraw();
           });
       }
@@ -38,38 +35,33 @@ export function TagsInput() {
       vnode.state.debouncedSearch = debounce((query) => {
         api.tags.list({ query, per_page: 5 })
           .then(({ data }) => {
-            vnode.state.choices = data.rows.map((tag) => {
-              return { value: tag.id, label: tag.name };
-            });
+            vnode.state.choices = [{
+              name: query,
+            }, ...data.rows];
             m.redraw();
           });
       }, 200);
 
       api.tags.list({ per_page: 5 })
       .then(({ data }) => {
-        vnode.state.choices = data.rows.map((tag) => {
-          return { value: tag.id, label: tag.name };
-        });
+        vnode.state.choices = data.rows;
       })
-    },
-    onupdate(vnode){
-      console.log('tags input updated', vnode.state.flowTags);
     },
     view(vnode) {
       return m(
         ".tag-badge-list my-2",
         [
           m('div.flex.flex-wrap.items-center.gap-2', [
-            vnode.state.flowTags.map((option) =>
+            vnode.state.flowTags.map((tag) =>
               m(
                 "span.badge.badge-lg.badge-primary.shadow-sm.flex.items-center.gap-2.border.border-primary/20",
                 [
-                  m('span.font-medium', option.label),
+                  m('span.font-medium', tag.name),
                   m('button.btn.btn-ghost.btn-xs.btn-circle', {
                     onclick: async () => {
                       try {
-                        await api.tags.delete(option.value);
-                        vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.value !== option.value);
+                        await api.tags.delete(tag.id, vnode.state.flowId);
+                        vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.id !== tag.id);
                       } catch (err) {
                         console.error('Failed to delete tag', err);
                       } finally {
@@ -124,14 +116,13 @@ export function TagsInput() {
                 }
               }, [
                 m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto',
-                  vnode.state.choices.map((option) =>
+                  vnode.state.choices.map((tag) =>
                     m('button.btn btn-ghost btn-sm w-full justify-start text-left', {
                       onclick: async () => {
-                        if (!vnode.state.flowTags.find((o) => o.value === option.value)) {
+                        if (!vnode.state.flowTags.find((o) => o.id === tag.id)) {
                           try {
-                            const { data } = await api.tags.create({ name: option.label });
-                            const newId = data?.id || data?.tag?.id || option.value;
-                            vnode.state.flowTags.push({ ...option, value: newId });
+                            const { data } = await api.tags.create({ tag: { name: tag.name } }, vnode.state.flowId);
+                            vnode.state.flowTags.push(data.tag);
                           } catch (err) {
                             console.error('Failed to create tag', err);
                           } finally {
@@ -140,7 +131,7 @@ export function TagsInput() {
                           }
                         }
                       }
-                    }, option.label)
+                    }, tag.id ? tag.name : `+ Create "${tag.name}"`)
                   )
                 )
               ])

@@ -57,8 +57,19 @@ export function TagsInput() {
                     m.redraw();
                   });
                 },
+                onblur: (e) => {
+                  const next = e.relatedTarget as HTMLElement | null;
+                  if (!next || !vnode.state.dropdownEl || !vnode.state.dropdownEl.contains(next)) {
+                    vnode.state.toggleAdd = false;
+                    m.redraw();
+                  }
+                },
               }),
-              m('.dropdown dropdown-open w-full', [
+              m('.dropdown dropdown-open w-full', {
+                oncreate: (ddVnode) => {
+                  vnode.state.dropdownEl = ddVnode.dom;
+                }
+              }, [
                 m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto', { tabindex: 0 },
                   vnode.state.choices.map((option) =>
                     m('button.btn btn-ghost btn-sm w-full justify-start text-left', {

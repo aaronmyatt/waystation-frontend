@@ -162,6 +162,12 @@ export const api = {
       apiClient.delete(`/tags/${id}`),
   },
 
+  // Flow Tags
+  flowTags: {
+    get: (id: string) =>
+      apiClient.get(`/flow_tags/${id}`),
+  },
+
   // Teams
   teams: {
     list: () =>

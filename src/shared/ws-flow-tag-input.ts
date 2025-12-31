@@ -15,6 +15,9 @@ export function TagsInput() {
         });
       })
     },
+    onupdate(vnode){
+      console.log('tags input updated', vnode.state.flowTags);
+    },
     view(vnode) {
       return m(
         ".tag-badge-list",
@@ -22,7 +25,7 @@ export function TagsInput() {
           m('ul.flex.flex-wrap',
             vnode.state.flowTags.map((option) =>
               m(
-                ".badge badge-lg mr-2 mb-2",
+                ".badge badge-lg badge-primary m-1 flex items-center",
                 
                 [m('span',option.label),
                   m('button.btn btn-sm btn-circle btn-ghost ml-2', {
@@ -83,29 +86,11 @@ export function TagsInput() {
                   vnode.state.dropdownEl = ddVnode.dom;
                 }
               }, [
-                m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto', {
-                  tabindex: 0,
-                  onclick: (e: MouseEvent) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  },
-                  onmousedown: (e: MouseEvent) => {
-                    vnode.state.dropdownPointerDown = true;
-                    e.stopPropagation();
-                    e.preventDefault();
-                  },
-                  onmouseup: (e: MouseEvent) => {
-                    vnode.state.dropdownPointerDown = false;
-                    e.stopPropagation();
-                    e.preventDefault();
-                  },
-                  onmouseleave: () => {
-                    vnode.state.dropdownPointerDown = false;
-                  },
-                },
+                m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto',
                   vnode.state.choices.map((option) =>
                     m('button.btn btn-ghost btn-sm w-full justify-start text-left', {
                       onclick: () => {
+                        console.log('adding tag', option);
                         if (!vnode.state.flowTags.find((o) => o.value === option.value)) {
                           vnode.state.flowTags.push(option);
                           vnode.state.toggleAdd = false;

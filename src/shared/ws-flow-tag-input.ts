@@ -1,6 +1,20 @@
 import m from "mithril";
 import { api } from "./api-client";
 
+function debounce<T extends (...args: any[]) => void>(fn: T, wait = 300): T {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return function(this: any, ...args: Parameters<T>) {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+
+    timeout = setTimeout(() => {
+      fn.apply(this, args);
+    }, wait);
+  } as T;
+}
+
 export function TagsInput() {
   return {
     oninit(vnode){
@@ -54,15 +68,20 @@ export function TagsInput() {
                 type: 'text',
                 placeholder: 'Search tags...',
                 value: vnode.state.query || '',
+                oncreate: () => {
+                  vnode.state.debouncedSearch = vnode.state.debouncedSearch || debounce((query) => {
+                    api.tags.list({ query, per_page: 5 })
+                      .then(({ data }) => {
+                        vnode.state.choices = data.rows.map((tag) => {
+                          return { value: tag.id, label: tag.name };
+                        });
+                        m.redraw();
+                      });
+                  }, 300);
+                },
                 oninput: (e) => {
                   vnode.state.query = e.target.value;
-                  api.tags.list({ query: vnode.state.query, per_page: 5 })
-                  .then(({ data }) => {
-                    vnode.state.choices = data.rows.map((tag) => {
-                      return { value: tag.id, label: tag.name };
-                    });
-                    m.redraw();
-                  });
+                  vnode.state.debouncedSearch?.(vnode.state.query);
                 },
                 onblur: (e) => {
                   const next = e.relatedTarget as HTMLElement | null;

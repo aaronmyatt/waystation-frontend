@@ -30,7 +30,7 @@ export function TagsInput() {
             });
             m.redraw();
           });
-      }, 300);
+      }, 200);
 
       api.tags.list({ per_page: 5 })
       .then(({ data }) => {
@@ -80,7 +80,7 @@ export function TagsInput() {
                 value: vnode.state.query || '',
                 oninput: (e) => {
                   vnode.state.query = e.target.value;
-                  vnode.state.debouncedSearch?.(vnode.state.query);
+                  vnode.state.debouncedSearch(vnode.state.query);
                 },
                 onblur: (e) => {
                   const next = e.relatedTarget as HTMLElement | null;

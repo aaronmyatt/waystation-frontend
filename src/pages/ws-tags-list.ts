@@ -29,7 +29,7 @@ const SearchBar = {
         placeholder: 'Search tags by name or slug...',
         value: globalThis.tagsListService.searchQuery,
         oninput: (e) => {
-          globalThis.tagsListService.setSearchQuery(e.target.value);
+          globalThis.tagsListService.search(e.target.value, { per_page: 100, page: 1 });
         }
       })
     );

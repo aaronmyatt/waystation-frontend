@@ -3,6 +3,7 @@ import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg,
 import { dispatch, _events } from "../shared/utils";
 import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
+import { TagsInput } from "./ws-flow-tag-input";
 
 let skipRederaw = false;
 
@@ -527,6 +528,9 @@ export function FlowEditor(): m.Component {
             class: '!z-[101]'
           }, m(FlowToolbar)),
         ]),
+        m(TagsInput, {
+          flow: vnode.state.flow,
+        }),
         m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
         m(FlowMatchList, {
           matches: vnode.state.matches,

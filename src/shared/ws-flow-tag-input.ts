@@ -26,13 +26,7 @@ export function TagsInput() {
       if (flowId) {
         api.flowTags.get(flowId)
           .then(({ data }) => {
-            const tags = Array.isArray(data)
-              ? data
-              : Array.isArray((data as any)?.tags)
-                ? (data as any).tags
-                : Array.isArray((data as any)?.rows)
-                  ? (data as any).rows
-                  : [];
+            const tags = data.tags || [];
             vnode.state.flowTags = tags.map((tag: any) => ({
               value: tag.id,
               label: tag.name,

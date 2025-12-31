@@ -20,7 +20,7 @@ export function TagsInput() {
     },
     view(vnode) {
       return m(
-        ".tag-badge-list",
+        ".tag-badge-list my-2",
         [
           m('div.flex.flex-wrap.items-center.gap-2', [
             vnode.state.flowTags.map((option) =>
@@ -41,7 +41,7 @@ export function TagsInput() {
               onclick: () => {
                 vnode.state.toggleAdd = true;
               }
-            }, 'Add Tag'),
+            }, '# Add Tag'),
           ]),
           vnode.state.options === 0 && m(".text-sm text-base-content/70", "Loading tags..."),
           vnode.state.toggleAdd && m('div.mt-2',

@@ -22,6 +22,16 @@ export function TagsInput() {
       vnode.state.flowTags = [];
       vnode.state.choices = [];
 
+      vnode.state.debouncedSearch = debounce((query) => {
+        api.tags.list({ query, per_page: 5 })
+          .then(({ data }) => {
+            vnode.state.choices = data.rows.map((tag) => {
+              return { value: tag.id, label: tag.name };
+            });
+            m.redraw();
+          });
+      }, 300);
+
       api.tags.list({ per_page: 5 })
       .then(({ data }) => {
         vnode.state.choices = data.rows.map((tag) => {
@@ -68,17 +78,6 @@ export function TagsInput() {
                 type: 'text',
                 placeholder: 'Search tags...',
                 value: vnode.state.query || '',
-                oncreate: () => {
-                  vnode.state.debouncedSearch = vnode.state.debouncedSearch || debounce((query) => {
-                    api.tags.list({ query, per_page: 5 })
-                      .then(({ data }) => {
-                        vnode.state.choices = data.rows.map((tag) => {
-                          return { value: tag.id, label: tag.name };
-                        });
-                        m.redraw();
-                      });
-                  }, 300);
-                },
                 oninput: (e) => {
                   vnode.state.query = e.target.value;
                   vnode.state.debouncedSearch?.(vnode.state.query);

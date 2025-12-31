@@ -85,11 +85,19 @@ export function TagsInput() {
               }, [
                 m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto', {
                   tabindex: 0,
-                  onmousedown: () => {
-                    vnode.state.dropdownPointerDown = true;
+                  onclick: (e: MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                   },
-                  onmouseup: () => {
+                  onmousedown: (e: MouseEvent) => {
+                    vnode.state.dropdownPointerDown = true;
+                    e.stopPropagation();
+                    e.preventDefault();
+                  },
+                  onmouseup: (e: MouseEvent) => {
                     vnode.state.dropdownPointerDown = false;
+                    e.stopPropagation();
+                    e.preventDefault();
                   },
                   onmouseleave: () => {
                     vnode.state.dropdownPointerDown = false;

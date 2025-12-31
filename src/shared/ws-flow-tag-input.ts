@@ -22,6 +22,25 @@ export function TagsInput() {
       vnode.state.flowTags = [];
       vnode.state.choices = [];
 
+      const flowId = vnode.attrs?.flowId || vnode.attrs?.flow_id;
+      if (flowId) {
+        api.flowTags.get(flowId)
+          .then(({ data }) => {
+            const tags = Array.isArray(data)
+              ? data
+              : Array.isArray((data as any)?.tags)
+                ? (data as any).tags
+                : Array.isArray((data as any)?.rows)
+                  ? (data as any).rows
+                  : [];
+            vnode.state.flowTags = tags.map((tag: any) => ({
+              value: tag.id,
+              label: tag.name,
+            }));
+            m.redraw();
+          });
+      }
+
       vnode.state.debouncedSearch = debounce((query) => {
         api.tags.list({ query, per_page: 5 })
           .then(({ data }) => {

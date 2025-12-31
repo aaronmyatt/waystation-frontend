@@ -38,12 +38,16 @@ export function TagsInput() {
           vnode.state.options === 0 && m(".text-sm text-base-content/70", "Loading tags..."),
           !vnode.state.toggleAdd && m('button.btn btn-sm btn-outline mt-2', {
               onclick: () => {
-                vnode.state.toggleAdd = !vnode.state.toggleAdd;
+                vnode.state.toggleAdd = true;
               }
           }, 'Add Tag'),
           vnode.state.toggleAdd && m('div.mt-2',
             [
               m('input.input input-bordered w-full mb-2', {
+                oncreate: (inputVnode) => {
+                  vnode.state.inputEl = inputVnode.dom as HTMLInputElement;
+                  vnode.state.inputEl.focus();
+                },
                 type: 'text',
                 placeholder: 'Search tags...',
                 value: vnode.state.query || '',

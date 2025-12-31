@@ -66,9 +66,15 @@ export function TagsInput() {
                 [
                   m('span.font-medium', option.label),
                   m('button.btn.btn-ghost.btn-xs.btn-circle', {
-                    onclick: () => {
-                      vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.value !== option.value);
-                      m.redraw();
+                    onclick: async () => {
+                      try {
+                        await api.tags.delete(option.value);
+                        vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.value !== option.value);
+                      } catch (err) {
+                        console.error('Failed to delete tag', err);
+                      } finally {
+                        m.redraw();
+                      }
                     }
                   }, '✕')
                 ]
@@ -120,12 +126,18 @@ export function TagsInput() {
                 m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto',
                   vnode.state.choices.map((option) =>
                     m('button.btn btn-ghost btn-sm w-full justify-start text-left', {
-                      onclick: () => {
-                        console.log('adding tag', option);
+                      onclick: async () => {
                         if (!vnode.state.flowTags.find((o) => o.value === option.value)) {
-                          vnode.state.flowTags.push(option);
-                          vnode.state.toggleAdd = false;
-                          m.redraw();
+                          try {
+                            const { data } = await api.tags.create({ name: option.label });
+                            const newId = data?.id || data?.tag?.id || option.value;
+                            vnode.state.flowTags.push({ ...option, value: newId });
+                          } catch (err) {
+                            console.error('Failed to create tag', err);
+                          } finally {
+                            vnode.state.toggleAdd = false;
+                            m.redraw();
+                          }
                         }
                       }
                     }, option.label)

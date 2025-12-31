@@ -63,7 +63,16 @@ export function TagsInput() {
                 },
                 onblur: (e) => {
                   const next = e.relatedTarget as HTMLElement | null;
-                  if (!next || !vnode.state.dropdownEl || !vnode.state.dropdownEl.contains(next)) {
+                  const isDropdownTarget = !!(next && vnode.state.dropdownEl && vnode.state.dropdownEl.contains(next));
+
+                  // If the blur was caused by interacting with the dropdown (e.g., mousedown),
+                  // re-focus the input and keep the dropdown open so the click can resolve.
+                  if (vnode.state.dropdownPointerDown) {
+                    vnode.state.inputEl?.focus();
+                    return;
+                  }
+
+                  if (!isDropdownTarget) {
                     vnode.state.toggleAdd = false;
                     m.redraw();
                   }
@@ -74,7 +83,18 @@ export function TagsInput() {
                   vnode.state.dropdownEl = ddVnode.dom;
                 }
               }, [
-                m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto', { tabindex: 0 },
+                m('div.dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto', {
+                  tabindex: 0,
+                  onmousedown: () => {
+                    vnode.state.dropdownPointerDown = true;
+                  },
+                  onmouseup: () => {
+                    vnode.state.dropdownPointerDown = false;
+                  },
+                  onmouseleave: () => {
+                    vnode.state.dropdownPointerDown = false;
+                  },
+                },
                   vnode.state.choices.map((option) =>
                     m('button.btn btn-ghost btn-sm w-full justify-start text-left', {
                       onclick: () => {

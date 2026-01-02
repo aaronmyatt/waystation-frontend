@@ -89,8 +89,8 @@ function debounce(func, wait) {
 }
 
 // Flow List - Refresh/Fetch all flows
-globalThis.addEventListener("ws::action::refreshList", async (event) => {
-  const customEvent = event as CustomEvent<{ filter?: "repos" | "public" }>;
+globalThis.addEventListener(_events.action.refreshList, async (event) => {
+  const customEvent = event as CustomEvent<{ filter?: "repos" | "public"; user_id?: string }>;
   console.log("Refresh list event received");
   try {
     let promise;
@@ -99,7 +99,7 @@ globalThis.addEventListener("ws::action::refreshList", async (event) => {
       promise = api.repos.list();
     } else if (customEvent.detail.filter === "public") {
       console.log("Fetching public flows");
-      promise = customEvent.detail.username ? api.publicFlows.userFlows({ username: customEvent.detail.username }) : api.publicFlows.list();
+      promise = api.publicFlows.list({ user_id: customEvent.detail?.user_id })
     } else {
       console.log("Fetching all flows");
       promise = api.flows.list();
@@ -155,7 +155,7 @@ globalThis.addEventListener(_events.flow.requestFlowPreview, async (event) => {
   const { flowId } = event.detail;
 
   try {
-    const response = await api.flows.get(flowId);
+    const response = await api.publicFlows.get(flowId);
 
     const flowData = response.data;
     console.log("Fetched flow preview data:", flowData);

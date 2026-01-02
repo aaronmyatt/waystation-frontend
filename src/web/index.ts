@@ -87,7 +87,12 @@ m.route(document.body, "/", {
   "/": {
     onmatch() {
       initData();
-      dispatch(_events.action.refreshList, {});
+      if(globalThis.authService?.loggedIn){
+        dispatch(_events.action.refreshList, {});
+      } else {
+        dispatch(_events.action.refreshList, { filter: 'public' });
+      }
+        
     },
     render(vnode: Vnode) {
       return m(Layout, m(FlowsPage, vnode.attrs));
@@ -178,9 +183,9 @@ m.route(document.body, "/", {
       return m(Layout, m(FlowPage, vnode.attrs));
     },
   },
-  "/flow/:id/preview": {
+  "/public_flows/:id": {
     onmatch(args, _requestedPath, _route): Promise<void> {
-      dispatch(_events.flow.requestFlowPreview, { flowId: args.id });
+      dispatch(_events.flow.requestFlowPreview, { public: true, flowId: args.id });
 
       return new Promise((resolve, reject) => {
         // TODO: use a proxy to inctercept flowService.flow changes instead of polling?

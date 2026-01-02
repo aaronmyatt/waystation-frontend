@@ -179,14 +179,11 @@ export const api = {
 
   // Public Flows
   publicFlows: {
-    list: () =>
-      apiClient.get('/public/flows'),
+    list: (params?: { user_id?: string }) =>
+      apiClient.get('/public_flows', { params }),
 
     get: (id: string) =>
-      apiClient.get(`/public/flows/${id}`),
-
-    userFlows: ({username}: {username: string}) =>
-      apiClient.get(`/users/${username}/flows`),
+      apiClient.get(`/public_flows/${id}`),
   },
 
   // Repos

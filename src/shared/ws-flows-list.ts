@@ -24,7 +24,9 @@ function FlowDescriptionMd(){
 
 const FlowCard = {
   oninit(vnode){
-    vnode.state.settingsModalEnabled = globalThis.featureToggleService.isEnabled('settings-modal');
+    vnode.state.settingsModalEnabled = (
+      globalThis.featureToggleService.isEnabled('settings-modal') && globalThis.flowService.canEdit(vnode.attrs.flow)
+    );
   },
   view(vnode){
     return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full', 
@@ -63,7 +65,7 @@ export const FlowList: m.Component = {
             m('li.list-none',
               { key: flow.id },
               m(m.route.Link, { 
-                href: vnode.attrs.activeTab === 'public' ? '/flow/' + flow.id + '/preview' : '/flow/' + flow.id,
+                href: vnode.attrs.activeTab === 'public' ? '/public_flows/' + flow.id : '/flow/' + flow.id,
                 class: 'no-underline hover:no-underline block h-full',
               }, [
                 m(FlowCard, { 

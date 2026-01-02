@@ -248,19 +248,20 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
     m.redraw();
   }
 
-  isOwnedByCurrentUser(): boolean {
+  isOwnedByCurrentUser(flow?: any): boolean {
+    flow = flow || this._flow.flow;
     const currentUser = globalThis.authService?.user;
     if (!currentUser) return false;
-    if (!this._flow?.flow?.user_id) return false;
-    return this._flow.flow.user_id === currentUser.id;
+    if (!flow?.user_id) return false;
+    return flow.user_id === currentUser.id;
   }
 
   isCreatingNew(): boolean {
     return !this._flow?.flow?.id;
   }
 
-  canEdit(): boolean {
-    return this.isOwnedByCurrentUser();
+  canEdit(flow?: any): boolean {
+    return this.isOwnedByCurrentUser(flow);
   }
 }
 

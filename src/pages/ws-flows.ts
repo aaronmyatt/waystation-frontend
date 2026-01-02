@@ -43,7 +43,7 @@ export const Page: m.Component = {
             (this.activeTab === 'public' && isLoggedIn)
               && m('button.tab', {
                 onclick: () => {
-                  dispatch(_events.action.refreshList, { filter: 'public', username: globalThis.authService.user?.username });
+                  dispatch(_events.action.refreshList, { filter: 'public', user_id: globalThis.authService.user?.id });
                 }
               }, '=|| Just mine')
           ]

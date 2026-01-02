@@ -15,15 +15,32 @@ function debounce<T extends (...args: any[]) => void>(fn: T, wait = 300): T {
   } as T;
 }
 
+function TagBadge() {
+  return {
+    view(vnode) {
+      return m(
+          "span.badge.badge-lg.badge-primary.shadow-sm.flex.items-center.gap-2.border.border-primary/20",
+          [
+            m('span.font-medium', vnode.attrs._tag.name),
+            vnode.attrs.ondelete && m('button.btn.btn-ghost.btn-xs.btn-circle', {
+              onclick: vnode.attrs.ondelete,
+            }, '✕')
+          ]
+        );    
+      },
+  }
+}
+
 export function TagsInput() {
   return {
     oninit(vnode){
-      vnode.state.toggleAdd = false;
+      vnode.state.toggleAdd = vnode.attrs.enableCrud;
+      vnode.state.toggleSearch = false;
       vnode.state.flowTags = [];
       vnode.state.choices = [];
       vnode.state.flowId = vnode.attrs?.flow?.id;
-      if (vnode.state.flowId) {
 
+      if (vnode.state.flowId) {
         api.flowTags.get(vnode.state.flowId)
           .then(({ data }) => {
             const tags = data.tags || [];
@@ -42,7 +59,7 @@ export function TagsInput() {
           });
       }, 200);
 
-      api.tags.list({ per_page: 5 })
+     vnode.attrs.enableCrud && api.tags.list({ per_page: 5 })
       .then(({ data }) => {
         vnode.state.choices = data.rows;
       })
@@ -52,34 +69,31 @@ export function TagsInput() {
         ".tag-badge-list my-2",
         [
           m('div.flex.flex-wrap.items-center.gap-2', [
-            vnode.state.flowTags.map((tag) =>
-              m(
-                "span.badge.badge-lg.badge-primary.shadow-sm.flex.items-center.gap-2.border.border-primary/20",
-                [
-                  m('span.font-medium', tag.name),
-                  m('button.btn.btn-ghost.btn-xs.btn-circle', {
-                    onclick: async () => {
-                      try {
-                        await api.tags.delete(tag.id, vnode.state.flowId);
-                        vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.id !== tag.id);
-                      } catch (err) {
-                        console.error('Failed to delete tag', err);
-                      } finally {
-                        m.redraw();
-                      }
-                    }
-                  }, '✕')
-                ]
-              )
+            vnode.state.flowTags.map((tag) => {
+              return m(TagBadge, {
+                _tag: tag,
+                // careful, 'onremove' is a reserved attribute in mithril
+                ondelete: vnode.attrs.enableCrud && (async () => {
+                  try {
+                    await api.tags.delete(tag.id, vnode.state.flowId);
+                    vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.id !== tag.id);
+                  } catch (err) {
+                    console.error('Failed to delete tag', err);
+                  } finally {
+                    m.redraw();
+                  }
+                })
+              })}
             ),
-            !vnode.state.toggleAdd && m('button.btn.btn-sm.btn-outline', {
+            vnode.state.toggleAdd && m('button.btn.btn-sm.btn-outline', {
               onclick: () => {
-                vnode.state.toggleAdd = true;
+                vnode.state.toggleAdd = false;
+                vnode.state.toggleSearch = true;
               }
             }, '# Add Tag'),
           ]),
           vnode.state.options === 0 && m(".text-sm text-base-content/70", "Loading tags..."),
-          vnode.state.toggleAdd && m('div.mt-2',
+          vnode.state.toggleSearch && m('div.mt-2',
             [
               m('input.input input-bordered w-full mb-2', {
                 oncreate: (inputVnode) => {
@@ -105,7 +119,8 @@ export function TagsInput() {
                   }
 
                   if (!isDropdownTarget) {
-                    vnode.state.toggleAdd = false;
+                    vnode.state.toggleAdd = true;
+                    vnode.state.toggleSearch = false;
                     m.redraw();
                   }
                 },
@@ -126,7 +141,8 @@ export function TagsInput() {
                           } catch (err) {
                             console.error('Failed to create tag', err);
                           } finally {
-                            vnode.state.toggleAdd = false;
+                            vnode.state.toggleAdd = true;
+                            vnode.state.toggleSearch = false;
                             m.redraw();
                           }
                         }

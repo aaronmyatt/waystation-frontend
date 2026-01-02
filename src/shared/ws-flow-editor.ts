@@ -529,7 +529,7 @@ export function FlowEditor(): m.Component {
           }, m(FlowToolbar)),
         ]),
         m(TagsInput, {
-          flow: vnode.state.flow,
+          flow: vnode.state.flow, enableCrud: true
         }),
         m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
         m(FlowMatchList, {

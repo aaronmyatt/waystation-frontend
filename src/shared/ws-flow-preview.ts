@@ -3,6 +3,7 @@ import { _events, dispatch } from './utils';
 import { MarkdownRenderer } from './ws-marked'
 import { syntaxHighlighter } from './ws-hljs';
 import { githubSvg } from './ws-svg';
+import { TagsInput } from './ws-flow-tag-input';
 
 export function FlowPreview(): m.Component {
     const marked = new MarkdownRenderer({ enableSanitizer: false });
@@ -42,6 +43,7 @@ export function FlowPreview(): m.Component {
                         ])
                     ])
                 ]),
+                m(TagsInput, { flow: vnode.state.flow, enableCrud: false }),
                 m('.prose max-w-none', m.trust(marked.parse(vnode.state.markdown)))
             ]);
         }

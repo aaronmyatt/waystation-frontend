@@ -33,7 +33,12 @@ const Layout = {
             ),
             m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
             // TODO: retain the link, but trigger a prompt/modal to guide the user to use the command palette instead
-            // m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Auth"),
+            globalThis.authService.loggedOut && m('button', { class: "btn btn-ghost", onclick: (e) => {
+                dispatch(_events.auth.login);
+              } }, "Login"),
+            globalThis.authService.loggedIn && m('button', { class: "btn btn-ghost", onclick: (e) => {
+                dispatch(_events.auth.logout);
+              } }, "Logout"),
             m(ThemePicker)
           ]),
         ]

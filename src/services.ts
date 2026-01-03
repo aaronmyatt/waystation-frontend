@@ -1,5 +1,87 @@
 import m from "mithril";
-import { _events, dispatch } from "./shared/utils";
+import { _events, dispatch, storageKeys } from "./shared/utils";
+
+class AuthService {
+  _state = {
+    loading: false,
+    error: '',
+    success: '',
+  }
+
+  get loading() {
+    return this._state.loading;
+  }
+
+  get error() {
+    return this._state.error;
+  }
+
+  get success() {
+    return this._state.success;
+  }
+
+  setLoading(loading: boolean) {
+    this._state.loading = loading;
+    m.redraw();
+  }
+
+  setError(error: string) {
+    this._state.error = error;
+    this._state.success = '';
+    m.redraw();
+  }
+
+  setSuccess(success: string) {
+    this._state.success = success;
+    this._state.error = '';
+
+    m.route.set('/'); // Redirect to home on success
+    // m.redraw();
+  }
+
+  clearMessages() {
+    this._state.error = '';
+    this._state.success = '';
+    m.redraw();
+  }
+
+  reset() {
+    this._state = {
+      loading: false,
+      error: '',
+      success: '',
+    };
+    m.redraw();
+  }
+
+  get user() {
+    const userJson = localStorage.getItem(storageKeys.user);
+    if (userJson) {
+      try {
+        return JSON.parse(userJson);
+      } catch (err) {
+        console.error("Failed to parse user data from localStorage:", err);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  get loggedIn() {
+    const token = localStorage.getItem(storageKeys.authToken);
+    return !!token;
+  }
+
+  get loggedOut() {
+    return !this.loggedIn;
+  }
+
+  logout(){
+    localStorage.removeItem(storageKeys.authToken);
+    this.reset();
+    m.route.set('/');
+  }
+}
 
 class TagsListService {
   _tags = []
@@ -268,8 +350,10 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 globalThis.flowService = new FlowService();
 globalThis.flowListService = new FlowListService();
 globalThis.featureToggleService = new FeatureToggleService();
+globalThis.authService = new AuthService();
 
 export {
+  AuthService,
   FlowListService,
   FlowService,
   FeatureToggleService

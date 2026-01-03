@@ -2,7 +2,7 @@ import m from "mithril";
 import { storageKeys } from "./utils";
 
 const THEMES = [
-  "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
+  "corporate", "light", "dark", "cupcake", "bumblebee", "emerald", "synthwave",
   "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua",
   "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula",
   "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee",
@@ -13,12 +13,10 @@ export const ThemePicker = {
   oninit: () => {
     // Load saved theme from local storage
     const savedTheme = localStorage.getItem(storageKeys.themeChoice);
-    if (savedTheme) {
-      document.documentElement.setAttribute("data-theme", savedTheme);
-    }
+    document.documentElement.setAttribute("data-theme", savedTheme || "corporate");
   },
   view: () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "cupcake";
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "corporate";
     return m("select.select select-sm", {
       value: currentTheme,
       onchange: (e) => {

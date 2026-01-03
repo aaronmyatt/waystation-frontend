@@ -4,6 +4,7 @@ import { dispatch, _events } from "../shared/utils";
 import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
 import { TagsInput } from "./ws-flow-tag-input";
+import { syntaxHighlighter } from "../shared/ws-hljs";
 
 let skipRederaw = false;
 
@@ -13,6 +14,8 @@ const FlowToolbar = {
       m(
         "button.btn btn-sm btn-outline hidden sm:inline-flex",
         {
+          tabindex: -1,
+          "aria-label": "Export flow",
           onclick: () => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
         },
         "Export"
@@ -20,16 +23,16 @@ const FlowToolbar = {
       m(
         ".dropdown dropdown-end",
         m(
-          ".btn xs:btn-sm btn-ghost text-primary",
-          { tabIndex: 0 },
-          m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
+          ".btn xs:btn-sm btn-ghost text-secondary",
+          { tabindex: -1, "aria-label": "Flow menu" },
+          m("span.block size-4", m.trust(verticalDotsSvg))
         ),
         m(
-          "ul.menu dropdown-content bg-base-200 rounded-box z-10 w-52 shadow-sm",
-          { tabIndex: -1 },
+          "ul.menu dropdown-content text-secondary bg-secondary-content rounded-box z-10 w-52 shadow-sm space-y-1",
+          { tabindex: -1 },
           [
             m("li",
-              m("a",
+              m("button.btn btn-ghost border border-secondary",
                 {
                   onclick: (e) => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
                 },
@@ -37,7 +40,7 @@ const FlowToolbar = {
               )
             ),
             m("li",
-              m("a",
+              m("button.btn btn-ghost border border-secondary",
                 {
                   onclick: (e) => {
                     dispatch(
@@ -50,7 +53,7 @@ const FlowToolbar = {
               )
             ),
             m("li",
-              m("a.text-error",
+              m("button.btn btn-ghost border border-error text-error",
                 {
                   onclick: (e) => {
                     dispatch(
@@ -84,34 +87,39 @@ const FlowMatchToolbar = {
         m(
           "button.btn btn-xs btn-ghost",
           {
-            class: vnode.attrs.match.order_index === 0 ? "btn-disabled bg-neutral-content" : "",
+            tabindex: -1,
+            "aria-label": "Move match up",
+            class: vnode.attrs.match.order_index === 0 ? "btn-disabled bg-accent" : "",
             onclick: (e) => {
               globalThis.flowService.moveFlowMatchUp(vnode.attrs.match);
             },
           },
-          m("span.text-primary block size-4", m.trust(upSvg))
+          m("span.text-secondary block size-4", m.trust(upSvg))
         ),
         m(
           "button.btn btn-xs btn-ghost",
           {
-            class: vnode.attrs.match.order_index === globalThis.flowService.matches.length - 1 ? "btn-disabled bg-neutral-content" : "",
+            tabindex: -1,
+            "aria-label": "Move match down",
+            class: vnode.attrs.match.order_index === globalThis.flowService.matches.length ? "btn-disabled bg-accent" : "",
             onclick: (e) => {
               globalThis.flowService.moveFlowMatchDown(vnode.attrs.match);
             },
           },
-          m("span.text-primary block size-4", m.trust(downSvg))
+          m("span.text-secondary block size-4", m.trust(downSvg))
         ),
         m(
-          "details.dropdown dropdown-end",
+          ".dropdown dropdown-end",
           m(
-            "summary.btn btn-xs btn-ghost text-primary",
-            m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
+            "button.btn btn-xs btn-ghost text-secondary",
+            { tabindex: -1, "aria-label": "Match menu" },
+            m("span.block size-4", m.trust(verticalDotsSvg))
           ),
           m(
-            "ul.menu dropdown-content bg-base-200 rounded-box w-52 p-2 shadow-sm",
+            "ul.menu dropdown-content text-neutral bg-neutral-content rounded-box w-52 p-2 shadow-sm space-y-1",
             [
               m("li",
-                [m("a",
+                [m("button.btn btn-ghost border border-base-300",
                   {
                     onclick: () => {
                       dispatch(_events.dialog.openInsertBetween, {
@@ -124,7 +132,7 @@ const FlowMatchToolbar = {
               ]
               ),
               m("li",
-                m("a",
+                m("button.btn btn-ghost border border-base-300",
                   {
                     onclick: (e) => {
                       dispatch(_events.action.createChildFlow, {
@@ -136,7 +144,7 @@ const FlowMatchToolbar = {
                 )
               ),
               m("li",
-                m("a",
+                m("button.btn btn-ghost border border-base-300",
                   {
                     onclick: (e) => {
                       dispatch(_events.action.generateFlowMatchContent, {
@@ -148,7 +156,7 @@ const FlowMatchToolbar = {
                 )
               ),
               m("li",
-                m("a.text-error",
+                m("button.btn btn-ghost border border-error text-error",
                   {
                     onclick: (e) => {
                       globalThis.flowService.deleteFlowMatch(vnode.attrs.match);
@@ -237,7 +245,7 @@ function FlowMatch() {
       return m.fragment([
         m(
           // peer: allows the next sibling to style itself based on this element's hover state
-          ".match card card-xs sm:card-md m-1 p-1 bg-base-100 shadow-md border border-base-300 peer mb-2 sm:mb-0",
+          ".match card card-xs sm:card-md m-1 bg-secondary-content shadow-md border border-base-300 peer mb-2 sm:mb-0",
           {
             class:
               "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
@@ -262,7 +270,10 @@ function FlowMatch() {
                 ),
               m(
                 ".btn btn-xs btn-circle flex-shrink-0 sm:hidden",
-                { onclick: (e) => { 
+                { 
+                  tabindex: -1,
+                  "aria-label": open ? "Collapse match details" : "Expand match details",
+                  onclick: (e) => { 
                     e.stopPropagation(); 
                     open = !open;
                   } 
@@ -281,21 +292,21 @@ function FlowMatch() {
             m('.flex flex-grow space-x-2', [
               // match.git_repo_root
             vnode.attrs.match.match?.git_repo_root 
-              && m(".hidden sm:flex text-sm link link-primary mb-1 flex items-center gap-1", [
+              && m(".hidden sm:flex text-sm link link-secondary mb-1 flex items-center gap-1", [
                 m("span.block size-4", m.trust(githubSvg)),
                 m('span', vnode.attrs.match.match.git_repo_root),
               ]),
             // match.repo_relative_file_path
             vnode.attrs.match.match?.repo_relative_file_path 
-              && m(".text-sm link link-primary mb-1", [
+              && m(".text-sm link link-secondary mb-1", [
                 m('span', vnode.attrs.match.match.repo_relative_file_path),
                 m('span', {
-                  class: "text-base-content/70"
+                  class: "text-info"
                 }, ' +'+vnode.attrs.match.match.line_no),
               ]),
             ]),
             (!open && vnode.attrs.match.match?.line) 
-              && m(".text-sm text-base-content/70 text-nowrap overflow-hidden", m(
+              && m(".text-sm text-base-content/90 text-nowrap overflow-hidden", m(
               CodeLine, { match: vnode.attrs.match }
             )),
             // Collapsible description on small screens
@@ -304,7 +315,7 @@ function FlowMatch() {
                 class: open ? "collapse-open" : "collapse-close xs:collapse-open",
               },
               [
-                m(".collapse-content p-0", [
+                m(".collapse-content p-0 space-y-1", [
                   m(FlowMatchDescriptionEditor, {
                     description,
                     onChange: (value) => {
@@ -353,19 +364,23 @@ const InsertBetweenDialog = {
         m(".modal-box",
           [
             m('form', { method: "dialog" },
-              m('button.btn btn-sm btn-circle btn-ghost absolute right-2 top-2', { onclick: this.close }, '✕')
+              m('button.btn btn-sm btn-circle btn-ghost absolute right-2 top-2', { tabindex: -1, "aria-label": "Close dialog", onclick: this.close }, '✕')
             ),
             m('h4.font-bold', 'Add a Step'),
             m('p.mb-4', 'Would you like to insert a text only note or a match from your editor cursor position/selection?'),
             m('.modal-action',
               [
                 m('button.btn btn-primary', {
+                  tabindex: -1,
+                  "aria-label": "Insert match from editor cursor",
                   onclick: () => {
                     dispatch(_events.action.insertFlowMatchAfter, { flow: { ...globalThis.flowService.flow }, flowMatch: { ...vnode.state.match }});
                     this.close(); 
                   }
                 }, 'Match from cursor'),
                 m('button.btn btn-secondary', {
+                  tabindex: -1,
+                  "aria-label": "Add text note step",
                   onclick: () => {
                     console.log('Adding note step at index', vnode.state.index);
                     globalThis.flowService.addNoteStep(vnode.state.index);
@@ -386,7 +401,7 @@ const InsertBetweenDialog = {
 const FlowMatchInsertBetween = {
   view(vnode) {
     return m(
-      ".flex justify-center ",
+      ".flex justify-center mx-1",
       {
         // group: allows children to respond to this wrapper's hover state
         // peer-hover:[&>button]:opacity-100: shows button when preceding peer (FlowMatch) is hovered
@@ -396,8 +411,10 @@ const FlowMatchInsertBetween = {
         // opacity-0: hidden by default
         // group-hover:opacity-100: shows when hovering over the wrapper itself
         // transition-opacity: smooth fade in/out
-        "button.btn btn-sm btn-outline w-full opacity-0 group-hover:opacity-100 group-hover:my-4 transition-opacity",
+        "button.btn btn-sm btn-outline border-secondary/60 w-full opacity-0 group-hover:opacity-100 group-hover:my-4 transition-opacity",
         {
+          tabindex: -1,
+          "aria-label": "Insert step after this match",
           onclick: () => {
             dispatch(_events.dialog.openInsertBetween, {
               ...vnode.attrs
@@ -473,9 +490,10 @@ function TitleInput() {
     },
     view(vnode){
       return (
-        m("textarea.title w-full break-words border-b border-dashed border-primary", {
+        m("textarea.text-primary title w-full break-words border-b border-dashed border-primary focus:border-0 focus:outline-none focus:ring-2 focus:ring-primary", {
           value: title,
           name: "flow title",
+          "aria-label": vnode.attrs.title ? "Edit flow or match title" : "Enter flow or match title",
           rows: 1,
           style: "word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; overflow: hidden; resize: none;",
           oncreate: (vnode) => this.resize(vnode),
@@ -507,30 +525,37 @@ export function FlowEditor(): m.Component {
       vnode.state.flow = globalThis.flowService.flow;
       vnode.state.matches = globalThis.flowService.matches;
     },
+    onupdate(vnode) {
+      syntaxHighlighter.highlightAll();
+    },
     view(vnode) {
       return m(".flow", [
         // title & toolbar
-        m(".flex justify-between gap-4", [
-          m(
-            "h1.text-2xl font-bold text-base-content min-w-0 flex-grow break-words overflow-wrap",
-            m(TitleInput, {
-              title: vnode.state.flow.name,
-              cb: (newTitle) => {
-                globalThis.flowService.updateFlow({
-                  ...globalThis.flowService.flow,
-                  name: newTitle,
-                });
-              },
-            })
-          ),
-          m(".toolbar-wrapper flex-shrink-0", {
-            class: '!z-[101]'
-          }, m(FlowToolbar)),
-        ]),
-        m(TagsInput, {
-          flow: vnode.state.flow, enableCrud: true
-        }),
-        m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
+        m('.card card-xs sm:card-md m-1 shadow-md border border-base-300 peer mb-2 sm:mb-0',
+          m(".card-body gap-1 space-y-2", [
+            m(".flex justify-between gap-4", [
+              m(
+                "h1.text-2xl font-bold text-base-content min-w-0 flex-grow break-words overflow-wrap",
+                m(TitleInput, {
+                  title: vnode.state.flow.name,
+                  cb: (newTitle) => {
+                    globalThis.flowService.updateFlow({
+                      ...globalThis.flowService.flow,
+                      name: newTitle,
+                    });
+                  },
+                })
+              ),
+              m(".toolbar-wrapper flex-shrink-0", {
+                class: '!z-[101]'
+              }, m(FlowToolbar)),
+            ]),
+            m(TagsInput, {
+              flow: vnode.state.flow, enableCrud: true
+            }),
+            m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
+          ]
+        )),
         m(FlowMatchList, {
           matches: vnode.state.matches,
         }),

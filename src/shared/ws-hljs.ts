@@ -1,5 +1,15 @@
 // Simplified code display without highlight.js dependency for better performance
 import m from 'mithril';
+import hljs from 'highlight.js';
+
+export const syntaxHighlighter = {
+  highlightAll: () => {
+    // Highlight code blocks in markdown preview
+    document.querySelectorAll('pre code:not(.hljs)').forEach((block) => {
+      hljs.highlightElement(block as HTMLElement);
+    });
+  }
+};
 
 // Helper function to dedent code by removing common leading whitespace
 function dedentCode(code: string): string {
@@ -30,9 +40,9 @@ function SimpleCodeBlock() {
     view(vnode) {
       const code = dedentCode(vnode.attrs.code || "");
       return m(
-        ".code.card bg-base-200 p-1",
+        ".code",
         m(
-          "pre.overflow-x-auto text-sm",
+          "pre.text-sm",
           { style: "font-family: monospace; white-space: pre;" },
           m("code", code)
         )
@@ -66,16 +76,3 @@ export function CodeLine(): m.Component {
     },
   };
 }
-
-// Minimal highlight.js integration for markdown preview
-// Flow editor uses the simplified SimpleCodeBlock component above
-import hljs from 'highlight.js';
-
-export const syntaxHighlighter = {
-  highlightAll: () => {
-    // Highlight code blocks in markdown preview
-    document.querySelectorAll('pre code:not(.hljs)').forEach((block) => {
-      hljs.highlightElement(block as HTMLElement);
-    });
-  }
-};

@@ -155,7 +155,7 @@ globalThis.addEventListener(_events.flow.requestFlowPreview, async (event) => {
   const { flowId } = event.detail;
 
   try {
-    const response = await api.publicFlows.get(flowId);
+    const response = await api.flows.get(flowId);
 
     const flowData = response.data;
     console.log("Fetched flow preview data:", flowData);

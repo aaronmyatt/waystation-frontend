@@ -116,29 +116,14 @@ globalThis.addEventListener(_events.action.refreshList, async (event) => {
   }
 });
 
-// Fetch Single Flow (for editing - requires aggregate structure)
-globalThis.addEventListener(_events.action.requestFlow, async (event) => {
-  console.log("Request flow event received:", event.detail.flowId);
-  const { flowId } = event.detail;
+const wrapGet = async (event, cb) => {
+  console.log("Request flow event received");
+  const customEvent = event as CustomEvent<{ flowId: string }>;
+  const { flowId } = customEvent.detail;
 
   try {
-    const isLoggedIn = globalThis.authService?.loggedIn;
-
-    if (!isLoggedIn) {
-      // Non-logged in users cannot edit, skip loading aggregate
-      console.log("Not logged in, skipping flow aggregate load");
-      return;
-    }
-
-    // Logged in users use regular flow aggregates endpoint
-    const response = await api.flowAggregates.get(flowId);
-    const flowData = response.data;
-    console.log("Fetched flow data:", flowData);
-
-    // Update the flow service
-    if (globalThis.flowService) {
-      globalThis.flowService.load(flowData);
-    }
+    await cb(flowId);
+    
     console.log("Flow loaded:", flowId);
   } catch (error) {
     console.error("Error fetching flow:", error);
@@ -147,27 +132,47 @@ globalThis.addEventListener(_events.action.requestFlow, async (event) => {
       globalThis.flowService.clear();
     }
   }
+}
+
+globalThis.addEventListener(_events.action.requestFlow, (event) => {
+  if (globalThis.authService?.loggedOut) return;
+
+  wrapGet(event, async (flowId) => {
+    const response = await api.flowAggregates.get(flowId);
+    const flowData = response.data;
+    console.log("Fetched flow data:", flowData);
+
+    if (globalThis.flowService) {
+      globalThis.flowService.load(flowData);
+    }
+  })
 });
 
-// Fetch Flow Preview (for markdown preview - works for both auth and public)
-globalThis.addEventListener(_events.flow.requestFlowPreview, async (event) => {
-  console.log("Request flow preview event received:", event.detail.flowId);
-  const { flowId } = event.detail;
+globalThis.addEventListener(_events.flow.requestFlowPreview, (event) => {
+  if (globalThis.authService?.loggedOut) return;
 
-  try {
+  wrapGet(event, async (flowId) => {
     const response = await api.flows.get(flowId);
-
     const flowData = response.data;
     console.log("Fetched flow preview data:", flowData);
 
-    // Update the flow service with preview data
     if (globalThis.flowService) {
       globalThis.flowService.loadPreview(flowData);
     }
-    console.log("Flow preview loaded:", flowId);
-  } catch (error) {
-    console.error("Error fetching flow preview:", error);
-  }
+  })
+});
+
+// Fetch Flow Preview (for markdown preview - works for both auth and public)
+globalThis.addEventListener(_events.flow.requestPublicFlow, async (event) => {
+  wrapGet(event, async (flowId) => {
+    const response = await api.publicFlows.get(flowId);
+    const flowData = response.data;
+    console.log("Fetched public flow data:", flowData);
+
+    if (globalThis.flowService) {
+      globalThis.flowService.loadPreview(flowData);
+    }
+  });
 });
 
 // Create/Update Flow (debounced to prevent spam)

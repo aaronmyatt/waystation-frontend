@@ -33,6 +33,7 @@ export const _events = {
   flow: {
     updated: 'ws::flow::updated',
     requestFlowPreview: 'ws::flow::requestFlowPreview',
+    requestPublicFlow: 'ws::flow::requestPublicFlow',
     updateFlowSingular: "ws::action::updateFlow",
   },
   ui: {

@@ -20,7 +20,7 @@ const FlowToolbar = {
       m(
         ".dropdown dropdown-end",
         m(
-          ".btn sm:btn-sm btn-ghost text-primary",
+          ".btn xs:btn-sm btn-ghost text-primary",
           { tabIndex: 0 },
           m("span.block size-4 text-primary", m.trust(verticalDotsSvg))
         ),
@@ -200,13 +200,13 @@ function FlowMatch() {
         vnode.attrs.match.step_content?.body ||
         "";
 
-      if( window.innerWidth < 680 ){
+      if( window.innerWidth < 640 ){
         open = false;
       }
 
       // register resize listener to handle collapse state
       window.addEventListener('resize', () => {
-        if( window.innerWidth < 680 ){
+        if( window.innerWidth < 640 ){
           open = false;
         } else {
           open = true;
@@ -237,7 +237,7 @@ function FlowMatch() {
       return m.fragment([
         m(
           // peer: allows the next sibling to style itself based on this element's hover state
-          ".match card card-xs sm:card-md p-1 bg-base-100 shadow-md border border-base-300 peer mb-2 sm:mb-0",
+          ".match card card-xs sm:card-md m-1 p-1 bg-base-100 shadow-md border border-base-300 peer mb-2 sm:mb-0",
           {
             class:
               "hover:shadow-lg hover:border-primary transition-shadow duration-300 cursor-pointer",
@@ -246,7 +246,6 @@ function FlowMatch() {
               dispatch(_events.action.clickFlowMatch, {  flowMatch: { ...vnode.attrs.match }  });
             },
           },
-          // NOTE: previous overflow-hidden, why?
           m(".card-body gap-0 space-y-2 sm:gap-2", [
             // title & toolbar
             m(".flex justify-between items-baseline gap-1 sm:gap-4", [
@@ -302,7 +301,7 @@ function FlowMatch() {
             // Collapsible description on small screens
             m(".collapse", 
               {
-                class: open ? "collapse-open" : "collapse-close sm:collapse-open",
+                class: open ? "collapse-open" : "collapse-close xs:collapse-open",
               },
               [
                 m(".collapse-content p-0", [

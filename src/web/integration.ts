@@ -1,3 +1,4 @@
+import { type Params } from "mithril";
 import { api } from "../shared/api-client";
 import { storageKeys, _events } from "../shared/utils";
 
@@ -90,19 +91,19 @@ function debounce(func, wait) {
 
 // Flow List - Refresh/Fetch all flows
 globalThis.addEventListener(_events.action.refreshList, async (event) => {
-  const customEvent = event as CustomEvent<{ filter?: "repos" | "public"; user_id?: string }>;
+  const customEvent = event as CustomEvent<{ filter?: "repos" | "public"; params?: Params; }>;
   console.log("Refresh list event received");
   try {
     let promise;
     if (customEvent.detail.filter === "repos") {
       console.log("Fetching flows from repositories");
       promise = api.repos.list();
-    } else if (customEvent.detail.filter === "public") {
+    } else if (customEvent.detail.filter === "public" && customEvent.detail.params) {
       console.log("Fetching public flows");
-      promise = api.publicFlows.list({ user_id: customEvent.detail?.user_id })
+      promise = api.publicFlows.list(customEvent.detail.params);  
     } else {
       console.log("Fetching all flows");
-      promise = api.flows.list();
+      promise = api.flows.list(customEvent.detail.params);
     }
 
     const response = await promise;

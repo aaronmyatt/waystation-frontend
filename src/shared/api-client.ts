@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { storageKeys } from './utils';
+import { type Params } from 'mithril';
 
 // API Client Configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000/api/v1';
@@ -185,7 +186,7 @@ export const api = {
 
   // Public Flows
   publicFlows: {
-    list: (params?: { user_id?: string }) =>
+    list: (params: Params) =>
       apiClient.get('/public_flows', { params }),
 
     get: (id: string) =>

@@ -17,8 +17,14 @@ function debounce<T extends (...args: any[]) => void>(fn: T, wait = 300): T {
 
 function TagBadge() {
   return {
+    oninit(vnode){
+      const params = m.buildQueryString({ tags: [vnode.attrs._tag.name].map(s => s.toLowerCase()).join(',') });
+      vnode.state.slug = '/?' + params;
+    },
     view(vnode) {
-      return m(
+      return m(m.route.Link, {
+        href: vnode.state.slug
+      }, m(
           "span.badge.badge-lg.badge-primary.shadow-sm.flex.items-center.gap-2.border.border-primary/20",
           [
             m('span.font-medium', vnode.attrs._tag.name),
@@ -26,7 +32,7 @@ function TagBadge() {
               onclick: vnode.attrs.ondelete,
             }, '✕')
           ]
-        );    
+        )) 
       },
   }
 }

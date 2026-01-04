@@ -85,12 +85,12 @@ const L = (child) => {
 
 m.route(document.body, "/", {
   "/": {
-    onmatch() {
+    onmatch(args): void {
       initData();
       if(globalThis.authService?.loggedIn){
-        dispatch(_events.action.refreshList, {});
+        dispatch(_events.action.refreshList, { params: args });
       } else {
-        dispatch(_events.action.refreshList, { filter: 'public' });
+        dispatch(_events.action.refreshList, { filter: 'public', params: args });
       }
         
     },

@@ -12,13 +12,7 @@ export const Page: m.Component = {
     this.activeTab = isLoggedIn ? 'my-flows' : 'public';
 
     // Initial load with appropriate filter
-    if (isLoggedIn) {
-      dispatch(_events.action.refreshList, {});
-    } else {
-      dispatch(_events.action.refreshList, { filter: 'public' });
-    }
   },
-
   view() {
     const isLoggedIn = globalThis.authService?.loggedIn;
     return m('.container mx-auto p-4',
@@ -30,20 +24,20 @@ export const Page: m.Component = {
               class: this.activeTab === 'my-flows' ? 'tab-active' : '',
               onclick: () => {
                 this.activeTab = 'my-flows';
-                dispatch(_events.action.refreshList, {});
+                dispatch(_events.action.refreshList, { params: m.route.param() });
               }
             }, 'My Flows'),
             m('button.tab', {
               class: this.activeTab === 'public' ? 'tab-active' : '',
               onclick: () => {
                 this.activeTab = 'public';
-                dispatch(_events.action.refreshList, { filter: 'public' });
+                dispatch(_events.action.refreshList, { filter: 'public', params: m.route.param() });
               }
             }, 'Public'),
             (this.activeTab === 'public' && isLoggedIn)
               && m('button.tab', {
                 onclick: () => {
-                  dispatch(_events.action.refreshList, { filter: 'public', user_id: globalThis.authService.user?.id });
+                  dispatch(_events.action.refreshList, { filter: 'public', params: {user_id: globalThis.authService.user?.id} });
                 }
               }, '=|| Just mine')
           ]

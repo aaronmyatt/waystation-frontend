@@ -10,19 +10,36 @@ const THEMES = [
 ];
 
 export const ThemePicker = {
-  oninit: () => {
+  oninit: (vnode) => {
     // Load saved theme from local storage
     const savedTheme = localStorage.getItem(storageKeys.themeChoice);
     document.documentElement.setAttribute("data-theme", savedTheme || "corporate");
+    vnode.state.isOpen = false;
   },
-  view: () => {
+  view: (vnode) => {
     const currentTheme = document.documentElement.getAttribute("data-theme") || "corporate";
     return m("select.select select-sm", {
       value: currentTheme,
-      onchange: (e) => {
-        const theme = e.target.value;
+      // Allow toggling the native select closed on repeated clicks
+      onmousedown: (e: MouseEvent) => {
+        const select = e.currentTarget as HTMLSelectElement;
+        if (vnode.state.isOpen) {
+          e.preventDefault();
+          select.blur();
+          vnode.state.isOpen = false;
+          return;
+        }
+        vnode.state.isOpen = true;
+      },
+      onblur: () => {
+        vnode.state.isOpen = false;
+      },
+      onchange: (e: Event) => {
+        const select = e.target as HTMLSelectElement;
+        const theme = select.value;
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem(storageKeys.themeChoice, theme);
+        vnode.state.isOpen = false;
       },
     }, THEMES.map(theme => 
       m("option", { value: theme }, theme.charAt(0).toUpperCase() + theme.slice(1))

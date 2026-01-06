@@ -22,6 +22,7 @@ const Logo = m(
 
 const Layout = {
   oninit(vnode) {
+    vnode.state.menuOpen = false;
     this.onbeforeupdate(vnode);
   },
   onbeforeupdate(vnode) {
@@ -29,32 +30,154 @@ const Layout = {
   },
   view: (vnode) => {
     return m("main.layout container mx-auto", [
-      m(".navbar", [
-        m(".navbar-start", Logo),
+      m(".navbar items-center px-3 md:px-6", [
+        m(".navbar-start flex-1", Logo),
         m(".navbar-end gap-2", [
-          m(
-            "button.btn btn-ghost",
-            {
-              onclick: () => {
-                if (vnode.state.loggedIn) {
-                  m.route.set("/flow/new");
-                } else {
-                  m.route.set("/auth");
-                }
-              },
-            },
-            "New Flow"
-          ),
-          m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
-          !vnode.state.loggedIn &&
-            m(m.route.Link, { href: "/auth", class: "btn btn-ghost" }, "Login"),
-          vnode.state.loggedIn &&
+          m(".hidden md:flex items-center gap-2", [
             m(
               "button.btn btn-ghost",
-              { onclick: () => dispatch(_events.auth.logout) },
-              "Logout"
+              {
+                onclick: () => {
+                  if (vnode.state.loggedIn) {
+                    m.route.set("/flow/new");
+                  } else {
+                    m.route.set("/auth");
+                  }
+                },
+              },
+              "New Flow"
             ),
-          m(ThemePicker),
+            m(m.route.Link, { href: "/", class: "btn btn-ghost" }, "Flows"),
+            !vnode.state.loggedIn &&
+              m(
+                m.route.Link,
+                { href: "/auth", class: "btn btn-ghost" },
+                "Login"
+              ),
+            vnode.state.loggedIn &&
+              m(
+                "button.btn btn-ghost",
+                { onclick: () => dispatch(_events.auth.logout) },
+                "Logout"
+              ),
+          ]),
+          m(
+            `.dropdown dropdown-end md:hidden ${vnode.state.menuOpen ? " dropdown-open" : ""}`,
+            [
+              m(
+                "label.btn btn-ghost swap swap-rotate",
+                {
+                  tabindex: 0,
+                  onclick: () => {
+                    vnode.state.menuOpen = !vnode.state.menuOpen;
+                  },
+                },
+                [
+                  m("input", {
+                    type: "checkbox",
+                    checked: vnode.state.menuOpen,
+                    onchange: (e) => {
+                      vnode.state.menuOpen = e.target.checked;
+                    },
+                  }),
+                  m(
+                    "svg.swap-off fill-current h-6 w-6",
+                    {
+                      xmlns: "http://www.w3.org/2000/svg",
+                      viewBox: "0 0 24 24",
+                    },
+                    [
+                      m("path", {
+                        d: "M4 6h16M4 12h16M4 18h16",
+                        stroke: "currentColor",
+                        "stroke-linecap": "round",
+                        "stroke-width": "2",
+                        fill: "none",
+                      }),
+                    ]
+                  ),
+                  m(
+                    "svg.swap-on fill-current h-6 w-6",
+                    {
+                      xmlns: "http://www.w3.org/2000/svg",
+                      viewBox: "0 0 24 24",
+                    },
+                    [
+                      m("path", {
+                        d: "M6 18L18 6M6 6l12 12",
+                        stroke: "currentColor",
+                        "stroke-linecap": "round",
+                        "stroke-width": "2",
+                        fill: "none",
+                      }),
+                    ]
+                  ),
+                ]
+              ),
+              m(
+                "ul.menu dropdown-content bg-base-200 rounded-box z-10 mt-2 w-56 p-2 shadow",
+                [
+                  m("li", [
+                    m(
+                      "button.btn btn-ghost justify-start",
+                      {
+                        onclick: () => {
+                          vnode.state.menuOpen = false;
+                          if (vnode.state.loggedIn) {
+                            m.route.set("/flow/new");
+                          } else {
+                            m.route.set("/auth");
+                          }
+                        },
+                      },
+                      "New Flow"
+                    ),
+                  ]),
+                  m("li", [
+                    m(
+                      m.route.Link,
+                      {
+                        href: "/",
+                        class: "btn btn-ghost justify-start",
+                        onclick: () => {
+                          vnode.state.menuOpen = false;
+                        },
+                      },
+                      "Flows"
+                    ),
+                  ]),
+                  !vnode.state.loggedIn &&
+                    m("li", [
+                      m(
+                        m.route.Link,
+                        {
+                          href: "/auth",
+                          class: "btn btn-ghost justify-start",
+                          onclick: () => {
+                            vnode.state.menuOpen = false;
+                          },
+                        },
+                        "Login"
+                      ),
+                    ]),
+                  vnode.state.loggedIn &&
+                    m("li", [
+                      m(
+                        "button.btn btn-ghost justify-start",
+                        {
+                          onclick: () => {
+                            vnode.state.menuOpen = false;
+                            dispatch(_events.auth.logout);
+                          },
+                        },
+                        "Logout"
+                      ),
+                    ]),
+                ]
+              ),
+            ]
+          ),
+          m(".ml-1 md:ml-3", m(ThemePicker)),
         ]),
       ]),
       m("section.mt-10", vnode.children),

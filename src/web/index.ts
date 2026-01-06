@@ -1,5 +1,6 @@
 import m from "mithril";
 import "../services";
+import "@tailwindplus/elements";
 import { Page as FlowsPage } from "../pages/ws-flows";
 import { Page as FlowPage } from "../pages/ws-flow";
 import { FlowPreview } from "../shared/ws-flow-preview";
@@ -31,6 +32,20 @@ const Layout = {
   },
   view: (vnode) => {
     const isRootRoute = m.route.get() === "/";
+    const closeMobileMenu = () => {
+      const popover = vnode.dom.getElementById("mobile-nav-popover") as (HTMLElement & {
+        hidePopover?: () => void;
+      }) | null;
+
+      if (popover?.hidePopover) {
+        popover.hidePopover();
+      } else {
+        popover?.removeAttribute("open");
+      }
+
+      vnode.state.menuOpen = false;
+    };
+
     return m(".drawer", [
       m("input#tags-drawer", {
         type: "checkbox",
@@ -89,122 +104,119 @@ const Layout = {
                 "Logout"
               ),
           ]),
-          m(
-            `.dropdown dropdown-end md:hidden ${vnode.state.menuOpen ? " dropdown-open" : ""}`,
-            [
-              m(
-                "label.btn btn-ghost swap swap-rotate",
-                {
-                  tabindex: 0,
-                  onclick: () => {
-                    vnode.state.menuOpen = !vnode.state.menuOpen;
+          m(".md:hidden relative", [
+            m(
+              "button",
+              {
+                type: "button",
+                class:
+                  "inline-flex items-center justify-center rounded-full p-2 text-gray-800 transition hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-gray-100 dark:hover:bg-gray-800",
+                popovertarget: "mobile-nav-popover",
+                "aria-controls": "mobile-nav-popover",
+                "aria-expanded": vnode.state.menuOpen ? "true" : "false",
+                "aria-label": "Toggle navigation menu",
+              },
+              [
+                m("span.sr-only", "Toggle navigation menu"),
+                m(
+                  "svg",
+                  {
+                    class: `${vnode.state.menuOpen ? "hidden" : "block"} h-6 w-6` ,
+                    xmlns: "http://www.w3.org/2000/svg",
+                    fill: "none",
+                    viewBox: "0 0 24 24",
+                    stroke: "currentColor",
                   },
+                  m("path", {
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round",
+                    "stroke-width": "2",
+                    d: "M4 6h16M4 12h16M4 18h16",
+                  })
+                ),
+                m(
+                  "svg",
+                  {
+                    class: `${vnode.state.menuOpen ? "block" : "hidden"} h-6 w-6`,
+                    xmlns: "http://www.w3.org/2000/svg",
+                    fill: "none",
+                    viewBox: "0 0 24 24",
+                    stroke: "currentColor",
+                  },
+                  m("path", {
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round",
+                    "stroke-width": "2",
+                    d: "M6 18L18 6M6 6l12 12",
+                  })
+                ),
+              ]
+            ),
+            m(
+              "el-popover#mobile-nav-popover",
+              {
+                anchor: "bottom",
+                popover: true,
+                class:
+                  "z-40 mt-3 w-[100vw] overflow-visible rounded-2xl bg-white p-3 text-gray-900 shadow-2xl ring-1 ring-black/10 transition data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-leave:duration-150 dark:bg-slate-900 dark:text-gray-100 dark:ring-white/10",
+                onbeforetoggle: (event) => {
+                  vnode.state.menuOpen = (event as any)?.newState === "open";
                 },
-                [
-                  m("input", {
-                    type: "checkbox",
-                    checked: vnode.state.menuOpen,
-                    onchange: (e) => {
-                      vnode.state.menuOpen = e.target.checked;
+              },
+              m("div.flex.flex-col.gap-2", [
+                m(
+                  "button",
+                  {
+                    class:
+                      "w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-gray-900 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-gray-50 dark:hover:bg-slate-800",
+                    onclick: () => {
+                      closeMobileMenu();
+                      if (vnode.state.loggedIn) {
+                        m.route.set("/flow/new");
+                      } else {
+                        m.route.set("/auth");
+                      }
                     },
-                  }),
+                  },
+                  "New Flow"
+                ),
+                m(
+                  m.route.Link,
+                  {
+                    href: "/",
+                    class:
+                      "w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-gray-900 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-gray-50 dark:hover:bg-slate-800",
+                    onclick: () => closeMobileMenu(),
+                  },
+                  "Flows"
+                ),
+                !vnode.state.loggedIn &&
                   m(
-                    "svg.swap-off fill-current h-6 w-6",
+                    m.route.Link,
                     {
-                      xmlns: "http://www.w3.org/2000/svg",
-                      viewBox: "0 0 24 24",
+                      href: "/auth",
+                      class:
+                        "w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-gray-900 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-gray-50 dark:hover:bg-slate-800",
+                      onclick: () => closeMobileMenu(),
                     },
-                    [
-                      m("path", {
-                        d: "M4 6h16M4 12h16M4 18h16",
-                        stroke: "currentColor",
-                        "stroke-linecap": "round",
-                        "stroke-width": "2",
-                        fill: "none",
-                      }),
-                    ]
+                    "Login"
                   ),
+                vnode.state.loggedIn &&
                   m(
-                    "svg.swap-on fill-current h-6 w-6",
+                    "button",
                     {
-                      xmlns: "http://www.w3.org/2000/svg",
-                      viewBox: "0 0 24 24",
+                      class:
+                        "w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-gray-900 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-gray-50 dark:hover:bg-slate-800",
+                      onclick: () => {
+                        closeMobileMenu();
+                        dispatch(_events.auth.logout);
+                      },
                     },
-                    [
-                      m("path", {
-                        d: "M6 18L18 6M6 6l12 12",
-                        stroke: "currentColor",
-                        "stroke-linecap": "round",
-                        "stroke-width": "2",
-                        fill: "none",
-                      }),
-                    ]
+                    "Logout"
                   ),
-                ]
-              ),
-              m(
-                "ul.menu dropdown-content bg-base-200 rounded-box z-10 mt-2 w-56 p-2 shadow",
-                [
-                  m("li", [
-                    m(
-                      "button.btn btn-ghost justify-start",
-                      {
-                        onclick: () => {
-                          vnode.state.menuOpen = false;
-                          if (vnode.state.loggedIn) {
-                            m.route.set("/flow/new");
-                          } else {
-                            m.route.set("/auth");
-                          }
-                        },
-                      },
-                      "New Flow"
-                    ),
-                  ]),
-                  m("li", [
-                    m(
-                      m.route.Link,
-                      {
-                        href: "/",
-                        class: "btn btn-ghost justify-start",
-                        onclick: () => {
-                          vnode.state.menuOpen = false;
-                        },
-                      },
-                      "Flows"
-                    ),
-                  ]),
-                  !vnode.state.loggedIn &&
-                    m("li", [
-                      m(
-                        m.route.Link,
-                        {
-                          href: "/auth",
-                          class: "btn btn-ghost justify-start",
-                          onclick: () => {
-                            vnode.state.menuOpen = false;
-                          },
-                        },
-                        "Login"
-                      ),
-                    ]),
-                  vnode.state.loggedIn &&
-                    m("li", [
-                      m(
-                        "button.btn btn-ghost justify-start",
-                        {
-                          onclick: () => {
-                            vnode.state.menuOpen = false;
-                            dispatch(_events.auth.logout);
-                          },
-                        },
-                        "Logout"
-                      ),
-                    ]),
-                ]
-              ),
-            ]
-          ),
+              ])
+            ),
+          ]),
               m(".ml-1 md:ml-3", m(ThemePicker)),
             ]),
           ]),

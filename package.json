@@ -4,6 +4,7 @@
   "description": "Waystation Frontend",
   "type": "module",
   "dependencies": {
+    "@tailwindplus/elements": "^1.0.22",
     "axios": "^1.13.2",
     "highlight.js": "^11.8.0",
     "marked": "^4.3.0",

@@ -3,18 +3,18 @@ import { _events, dispatch } from '../shared/utils'
 
 const TagCard = {
   view(vnode) {
-    return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full',
+    return m('.card card-xs sm:card-md bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full',
       m('.card-body',
         [
-          m('.flex items-center gap-2',
+          m('.flex items-center gap-1 sm:gap-2',
             [
               vnode.attrs.color && m('.badge', {
                 style: `background-color: ${vnode.attrs.color}; color: white;`
               }, ''),
-              m('.card-title text-lg font-semibold text-primary', vnode.attrs.name || 'Untitled Tag'),
+              m('.card-title text-md sm:text-lg font-semibold text-primary', vnode.attrs.name || 'Untitled Tag'),
             ]
           ),
-          vnode.attrs.slug && m('.text-sm text-base-content/70', `Slug: ${vnode.attrs.slug}`)
+          vnode.attrs.slug && m('.text-xs sm:text-sm text-base-content/70', `Slug: ${vnode.attrs.slug}`)
         ]
       )
     );
@@ -23,7 +23,7 @@ const TagCard = {
 
 const SearchBar = {
   view() {
-    return m('.mb-6',
+    return m('.mb-2 sm:mb-6',
       m('input.input input-bordered w-full', {
         type: 'text',
         placeholder: 'Search tags by name or slug...',
@@ -57,7 +57,7 @@ export const TagsList: m.Component = {
             'No tags found matching your search.' :
             'No tags yet. Create your first tag!'
         ) :
-        m('ul.grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+        m('ul.grid gap-1 sm:gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
           tags.map((tag) =>
             m('li.list-none', { key: tag.id },
               m(m.route.Link, { href: `/?tags=${tag.slug}` },

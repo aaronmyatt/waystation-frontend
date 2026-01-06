@@ -34,6 +34,7 @@
     "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-replace": "^6.0.3",
     "@rollup/plugin-typescript": "^12.1.2",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@tailwindcss/typography": "^0.5.19",
     "@types/mithril-global": "^2.2.4",

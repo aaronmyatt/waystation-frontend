@@ -15,7 +15,7 @@ function debounce<T extends (...args: any[]) => void>(fn: T, wait = 300): T {
   } as T;
 }
 
-function TagBadge() {
+export function TagBadge() {
   return {
     oninit(vnode){
       const params = m.buildQueryString({ tags: [vnode.attrs._tag.name].map(s => s.toLowerCase()).join(',') });

@@ -45,7 +45,7 @@ const Layout = {
           m(".navbar items-center px-3 md:px-6", [
             m(".navbar-start flex-1 gap-2", [
               Logo,
-              isRootRoute && m("label.btn.btn-ghost.btn-circle", {
+              m("label.btn.btn-ghost.btn-circle", {
                 for: "tags-drawer",
                 "aria-label": "Open tags drawer"
               }, m("svg.h-6.w-6", {
@@ -212,12 +212,12 @@ const Layout = {
           //end
         ]),
       ]),
-      isRootRoute && m(".drawer-side", [
+      m(".drawer-side", [
         m("label.drawer-overlay", {
           for: "tags-drawer",
           "aria-label": "close sidebar"
         }),
-        m(".menu.bg-base-200.text-base-content.min-h-full.w-80.p-4", [
+        m(".bg-base-200.text-base-content.min-h-full.w-80 p-2 sm:p-4", [
           m(".flex.justify-between.items-center.mb-4", [
             m("h2.text-xl.font-bold", "Filter by Tags"),
             m("label.btn.btn-sm.btn-circle.btn-ghost.lg:hidden", {

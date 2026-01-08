@@ -60,19 +60,26 @@ export const FlowList: m.Component = {
     } else {
       return (
       m('.container mx-auto p-4', [
-        m('ul.grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3', 
-          globalThis.flowListService.flows.map(flow => 
-            m('li.list-none',
-              { key: flow.id },
-              m(m.route.Link, { 
-                href: vnode.attrs.activeTab === 'public' ? '/public_flows/' + flow.id : '/flow/' + flow.id,
-                class: 'no-underline hover:no-underline block h-full',
-              }, [
-                m(FlowCard, { 
-                  flow
-                })
-              ])
-            )
+        m('.', 
+          globalThis.flowListService.groupByDate().map(([date, flows]) => {
+            return [
+              m('h2.text-xl font-bold text-base-content my-4 col-span-full', date),
+              m('ul.grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',               
+                flows.map(flow =>
+                  m('li.list-none',
+                    { key: flow.id },
+                    m(m.route.Link, { 
+                      href: vnode.attrs.activeTab === 'public' ? '/public_flows/' + flow.id : '/flow/' + flow.id,
+                      class: 'no-underline hover:no-underline block h-full',
+                    }, [
+                      m(FlowCard, { 
+                        flow
+                      })
+                    ])
+                  )
+              ))
+            ];
+          }
           )),
           m(FlowSettingsModal)
         ])

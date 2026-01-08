@@ -31,7 +31,6 @@ const Layout = {
     vnode.state.loggedIn = globalThis.authService.loggedIn;
   },
   view: (vnode) => {
-    const isRootRoute = m.route.get() === "/";
     const closeMobileMenu = () => {
       const popover = vnode.dom.getElementById("mobile-nav-popover") as (HTMLElement & {
         hidePopover?: () => void;

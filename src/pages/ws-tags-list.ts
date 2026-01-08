@@ -40,11 +40,7 @@ const SearchBar = {
 export const TagsList: m.Component = {
   oninit() {
     // Trigger refresh on mount
-    dispatch(_events.action.refreshTagsList, {
-      params: {
-        per_page: 100, page: 1, 
-      }
-    });
+    globalThis.tagsListService.search('', { per_page: 100, page: 1 });
   },
   view() {
     const tags = globalThis.tagsListService.tags;

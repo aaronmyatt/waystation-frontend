@@ -97,16 +97,6 @@ const Layout = {
   },
 };
 
-const initData = () => {
-  // Load initial data if available
-  if (globalThis.__INITIAL_DATA__?.flows) {
-    try {
-      globalThis.flowListService.load(globalThis.__INITIAL_DATA__.flows);
-    } catch (err) {
-      console.error("Failed to load initial flow data:", err);
-    }
-  }
-};
 const L = (child) => {
   return {
     onmatch() {
@@ -125,7 +115,6 @@ const mountElement = document.getElementById("app") || document.querySelector("m
 m.route(mountElement, "/", {
   "/": {
     onmatch() {
-      initData();
       dispatch(_events.action.refreshList, {});
     },
     render(vnode: Vnode) {

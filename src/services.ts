@@ -91,6 +91,20 @@ class TagsListService {
     page: 1,
   };
 
+  constructor(){
+    if (globalThis.__INITIAL_DATA__?.tags) {
+      try {
+        this._tags = globalThis.__INITIAL_DATA__.tags.rows || [];
+        this._pagination = {
+          per_page: globalThis.__INITIAL_DATA__.tags.per_page || 100,
+          page: globalThis.__INITIAL_DATA__.tags.page || 1,
+        };
+      } catch (err) {
+        console.error("Failed to load initial tag data:", err);
+      }
+    }
+  }
+
   get tags() {
     if (!this._searchQuery) {
       return this._tags;
@@ -157,6 +171,16 @@ class FeatureToggleService {
 
 class FlowListService {
   _flows = []
+
+  constructor(){
+    if (globalThis.__INITIAL_DATA__?.flows) {
+      try {
+        this._flows = globalThis.__INITIAL_DATA__.flows || [];
+      } catch (err) {
+        console.error("Failed to load initial flow list data:", err);
+      }
+    }
+  }
   
   get flows(){
     return this._flows;  
@@ -190,6 +214,19 @@ class FlowService {
     },
     matches: [],
   };
+
+  constructor(){
+    if (globalThis.__INITIAL_DATA__?.flow) {
+      try {
+        const flow = globalThis.__INITIAL_DATA__.flow;
+        if (flow.hasOwnProperty("flow") && flow.hasOwnProperty("matches")) {
+          this._flow = flow;
+        }
+      } catch (err) {
+        console.error("Failed to load initial flow data:", err);
+      }
+    }
+  }
 
   get flow() {
     return this._flow?.flow || {};

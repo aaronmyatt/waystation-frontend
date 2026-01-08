@@ -1,23 +1,40 @@
 import m from 'mithril'
 import { _events, dispatch } from '../shared/utils'
 import { TagBadge } from '../shared/ws-flow-tag-input'
+import { star, starSolid } from '../shared/ws-svg'
 
 const TagCard = {
   view(vnode) {
     return m('.card card-xs @sm:card-md @md:card-lg bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full',
-      m('.card-body',
+      [m('.card-body flex-row justify-between items-center w-full',
         [
-          m('.flex items-center gap-1 @sm:gap-2',
-            [
-              vnode.attrs.color && m('.badge', {
-                style: `background-color: ${vnode.attrs.color}; color: white;`
-              }, ''),
-              m('.card-title text-md @sm:text-lg font-semibold text-primary', vnode.attrs.name || 'Untitled Tag'),
-            ]
-          ),
-          vnode.attrs.slug && m('.text-xs @sm:text-sm text-base-content/70', `Slug: ${vnode.attrs.slug}`)
-        ]
-      )
+          m('.flex flex-col gap-3', [
+            m('.flex items-center gap-1 @sm:gap-2',
+              [
+                vnode.attrs._tag.color && m('.badge', {
+                  style: `background-color: ${vnode.attrs._tag.color}; color: white;`
+                }, ''),
+                m('.card-title text-md @sm:text-lg font-semibold text-primary', vnode.attrs._tag.name || 'Untitled Tag'),
+                
+              ]
+            ),
+            vnode.attrs._tag.slug && m('.text-xs @sm:text-sm text-base-content/70', `Slug: ${vnode.attrs._tag.slug}`),
+          ]),
+          m('button.btn btn-ghost btn-square',
+            { 
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dispatch(_events.tags.toggleFavourite, { tag: { ...vnode.attrs._tag, favourite: !vnode.attrs._tag.favourite } });
+              }
+            },
+            m('span.text-sm text-base-content/70 hover:text-accent hover:scale-125 transition-transform duration-200', 
+              vnode.attrs._tag.favourite ? m.trust(star) : m.trust(starSolid)
+            )
+          )
+        ],
+      ),
+      ]
     );
   }
 }
@@ -97,9 +114,7 @@ export const TagsList: m.Component = {
                 tags: [...selectedTagSlugs, tag.slug].join(',')
               })}`, class: 'block' },
                 m(TagCard, {
-                  name: tag.name,
-                  slug: tag.slug,
-                  color: tag.color,
+                  _tag: tag,
                 })
               )
             )

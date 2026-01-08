@@ -40,6 +40,9 @@ export const _events = {
     openFlowSettingsModal: 'ws::ui::openFlowSettingsModal',
     closeFlowSettingsModal: 'ws::ui::closeFlowSettingsModal',
   },
+  tags: {
+    toggleFavourite: 'ws::tags::toggleFavourite',
+  },
   action: {
     refreshTagsList: 'ws::action::refreshTagsList',
     refreshList: 'ws::action::refreshList',

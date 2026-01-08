@@ -264,4 +264,29 @@ globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {
   }
 });
 
+
+const debounceTagUpdate = debounce(async (event) => {
+  const customEvent = event as CustomEvent<{ id: string }>;
+  console.log("Toggle favourite tag event received:", customEvent.detail);
+  const { tag } = customEvent.detail;
+
+  try {
+    const response = await api.tags.update(tag.id, { tag });
+    const updatedTag = response.data;
+    console.log("Tag favourite toggled:", updatedTag);
+
+    // Refresh the tags list
+    const listResponse = await api.tags.list();
+    if (globalThis.tagsListService) {
+      globalThis.tagsListService.load(listResponse.data);
+    }
+  } catch (error) {
+    console.error("Error toggling tag favourite:", error);
+  }
+}, 300); // 300ms debounce to prevent rapid toggles
+
+globalThis.addEventListener(_events.tags.toggleFavourite, event => {
+  debounceTagUpdate(event)
+})
+
 console.log("Flow API event listeners ready");

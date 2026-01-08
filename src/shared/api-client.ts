@@ -169,6 +169,12 @@ export const api = {
       apiClient.get(`/flow_tags/${id}`),
   },
 
+  // Favourite Tags
+  favouriteTags: {
+    list: () =>
+      apiClient.get('/favourite_tags'),
+  },
+
   // Teams
   teams: {
     list: () =>

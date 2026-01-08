@@ -24,7 +24,6 @@ const Layout = {
     vnode.state.drawerOpen = false;
   },
   view: (vnode) => {
-    const isRootRoute = m.route.get() === "/";
     return m(".drawer", [
       m("input#tags-drawer", {
         type: "checkbox",
@@ -41,7 +40,7 @@ const Layout = {
             [
               m(".navbar-start.gap-2", [
                 Logo,
-                isRootRoute && m("label.btn.btn-ghost.btn-circle", {
+                m("label.btn.btn-ghost.btn-circle", {
                   for: "tags-drawer",
                   "aria-label": "Open tags drawer"
                 }, m("svg.h-6.w-6", {
@@ -78,7 +77,7 @@ const Layout = {
           //end
         ]),
       ]),
-      isRootRoute && m(".drawer-side", [
+      m(".drawer-side", [
         m("label.drawer-overlay", {
           for: "tags-drawer",
           "aria-label": "close sidebar"

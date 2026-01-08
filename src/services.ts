@@ -185,6 +185,17 @@ class FlowListService {
   get flows(){
     return this._flows;  
   }
+
+  groupByDate(){
+    return Object.entries(Object.groupBy(this._flows, (flow) => {
+      const date = new Date(flow.updated_at);
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    })).toSorted(([a], [b]) => {
+      const dateA = new Date(a[0]);
+      const dateB = new Date(b[0]);
+      return dateB.getTime() - dateA.getTime();
+    });
+  }
   
   load(flows){
    this._flows = flows;

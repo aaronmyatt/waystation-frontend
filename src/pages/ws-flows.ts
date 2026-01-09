@@ -1,17 +1,29 @@
 import m from 'mithril'
 import { _events, dispatch } from '../shared/utils'
 import { FlowList } from '../shared/ws-flows-list'
-import { FlowSettingsModal } from '../shared/ws-flow-settings-modal';
+
+enum TabRoute {
+  Public = 'public',
+  UserFlows = 'user-flows',
+  UserPublicFlows = 'user-public-flows'
+}
 
 export const Page: m.Component = {
-  activeTab: 'my-flows',
+  activeTab: TabRoute.MyFlows,
 
   oninit() {
-    // Set default tab based on login status
-    const isLoggedIn = globalThis.authService?.loggedIn;
-    this.activeTab = isLoggedIn ? 'my-flows' : 'public';
-
-    // Initial load with appropriate filter
+    this.onupdate()
+  },
+  onupdate() {
+    // Update activeTab based on current route
+    const route = m.route.get();
+    if (route === '/public') {
+      this.activeTab = TabRoute.Public;
+    } else if (route === '/') {
+      this.activeTab = TabRoute.UserFlows;
+    } else {
+      this.activeTab = TabRoute.UserPublicFlows;
+    }
   },
   view() {
     const isLoggedIn = globalThis.authService?.loggedIn;
@@ -21,23 +33,22 @@ export const Page: m.Component = {
           [
             // Only show "My Flows" tab if user is logged in
             isLoggedIn && m('button.tab', {
-              class: this.activeTab === 'my-flows' ? 'tab-active' : '',
+              class: this.activeTab === TabRoute.UserFlows ? 'tab-active' : '',
               onclick: () => {
-                this.activeTab = 'my-flows';
-                dispatch(_events.action.refreshList, { params: m.route.param() });
+                m.route.set('/');
               }
             }, 'My Flows'),
             m('button.tab', {
-              class: this.activeTab === 'public' ? 'tab-active' : '',
+              class: this.activeTab === TabRoute.Public ? 'tab-active' : '',
               onclick: () => {
-                this.activeTab = 'public';
-                dispatch(_events.action.refreshList, { filter: 'public', params: m.route.param() });
+                m.route.set('/public');
               }
             }, 'Public'),
-            (this.activeTab === 'public' && isLoggedIn)
+            ([TabRoute.UserPublicFlows, TabRoute.Public].includes(this.activeTab) && isLoggedIn)
               && m('button.tab', {
+                class: this.activeTab === TabRoute.UserPublicFlows ? 'tab-active' : '',
                 onclick: () => {
-                  dispatch(_events.action.refreshList, { filter: 'public', params: {user_id: globalThis.authService.user?.id} });
+                  m.route.set(m.buildPathname('/public/:user_id', { user_id: globalThis.authService.user?.id }));
                 }
               }, '=|| Just mine')
           ]

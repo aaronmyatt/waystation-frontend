@@ -242,17 +242,6 @@ const Layout = {
   },
 };
 
-const initData = () => {
-  // Load initial data if available
-  if (globalThis.__INITIAL_DATA__?.flows) {
-    try {
-      globalThis.flowListService.load(globalThis.__INITIAL_DATA__.flows);
-    } catch (err) {
-      console.error("Failed to load initial flow data:", err);
-    }
-  }
-};
-
 const L = (child) => {
   return {
     onmatch() {},
@@ -265,15 +254,29 @@ const L = (child) => {
 m.route(document.body, "/", {
   "/": {
     onmatch(args): void {
-      initData();
       if(globalThis.authService?.loggedIn){
         dispatch(_events.action.refreshList, { params: args });
       } else {
-        dispatch(_events.action.refreshList, { filter: 'public', params: args });
+        m.route.set("/public");
       }
-        
     },
-    render(vnode: Vnode) {
+    render(vnode) {
+      return m(Layout, m(FlowsPage, vnode.attrs));
+    },
+  },
+  "/public": {
+    onmatch(args): void {
+      dispatch(_events.action.refreshList, { filter: 'public', params: args });
+    },
+    render(vnode) {
+      return m(Layout, m(FlowsPage, vnode.attrs));
+    },
+  },
+  "/public/:user_id": {
+    onmatch(args): void {
+      dispatch(_events.action.refreshList, { filter: 'public', params: args });
+    },
+    render(vnode) {
       return m(Layout, m(FlowsPage, vnode.attrs));
     },
   },

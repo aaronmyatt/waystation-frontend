@@ -173,6 +173,10 @@ export const api = {
   favouriteTags: {
     list: () =>
       apiClient.get('/favourite_tags'),
+    create: (tagData: any) =>
+      apiClient.post('/favourite_tags', tagData),
+    delete: (id: string) =>
+      apiClient.delete(`/favourite_tags/${id}`),
   },
 
   // Teams

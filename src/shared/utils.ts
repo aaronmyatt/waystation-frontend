@@ -35,6 +35,7 @@ export const _events = {
     requestFlowPreview: 'ws::flow::requestFlowPreview',
     requestPublicFlow: 'ws::flow::requestPublicFlow',
     updateFlowSingular: "ws::action::updateFlow",
+    copyFlow: "ws::flow::copyFlow",
   },
   ui: {
     openFlowSettingsModal: 'ws::ui::openFlowSettingsModal',

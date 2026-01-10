@@ -1,7 +1,7 @@
 import { MarkdownRenderer } from './ws-marked'
 import m from 'mithril'
 import { _events as _sharedEvents, dispatch } from './utils'
-import { cogSvg } from './ws-svg';
+import { cogSvg, copySvg } from './ws-svg';
 import { FlowSettingsModal } from './ws-flow-settings-modal';
 
 const marked = new MarkdownRenderer();
@@ -33,13 +33,23 @@ const FlowCard = {
       m('.card-body', [
         m('.card-title text-lg font-semibold text-primary justify-between', [
           m('span', vnode.attrs.flow.name || ''),
-          vnode.state.settingsModalEnabled && m('button.btn btn-circle btn-sm', {
-            onclick: (e: Event) => {
-              e.stopPropagation();
-              e.preventDefault();
-              dispatch(_sharedEvents.ui.openFlowSettingsModal, { flowId: vnode.attrs.flow.id });
-            }
-          }, m.trust(cogSvg))
+          m('.flex gap-1', [
+            m('button.btn btn-circle btn-sm btn-ghost', {
+              onclick: (e: Event) => {
+                e.stopPropagation();
+                e.preventDefault();
+                dispatch(_sharedEvents.flow.copyFlow, { flow: vnode.attrs.flow });
+              },
+              'aria-label': 'Copy flow'
+            }, m.trust(copySvg)),
+            vnode.state.settingsModalEnabled && m('button.btn btn-circle btn-sm', {
+              onclick: (e: Event) => {
+                e.stopPropagation();
+                e.preventDefault();
+                dispatch(_sharedEvents.ui.openFlowSettingsModal, { flowId: vnode.attrs.flow.id });
+              }
+            }, m.trust(cogSvg))
+          ])
         ]),
         m(FlowDescriptionMd, { description: vnode.attrs.flow.description }),
         m('.flex-1'),

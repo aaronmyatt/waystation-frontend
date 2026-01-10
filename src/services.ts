@@ -393,6 +393,26 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
   canEdit(flow?: any): boolean {
     return this.isOwnedByCurrentUser(flow);
   }
+
+  copyFlow(sourceFlow: any) {
+    // Create a copy of the flow without the ID to create it as new
+    const copiedFlow = {
+      flow: {
+        ...sourceFlow,
+        id: undefined, // Remove ID to create new flow
+        name: `${sourceFlow.name} (Copy)`,
+        parent_id: sourceFlow.id, // Point to the original flow
+        user_id: undefined, // Will be set by backend
+      },
+      matches: this.matches.map(match => ({
+        ...match,
+        flow_match_id: crypto.randomUUID(), // Generate new IDs for matches
+        flow_id: undefined, // Will be set by backend
+      }))
+    };
+    
+    return copiedFlow;
+  }
 }
 
 globalThis.flowService = new FlowService();

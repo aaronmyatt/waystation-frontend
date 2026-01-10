@@ -1,5 +1,5 @@
 import m from "mithril";
-import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg, githubSvg } from "../shared/ws-svg";
+import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg, githubSvg, copySvg } from "../shared/ws-svg";
 import { dispatch, _events } from "../shared/utils";
 import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
@@ -37,6 +37,19 @@ const FlowToolbar = {
                   onclick: (e) => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
                 },
                 "Export"
+              )
+            ),
+            m("li",
+              m("button.btn btn-ghost border border-secondary",
+                {
+                  onclick: (e) => {
+                    dispatch(
+                      _events.flow.copyFlow,
+                      {flow: { ...globalThis.flowService.flow }}
+                    );
+                  },
+                },
+                [m("span.block size-4 mr-2", m.trust(copySvg)), "Copy Flow"]
               )
             ),
             m("li",

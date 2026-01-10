@@ -1,4 +1,4 @@
-import { type Params } from "mithril";
+import m, { type Params } from "mithril";
 import { api } from "../shared/api-client";
 import { storageKeys, _events } from "../shared/utils";
 
@@ -288,5 +288,55 @@ const debounceTagUpdate = debounce(async (event) => {
 globalThis.addEventListener(_events.tags.toggleFavourite, event => {
   debounceTagUpdate(event)
 })
+
+// Copy Flow
+globalThis.addEventListener(_events.flow.copyFlow, async (event) => {
+  const customEvent = event as CustomEvent<{ flow: any }>;
+  console.log("Copy flow event received:", customEvent.detail);
+  const { flow } = customEvent.detail;
+
+  try {
+    // Load the full flow data if we only have minimal data
+    let fullFlowData;
+    if (!flow.matches || flow.matches.length === 0) {
+      const response = await api.flowAggregates.get(flow.id);
+      fullFlowData = response.data;
+    } else {
+      fullFlowData = { flow, matches: flow.matches || [] };
+    }
+
+    // Create a copy of the flow
+    const copiedFlow = {
+      flow: {
+        ...fullFlowData.flow,
+        id: undefined, // Remove ID to create as new
+        name: `${fullFlowData.flow.name} (Copy)`,
+        parent_id: fullFlowData.flow.id, // Point to original
+        user_id: undefined, // Will be set by backend
+      },
+      matches: (fullFlowData.matches || []).map((match: any) => ({
+        ...match,
+        flow_match_id: crypto.randomUUID(), // New IDs for matches
+        flow_id: undefined, // Will be set by backend
+      }))
+    };
+
+    // Create the new flow via API
+    const createResponse = await api.flowAggregates.create(copiedFlow);
+    const newFlow = createResponse.data;
+    console.log("Flow copied successfully:", newFlow);
+
+    // Navigate to the new flow
+    if (newFlow.flow?.id) {
+      m.route.set(`/flow/${newFlow.flow.id}`);
+    }
+
+    // Refresh the flow list
+    const listResponse = await api.flows.list();
+    globalThis.flowListService.load(listResponse.data.rows);
+  } catch (error) {
+    console.error("Error copying flow:", error);
+  }
+});
 
 console.log("Flow API event listeners ready");

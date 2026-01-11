@@ -305,10 +305,12 @@ function FlowMatch() {
             m('.flex flex-grow space-x-2', [
               // match.git_repo_root
             vnode.attrs.match.match?.git_repo_root 
-              && m(".hidden sm:flex text-sm link link-secondary mb-1 flex items-center gap-1", [
+              && m(m.route.Link, {
+                href: '/?' + m.buildQueryString({ repo: vnode.attrs.match.match?.git_repo_root  })
+              }, m(".flex text-sm link link-secondary mb-1 flex items-center gap-1", [
                 m("span.block size-4", m.trust(githubSvg)),
                 m('span', vnode.attrs.match.match.git_repo_root),
-              ]),
+              ])),
             // match.repo_relative_file_path
             vnode.attrs.match.match?.repo_relative_file_path 
               && m(".text-sm link link-secondary mb-1", [
@@ -563,6 +565,13 @@ export function FlowEditor(): m.Component {
                 class: '!z-[101]'
               }, m(FlowToolbar)),
             ]),
+            vnode.state.flow?.git_repo_root 
+              && m(m.route.Link, {
+                href: '/?' + m.buildQueryString({ repo: vnode.state.flow?.git_repo_root })
+              }, m(".flex text-sm link link-secondary mb-1 flex items-center gap-1", [
+                m("span.block size-4", m.trust(githubSvg)),
+                m('span', vnode.state.flow.git_repo_root),
+              ])),
             m(TagsInput, {
               flow: vnode.state.flow, enableCrud: true
             }),

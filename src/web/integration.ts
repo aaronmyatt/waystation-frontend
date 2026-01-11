@@ -89,24 +89,32 @@ function debounce(func, wait) {
   };
 }
 
-// Flow List - Refresh/Fetch all flows
-globalThis.addEventListener(_events.action.refreshList, async (event) => {
-  const customEvent = event as CustomEvent<{ filter?: "repos" | "public"; params?: Params; }>;
+const refreshFlowList = async (event) => {
+  const customEvent = event as CustomEvent<{ params?: Params; }>;
   console.log("Refresh list event received");
   try {
-    let promise;
-    if (customEvent.detail.filter === "repos") {
-      console.log("Fetching flows from repositories");
-      promise = api.repos.list();
-    } else if (customEvent.detail.filter === "public" && customEvent.detail.params) {
-      console.log("Fetching public flows");
-      promise = api.publicFlows.list(customEvent.detail.params);  
-    } else {
-      console.log("Fetching all flows");
-      promise = api.flows.list(customEvent.detail.params);
-    }
+    console.log("Fetching flows");
+    const response = await api.flows.list(customEvent.detail.params);
+    const flows = response.data.rows;
+    // Update the flow list service
+    globalThis.flowListService.load(flows);
+    console.log(`Loaded ${flows.length} flows`);
+  } catch (error) {
+    globalThis.flowListService.load([]);
+    console.error("Error fetching flows:", error);
+  }
+}
 
-    const response = await promise;
+globalThis.addEventListener(_events.flows.refreshList, refreshFlowList);
+globalThis.addEventListener(_events.flows.filterByRepo, refreshFlowList);
+
+
+globalThis.addEventListener(_events.flows.publicOnly, async (event) => {
+  const customEvent = event as CustomEvent<{ params?: Params; }>;
+  console.log("Refresh list event received");
+  try {
+    console.log("Fetching flows");
+    const response = await api.publicFlows.list(customEvent.detail.params);
     const flows = response.data.rows;
     // Update the flow list service
     globalThis.flowListService.load(flows);

@@ -160,6 +160,7 @@ globalThis.tagsListService = new TagsListService();
 class FeatureToggleService {
   private features: Record<string, boolean> = {
     "settings-modal": true,
+    "llm-generation": true,
   };
 
   constructor() {
@@ -203,7 +204,7 @@ class FlowListService {
     return Object.entries(Object.groupBy(this._flows, (flow) => {
       const date = new Date(flow.updated_at);
       return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-    })).toSorted(([a], [b]) => {
+    })).toSorted((a, b) => {
       const dateA = new Date(a[0]);
       const dateB = new Date(b[0]);
       return dateB.getTime() - dateA.getTime();
@@ -405,6 +406,26 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 
   canEdit(flow?: any): boolean {
     return this.isOwnedByCurrentUser(flow);
+  }
+
+  copyFlow(sourceFlow: any) {
+    // Create a copy of the flow without the ID to create it as new
+    const copiedFlow = {
+      flow: {
+        ...sourceFlow,
+        id: undefined, // Remove ID to create new flow
+        name: `${sourceFlow.name} (Copy)`,
+        parent_id: sourceFlow.id, // Point to the original flow
+        user_id: undefined, // Will be set by backend
+      },
+      matches: this.matches.map(match => ({
+        ...match,
+        flow_match_id: crypto.randomUUID(), // Generate new IDs for matches
+        flow_id: undefined, // Will be set by backend
+      }))
+    };
+    
+    return copiedFlow;
   }
 }
 

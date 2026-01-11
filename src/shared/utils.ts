@@ -37,6 +37,12 @@ export const _events = {
     updateFlowSingular: "ws::action::updateFlow",
     copyFlow: "ws::flow::copyFlow",
   },
+  flows: {
+    filterByRepo: 'ws::flows::filterByRepo',
+    search: 'ws::flows::search',
+    refreshList: 'ws::flows::refreshList',
+    publicOnly: 'ws::flows::publicOnly',
+  },
   ui: {
     openFlowSettingsModal: 'ws::ui::openFlowSettingsModal',
     closeFlowSettingsModal: 'ws::ui::closeFlowSettingsModal',
@@ -47,7 +53,6 @@ export const _events = {
     refreshUserTagsList: 'ws::action::refreshUserTagsList',
   },
   action: {
-    refreshList: 'ws::action::refreshList',
     requestFlow: 'ws::action::requestFlow',
     actionError: 'ws::action::actionError',
 

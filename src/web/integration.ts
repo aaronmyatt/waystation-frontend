@@ -319,6 +319,7 @@ globalThis.addEventListener(_events.flow.copyFlow, async (event) => {
         name: `${fullFlowData.flow.name} (Copy)`,
         parent_flow_id: fullFlowData.flow.id, // Point to original
         user_id: undefined, // Will be set by backend
+        status: 'draft', // New copies start as draft
       },
       matches: (fullFlowData.matches || []).map((match: any) => ({
         ...match,

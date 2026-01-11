@@ -8,16 +8,16 @@ export function FlowSettingsModal() {
     oninit(vnode){
         globalThis.addEventListener(_events.ui.openFlowSettingsModal, (event) => {
           el && el.showModal();
-          vnode.state.flowId = (event as CustomEvent).detail.flowId;
+          vnode.state.flow = (event as CustomEvent).detail.flow;
           // default visibility when opening (can be changed by the user)
-          vnode.state.visibility = vnode.state.visibility || 'private';
+          vnode.state.visibility = vnode.state.flow.status || 'private';
         });
     },
     oncreate(vnode){
       el = vnode.dom;
     },
     onremove(vnode){
-      vnode.state.flowId = null;
+      vnode.state.flow = null;
       el.close();
     },
     view(vnode) {
@@ -109,7 +109,7 @@ export function FlowSettingsModal() {
                       onclick: () => {
                           // Save settings
                           dispatch(_events.flow.updateFlowSingular, {
-                              flowId: vnode.state.flowId,
+                              flowId: vnode.state.flow.id,
                               flow: { status: vnode.state.visibility },
                           });
                           el && el.close();

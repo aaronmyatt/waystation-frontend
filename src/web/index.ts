@@ -367,7 +367,7 @@ m.route(document.body, "/", {
   },
   "/public_flows/:id": {
     onmatch(args, _requestedPath, _route): Promise<void> {
-      dispatch(_events.flow.requestPublicFlow, { public: true, flowId: args.id });
+      dispatch(_events.flow.requestPublicFlow, { flowId: args.id });
 
       return new Promise((resolve, reject) => {
         // TODO: use a proxy to inctercept flowService.flow changes instead of polling?

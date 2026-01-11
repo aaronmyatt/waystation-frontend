@@ -46,7 +46,7 @@ const FlowCard = {
               onclick: (e: Event) => {
                 e.stopPropagation();
                 e.preventDefault();
-                dispatch(_sharedEvents.ui.openFlowSettingsModal, { flowId: vnode.attrs.flow.id });
+                dispatch(_sharedEvents.ui.openFlowSettingsModal, { flow: vnode.attrs.flow });
               }
             }, m.trust(cogSvg))
           ])

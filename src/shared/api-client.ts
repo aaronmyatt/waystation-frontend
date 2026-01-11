@@ -1,9 +1,8 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { storageKeys } from './utils';
-import { type Params } from 'mithril';
 
 // API Client Configuration
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000/api/v1';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:4000/api/v1';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -63,7 +62,7 @@ export const api = {
 
   // Flows
   flows: {
-    list: (params?: { since?: number; tags?: string }) =>
+    list: (params?: { since?: number; tags?: string, repo?: string }) =>
       apiClient.get('/flows', { params }),
 
     get: (id: string) =>
@@ -203,19 +202,11 @@ export const api = {
 
   // Public Flows
   publicFlows: {
-    list: (params: Params) =>
+    list: (params?: { since?: number; tags?: string, repo?: string, user_id?: string }) =>
       apiClient.get('/public_flows', { params }),
 
     get: (id: string) =>
       apiClient.get(`/public_flows/${id}`),
-  },
-
-  // Repos
-  repos: {
-    list: () =>
-      apiClient.get('/repos'),
-    get: (name: string) =>
-      apiClient.get(`/repos/${name}`),
   },
 
   // Status

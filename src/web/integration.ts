@@ -317,7 +317,7 @@ globalThis.addEventListener(_events.flow.copyFlow, async (event) => {
         ...fullFlowData.flow,
         id: undefined, // Remove ID to create as new
         name: `${fullFlowData.flow.name} (Copy)`,
-        parent_id: fullFlowData.flow.id, // Point to original
+        parent_flow_id: fullFlowData.flow.id, // Point to original
         user_id: undefined, // Will be set by backend
       },
       matches: (fullFlowData.matches || []).map((match: any) => ({

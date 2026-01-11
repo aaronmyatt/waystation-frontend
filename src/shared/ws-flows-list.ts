@@ -34,7 +34,7 @@ const FlowCard = {
         m('.card-title text-lg font-semibold text-primary justify-between', [
           m('span', vnode.attrs.flow.name || ''),
           m('.flex gap-1', [
-            m('button.btn btn-circle btn-sm btn-ghost', {
+            m('button.btn btn-ghost btn-primary btn-circle btn-sm', {
               onclick: (e: Event) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -42,7 +42,7 @@ const FlowCard = {
               },
               'aria-label': 'Copy flow'
             }, m.trust(copySvg)),
-            vnode.state.settingsModalEnabled && m('button.btn btn-circle btn-sm', {
+            vnode.state.settingsModalEnabled && m('button.btn btn-ghost btn-primary btn-circle btn-sm', {
               onclick: (e: Event) => {
                 e.stopPropagation();
                 e.preventDefault();

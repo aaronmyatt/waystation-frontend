@@ -3,6 +3,7 @@ import m from 'mithril'
 import { _events as _sharedEvents, dispatch } from './utils'
 import { cogSvg, copySvg } from './ws-svg';
 import { FlowSettingsModal } from './ws-flow-settings-modal';
+import { formatDistanceToNow } from 'date-fns';
 
 const marked = new MarkdownRenderer();
 
@@ -53,10 +54,10 @@ const FlowCard = {
         ]),
         m(FlowDescriptionMd, { description: vnode.attrs.flow.description }),
         m('.flex-1'),
-        m('.card-actions justify-between',
+        m('.card-actions justify-between items-center',
           [
-            m('.text-sm', `Created ${vnode.attrs.flow.updated_at}`), 
-            m('button.btn btn-sm btn-ghost', 'View >'),
+            m('.text-sm', `${formatDistanceToNow(new Date(vnode.attrs.flow.updated_at), { addSuffix: true })}`), 
+            m('button.btn btn-sm', 'Open'),
           ])
       ])
     )
@@ -66,10 +67,10 @@ const FlowCard = {
 export const FlowList: m.Component = {
   view(vnode){
     if (globalThis.flowListService.flows.length === 0) {
-      return m('.container mx-auto p-4', m('p.text-center text-lg text-base-content/70', 'No flows found.'));
+      return m('.container mx-auto py-2 px-1 sm:p-4', m('p.text-center text-lg text-base-content/70', 'No flows found.'));
     } else {
       return (
-      m('.container mx-auto p-4', [
+      m('.container mx-auto', [
         m('.', 
           globalThis.flowListService.groupByDate().map(([date, flows]) => {
             return [

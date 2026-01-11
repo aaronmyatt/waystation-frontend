@@ -4,6 +4,7 @@ import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
+import terser from '@rollup/plugin-terser';
 
 const production = process.env.NODE_ENV === 'production';
 
@@ -39,8 +40,9 @@ export default [
         compilerOptions: {
           noEmitOnError: false
         }
-      })
-    ],
+      }),
+      production && terser()
+    ].filter(Boolean),
   },
 
   // Web Integration bundle
@@ -74,8 +76,9 @@ export default [
         compilerOptions: {
           noEmitOnError: false
         }
-      })
-    ],
+      }),
+      production && terser()
+    ].filter(Boolean),
   },
 
   // Web CSS bundle (reuses the existing styles entry)

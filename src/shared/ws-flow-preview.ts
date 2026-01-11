@@ -25,7 +25,7 @@ export function FlowPreview(): m.Component {
         },
         view(vnode){
             const gitInfoAvailable = vnode.state.flow.git_repo_root || vnode.state.flow.git_branch || vnode.state.flow.git_commit_sha;
-            return m('.p-4', [
+            return m('.p-2 sm:p-4', [
                 gitInfoAvailable && m('.flex mb-4 p-4 bg-base-200 rounded-lg items-center', [
                     m('.text-sm font-semibold text-base-content', m.trust(githubSvg)),
                     m('.flex gap-1 text-sm', [

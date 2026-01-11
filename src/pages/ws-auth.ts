@@ -82,7 +82,7 @@ export const Auth: m.Component = {
       vnode.state.mode = isLogin ? 'register' : 'login';
     };
 
-    return m('.auth-component.container mx-auto p-4 max-w-md', [
+    return m('.auth-component.container mx-auto p-2 sm:p-4 max-w-md', [
       m('.card w-full bg-base-100 shadow-xl border border-base-300', [
         m('.card-body', [
           // Title

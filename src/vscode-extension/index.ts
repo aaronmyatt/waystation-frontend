@@ -73,7 +73,7 @@ const Layout = {
               ]),
             ]
           ),
-          m("section.mt-10", vnode.children),
+          m("section.mt-5 sm:mt-10", vnode.children),
           //end
         ]),
       ]),

@@ -226,10 +226,10 @@ globalThis.addEventListener("ws::action::deleteFlow", async (event) => {
 });
 
 // Tags List - Refresh/Fetch all tags (debounced)
-const debouncedRefreshTagsList = debounce(async (event) => {
+const debouncedRefreshTagsList = debounce(async (event, requestTarget) => {
   try {
     const params = (event as CustomEvent<{ params?: any }>).detail.params || {};
-    const response = await api.tags.list(params);
+    const response = await requestTarget(params);
     const tags = response.data;
 
     // Update the tags list service
@@ -246,8 +246,12 @@ const debouncedRefreshTagsList = debounce(async (event) => {
   }
 }, 500); // 500ms debounce, adjust as needed
 
-globalThis.addEventListener("ws::action::refreshTagsList", (event) => {
-  debouncedRefreshTagsList(event);
+globalThis.addEventListener(_events.tags.refreshTagsList, (event) => {
+  debouncedRefreshTagsList(event, api.tags.list);
+});
+
+globalThis.addEventListener(_events.tags.refreshUserTagsList, (event) => {
+  debouncedRefreshTagsList(event, api.userTags.list);
 });
 
 globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {
@@ -266,17 +270,19 @@ globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {
 
 
 const debounceTagUpdate = debounce(async (event) => {
-  const customEvent = event as CustomEvent<{ id: string }>;
+  const customEvent = event as CustomEvent<{ tag: { id: string, is_favourite: boolean } }>;
   console.log("Toggle favourite tag event received:", customEvent.detail);
   const { tag } = customEvent.detail;
 
   try {
-    const response = await api.tags.update(tag.id, { tag });
-    const updatedTag = response.data;
-    console.log("Tag favourite toggled:", updatedTag);
+    if(tag.is_favourite) {
+      await api.favouriteTags.delete(tag.id);
+    } else {
+      await api.favouriteTags.create(tag.id);
+    }
 
     // Refresh the tags list
-    const listResponse = await api.tags.list();
+    const listResponse = await api.userTags.list();
     if (globalThis.tagsListService) {
       globalThis.tagsListService.load(listResponse.data);
     }

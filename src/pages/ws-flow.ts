@@ -23,7 +23,7 @@ export function Page(): m.Component {
       globalThis.flowService.clear();
     },
     view(vnode) {
-      return m('.container mx-auto p-2 sm:p-4 max-w-6xl',
+      return m('.container mx-auto max-w-6xl',
         [
           m('.tabs tabs-boxed mb-4',
             [

@@ -76,7 +76,7 @@ export const TagsList: m.Component = {
     );
     
     return m('.@container mx-auto w-full', [
-      m('h1.text-3xl font-bold mb-6', 'Tags'),
+      m('h2.mb-3 sm:mb-6', [m('span.text-3xl font-bold', 'Tags'), m('span.text.xs', ' (Click to filter)')]),
       m(SearchBar),
       
       // Show selected tags as badges

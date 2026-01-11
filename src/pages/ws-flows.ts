@@ -27,7 +27,7 @@ export const Page: m.Component = {
   },
   view() {
     const isLoggedIn = globalThis.authService?.loggedIn;
-    return m('.container mx-auto p-2 sm:p-4',
+    return m('.container mx-auto',
       [
         m('.tabs tabs-boxed mb-4',
           [

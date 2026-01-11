@@ -17,9 +17,9 @@ export const Page: m.Component = {
   onupdate() {
     // Update activeTab based on current route
     const route = m.route.get();
-    if (route === '/public') {
+    if (route === '/public' || route.startsWith('/public?')) {
       this.activeTab = TabRoute.Public;
-    } else if (route === '/') {
+    } else if (route === '/' || route.startsWith('/?')) {
       this.activeTab = TabRoute.UserFlows;
     } else {
       this.activeTab = TabRoute.UserPublicFlows;

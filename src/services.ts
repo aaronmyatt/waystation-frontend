@@ -117,13 +117,26 @@ class TagsListService {
     );
   }
 
+  push(tag) {
+    if(this._tags.find(t => t.id === tag.id)){
+      return;
+    }
+    this._tags.push(tag);
+    m.redraw();
+  }
+
+  delete(tagId) {
+    this._tags = this._tags.filter(tag => tag.id !== tagId);
+    m.redraw();
+  }
+
   get searchQuery() {
     return this._searchQuery;
   }
 
   search(query: string, pagination: { per_page: number; page: number }) {
     this._searchQuery = query;
-    dispatch(_events.action.refreshTagsList, {
+    dispatch(_events.tags.refreshUserTagsList, {
       params: Object.assign({}, pagination, {
         per_page: this._pagination.per_page,
         page: this._pagination.page,

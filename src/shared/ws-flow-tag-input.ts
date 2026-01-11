@@ -22,17 +22,18 @@ export function TagBadge() {
       vnode.state.slug = '/?' + params;
     },
     view(vnode) {
-      return m(m.route.Link, {
-        href: vnode.state.slug
-      }, m(
-          "span.badge.badge-lg.badge-primary.shadow-sm.flex.items-center.gap-2.border.border-primary/20",
-          [
-            m('span.font-medium', vnode.attrs._tag.name),
-            vnode.attrs.ondelete && m('button.btn.btn-ghost.btn-xs.btn-circle', {
-              onclick: vnode.attrs.ondelete,
-            }, '✕')
-          ]
-        )) 
+      return m('div.join.shadow-sm', [
+        m(m.route.Link, {
+          href: vnode.state.slug,
+          class: 'btn btn-primary btn-sm join-item'
+        }, m('span.font-medium', vnode.attrs._tag.name)),
+        vnode.attrs.ondelete && m('button.btn btn-primary btn-sm join-item opacity-60 hover:opacity-90 border border-l-1', {
+          onclick: (e) => {
+            e.stopPropagation();
+            vnode.attrs.ondelete(e)
+          },
+        }, '✕')
+      ]);
       },
   }
 }
@@ -83,6 +84,7 @@ export function TagsInput() {
                   try {
                     await api.tags.delete(tag.id, vnode.state.flowId);
                     vnode.state.flowTags = vnode.state.flowTags.filter((o) => o.id !== tag.id);
+                    // globalThis.tagsListService.delete(tag.id);
                   } catch (err) {
                     console.error('Failed to delete tag', err);
                   } finally {
@@ -144,6 +146,7 @@ export function TagsInput() {
                           try {
                             const { data } = await api.tags.create({ tag: { name: tag.name } }, vnode.state.flowId);
                             vnode.state.flowTags.push(data.tag);
+                            globalThis.tagsListService.push(data.tag);
                           } catch (err) {
                             console.error('Failed to create tag', err);
                           } finally {

@@ -25,11 +25,12 @@ const TagCard = {
               onclick: (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                dispatch(_events.tags.toggleFavourite, { tag: { ...vnode.attrs._tag, favourite: !vnode.attrs._tag.favourite } });
+                dispatch(_events.tags.toggleFavourite, { tag: { ...vnode.attrs._tag } });
+                vnode.attrs._tag.is_favourite = !vnode.attrs._tag.is_favourite;
               }
             },
             m('span.text-sm text-base-content/70 hover:text-accent hover:scale-125 transition-transform duration-200', 
-              vnode.attrs._tag.favourite ? m.trust(star) : m.trust(starSolid)
+              vnode.attrs._tag.is_favourite ? m('span.text-accent', m.trust(starSolid)) : m.trust(star)
             )
           )
         ],

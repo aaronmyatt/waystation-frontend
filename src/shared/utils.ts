@@ -42,9 +42,10 @@ export const _events = {
   },
   tags: {
     toggleFavourite: 'ws::tags::toggleFavourite',
+    refreshTagsList: 'ws::action::refreshTagsList',
+    refreshUserTagsList: 'ws::action::refreshUserTagsList',
   },
   action: {
-    refreshTagsList: 'ws::action::refreshTagsList',
     refreshList: 'ws::action::refreshList',
     requestFlow: 'ws::action::requestFlow',
     actionError: 'ws::action::actionError',

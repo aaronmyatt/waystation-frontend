@@ -172,11 +172,18 @@ export const api = {
   // Favourite Tags
   favouriteTags: {
     list: () =>
-      apiClient.get('/favourite_tags'),
-    create: (tagData: any) =>
-      apiClient.post('/favourite_tags', tagData),
-    delete: (id: string) =>
-      apiClient.delete(`/favourite_tags/${id}`),
+      apiClient.get('/favorite_tags'),
+    create: (tag_id: any) =>
+      apiClient.post('/favorite_tags', { tag_id }),
+    delete: (tag_id: string) =>
+      // keeping tag_id in the slug to satisfy rails
+      apiClient.delete(`/favorite_tags/${tag_id}`, { data: { tag_id } }),
+  },
+
+    // User Tags
+  userTags: {
+    list: () =>
+      apiClient.get('/user_tags'),
   },
 
   // Teams

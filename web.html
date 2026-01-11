@@ -11,7 +11,11 @@
     <div id="app"></div>
 
     <script>
-      window.__INITIAL_DATA__ = window.__INITIAL_DATA__ || {};
+      window.__INITIAL_DATA__ = window.__INITIAL_DATA__ || {
+        features: {
+          "llm-generation": false,
+        }
+      };
     </script>
     <script src="dist/waystation-integration.js"></script>
     <script src="dist/waystation-web.js"></script>

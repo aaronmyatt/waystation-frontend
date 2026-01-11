@@ -160,6 +160,7 @@ globalThis.tagsListService = new TagsListService();
 class FeatureToggleService {
   private features: Record<string, boolean> = {
     "settings-modal": true,
+    "llm-generation": true,
   };
 
   constructor() {
@@ -203,7 +204,7 @@ class FlowListService {
     return Object.entries(Object.groupBy(this._flows, (flow) => {
       const date = new Date(flow.updated_at);
       return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-    })).toSorted(([a], [b]) => {
+    })).toSorted((a, b) => {
       const dateA = new Date(a[0]);
       const dateB = new Date(b[0]);
       return dateB.getTime() - dateA.getTime();

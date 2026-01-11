@@ -52,7 +52,7 @@ const FlowToolbar = {
                 [m("span.block size-4 mr-2", m.trust(copySvg)), "Copy Flow"]
               )
             ),
-            m("li",
+            globalThis.featureToggleService.isEnabled("llm-generation") && m("li",
               m("button.btn btn-ghost border border-secondary",
                 {
                   onclick: (e) => {
@@ -156,7 +156,7 @@ const FlowMatchToolbar = {
                   "Create Child Flow"
                 )
               ),
-              m("li",
+              globalThis.featureToggleService.isEnabled("llm-generation") && m("li",
                 m("button.btn btn-ghost border border-base-300",
                   {
                     onclick: (e) => {

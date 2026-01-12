@@ -19,6 +19,9 @@ declare global {
   var marked: any;
   var syntaxHighlighter: any;
   var api: any;
+  var actions: {
+    copyFlow: () => import("../services/copy-flow").CopyFlowService;
+  };
 }
 
 export {};

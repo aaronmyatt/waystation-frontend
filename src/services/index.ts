@@ -1,5 +1,6 @@
 import m from "mithril";
-import { _events, dispatch, storageKeys } from "./shared/utils";
+import { CopyFlowService } from "./copy-flow";
+import { _events, dispatch, storageKeys } from "../shared/utils";
 
 class AuthService {
   _state = {
@@ -210,6 +211,14 @@ class FlowListService {
       return dateB.getTime() - dateA.getTime();
     });
   }
+
+  push(flow){
+    if(this._flows.find(f => f.id === flow.id)){
+      return;
+    }
+    this._flows.push(flow);
+    m.redraw();
+  }
   
   load(flows){
    this._flows = flows;
@@ -407,37 +416,21 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
   canEdit(flow?: any): boolean {
     return this.isOwnedByCurrentUser(flow);
   }
-
-  copyFlow(sourceFlow: any) {
-    // Create a copy of the flow without the ID to create it as new
-    const copiedFlow = {
-      flow: {
-        ...sourceFlow,
-        id: undefined, // Remove ID to create new flow
-        name: `${sourceFlow.name} (Copy)`,
-        parent_id: sourceFlow.id, // Point to the original flow
-        user_id: undefined, // Will be set by backend
-      },
-      matches: this.matches.map(match => ({
-        ...match,
-        flow_match_id: crypto.randomUUID(), // Generate new IDs for matches
-        flow_id: undefined, // Will be set by backend
-      }))
-    };
-    
-    return copiedFlow;
-  }
 }
 
 globalThis.flowService = new FlowService();
 globalThis.flowListService = new FlowListService();
 globalThis.featureToggleService = new FeatureToggleService();
 globalThis.authService = new AuthService();
+globalThis.actions = {
+  copyFlow: () => new CopyFlowService(),
+};
 
 export {
   AuthService,
   FlowListService,
   FlowService,
-  FeatureToggleService
+  FeatureToggleService,
+  CopyFlowService,
 };
 

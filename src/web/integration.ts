@@ -1,6 +1,7 @@
 import m, { type Params } from "mithril";
 import { api } from "../shared/api-client";
 import { storageKeys, _events } from "../shared/utils";
+import { CopyFlowService } from "src/services";
 
 globalThis.addEventListener(_events.auth.logout, (event) => {
   console.log("Logout event received");
@@ -310,31 +311,10 @@ globalThis.addEventListener(_events.flow.copyFlow, async (event) => {
   const { flow } = customEvent.detail;
 
   try {
+    const {data: originalFlow } = await api.flowAggregates.get(flow.id);
     // Load the full flow data if we only have minimal data
-    let fullFlowData;
-    if (!flow.matches || flow.matches.length === 0) {
-      const response = await api.flowAggregates.get(flow.id);
-      fullFlowData = response.data;
-    } else {
-      fullFlowData = { flow, matches: flow.matches || [] };
-    }
 
-    // Create a copy of the flow
-    const copiedFlow = {
-      flow: {
-        ...fullFlowData.flow,
-        id: undefined, // Remove ID to create as new
-        name: `${fullFlowData.flow.name} (Copy)`,
-        parent_flow_id: fullFlowData.flow.id, // Point to original
-        user_id: undefined, // Will be set by backend
-        status: 'draft', // New copies start as draft
-      },
-      matches: (fullFlowData.matches || []).map((match: any) => ({
-        ...match,
-        flow_match_id: crypto.randomUUID(), // New IDs for matches
-        flow_id: undefined, // Will be set by backend
-      }))
-    };
+    const copiedFlow = (new CopyFlowService(originalFlow.flow, originalFlow.matches || [])).process();
 
     // Create the new flow via API
     const createResponse = await api.flowAggregates.create(copiedFlow);

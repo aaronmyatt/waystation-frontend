@@ -96,21 +96,6 @@ export const api = {
       apiClient.delete(`/flow_matches/${id}`),
   },
 
-  // Match Notes
-  matchNotes: {
-    list: (params?: { since?: number }) =>
-      apiClient.get('/match_notes', { params }),
-
-    create: (noteData: any) =>
-      apiClient.post('/match_notes', noteData),
-
-    update: (id: string, noteData: any) =>
-      apiClient.put(`/match_notes/${id}`, noteData),
-
-    delete: (id: string) =>
-      apiClient.delete(`/match_notes/${id}`),
-  },
-
   // Step Contents
   stepContents: {
     list: (params?: { since?: number }) =>

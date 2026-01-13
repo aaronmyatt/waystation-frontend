@@ -164,7 +164,7 @@ globalThis.__INITIAL_DATA__ = {
       "flow_match_id": "264dff8a-f103-4c29-81cd-d98d33f9cd21",
       "match_id": "c77cf341be3f65837faa6961c7dc6bc8",
       "order_index": 0,
-      "content_kind": "match",
+      "content_kind": "note",
       "match": {
         "line": "class FlowStateManager {",
         "file_path": "/Users/aaronmyatt/Development/waystation-vscode/src/state/flowStateManager.ts",
@@ -176,16 +176,17 @@ globalThis.__INITIAL_DATA__ = {
         "git_commit_sha": "109367478c8ba38724670f52a027a245b0ec0ead",
         "git_branch": "copilot/simplify-local-state-management"
       },
-      "note": {
-        "name": "FlowStateManager",
-        "description": "We now have some indirection between the db and manipulating the state within it. Rather than writing changes directly to the WASM instance of Sqlite3, we first write it to a serializable, in-memory representation.\n\nA potential plan for this, other than making the state flows a little more intuitive, is to enable more convenient iteration on the underlying persistence technology, now we can more easily translate the in memory representation to any new schema or DB technology choice.\n\nThis should now also offer a natural point to issue automated syncing requests to the backend whenever the user is logged in."
+      "step_content": {
+        "title": "FlowStateManager",
+        "body": "We now have some indirection between the db and manipulating the state within it. Rather than writing changes directly to the WASM instance of Sqlite3, we first write it to a serializable, in-memory representation.\n\nA potential plan for this, other than making the state flows a little more intuitive, is to enable more convenient iteration on the underlying persistence technology, now we can more easily translate the in memory representation to any new schema or DB technology choice.\n\nThis should now also offer a natural point to issue automated syncing requests to the backend whenever the user is logged in.",
+        "file_path": null
       }
     },
     {
       "flow_match_id": "48232193-121f-4cc0-8963-5f24b8d79ce8",
       "match_id": "fdacae97b8c37c9756b009fff0b5585e",
       "order_index": 1,
-      "content_kind": "match",
+      "content_kind": "note",
       "match": {
         "line": "    async loadFlowsList(filter?: { repoRoot?: string }): Promise<FlowListItem[]> {",
         "file_path": "/Users/aaronmyatt/Development/waystation-vscode/src/state/flowStateManager.ts",
@@ -197,16 +198,17 @@ globalThis.__INITIAL_DATA__ = {
         "git_commit_sha": "109367478c8ba38724670f52a027a245b0ec0ead",
         "git_branch": "copilot/simplify-local-state-management"
       },
-      "note": {
-        "name": "Fetch and cache",
-        "description": "Now we are fetching the minimal set of data needed to present the \"active\" state in the app - namely the list of \"flow\" titiles (for the sidepanel) an the active flows combined state to render the markdown preview."
+      "step_content": {
+        "title": "Fetch and cache",
+        "body": "Now we are fetching the minimal set of data needed to present the \"active\" state in the app - namely the list of \"flow\" titiles (for the sidepanel) an the active flows combined state to render the markdown preview.",
+        "file_path": null
       }
     },
     {
       "flow_match_id": "be59c868-c750-4fcf-b983-9bd1b5a88f9c",
       "match_id": "25200052de401a48d030809c8b22ca8c",
       "order_index": 2,
-      "content_kind": "match",
+      "content_kind": "note",
       "match": {
         "line": "    async loadFlowState(flowId: string): Promise<FlowState | null> {",
         "file_path": "/Users/aaronmyatt/Development/waystation-vscode/src/state/flowStateManager.ts",
@@ -234,7 +236,7 @@ globalThis.__INITIAL_DATA__ = {
       "flow_match_id": "fe6e5450-661f-4881-b4da-30f8aa32f599",
       "match_id": "5c30808d-60c9-40cc-8f64-84eba76a17a2",
       "order_index": 4,
-      "content_kind": "match",
+      "content_kind": "note",
       "match": {
         "line": "    private transformToMatchState(rows: any[]): MatchState[] {",
         "file_path": "/Users/aaronmyatt/Development/waystation-vscode/src/state/flowStateManager.ts",
@@ -246,9 +248,9 @@ globalThis.__INITIAL_DATA__ = {
         "git_commit_sha": "109367478c8ba38724670f52a027a245b0ec0ead",
         "git_branch": "copilot/simplify-local-state-management"
       },
-      "note": {
-        "name": "In-memory Schema",
-        "description": ""
+      "step_content": {
+        "title": "In-memory Schema",
+        "body": ""
       }
     },
     {
@@ -301,9 +303,10 @@ globalThis.__INITIAL_DATA__ = {
         "git_commit_sha": "109367478c8ba38724670f52a027a245b0ec0ead",
         "git_branch": "copilot/simplify-local-state-management"
       },
-      "note": {
-        "name": "Opt in persistence",
-        "description": "Explicitly write out changes to the db when needed."
+      "step_content": {
+        "title": "Opt in persistence",
+        "body": "Explicitly write out changes to the db when needed.",
+        "file_path": null
       }
     },
     {
@@ -322,9 +325,10 @@ globalThis.__INITIAL_DATA__ = {
         "git_commit_sha": "109367478c8ba38724670f52a027a245b0ec0ead",
         "git_branch": "copilot/simplify-local-state-management"
       },
-      "note": {
-        "name": "The only exception",
-        "description": "FlowMatch changes are destructive, we need to handle them immediately so we can recompute the order of steps correctly."
+      "step_content": {
+        "title": "The only exception",
+        "body": "FlowMatch changes are destructive, we need to handle them immediately so we can recompute the order of steps correctly.",
+        "file_path": null
       }
     }
   ],

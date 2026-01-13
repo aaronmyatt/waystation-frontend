@@ -1,7 +1,7 @@
 import m, { type Params } from "mithril";
 import { api } from "../shared/api-client";
 import { storageKeys, _events } from "../shared/utils";
-import { CopyFlowService } from "src/services";
+import { CopyFlowService } from "../services";
 
 globalThis.addEventListener(_events.auth.logout, (event) => {
   console.log("Logout event received");

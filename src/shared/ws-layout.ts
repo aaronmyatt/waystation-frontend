@@ -123,11 +123,7 @@ export const Layout = {
                 "button.btn btn-outline",
                 {
                   onclick: () => {
-                    if (vnode.state.loggedIn) {
-                      m.route.set("/flow/new");
-                    } else {
-                      m.route.set("/auth");
-                    }
+                    m.route.set("/flow/new");
                     vnode.state.drawerOpen = false;
                   },
                 },

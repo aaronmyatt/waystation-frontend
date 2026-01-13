@@ -233,7 +233,6 @@ class FlowService {
     matches: {
       flow_match_id: string;
       content_kind: string;
-      note?: { name: string; description: string };
       step_content?: { title: string; body: string };
       match?: {
         file_name: string;

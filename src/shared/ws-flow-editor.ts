@@ -212,12 +212,10 @@ function FlowMatch() {
   return {
     oninit(vnode) {
       title =
-        vnode.attrs.match.note?.name ||
         vnode.attrs.match.step_content?.title ||
         "";
 
       description =
-        vnode.attrs.match.note?.description ||
         vnode.attrs.match.step_content?.body ||
         "";
 
@@ -239,13 +237,7 @@ function FlowMatch() {
       window.removeEventListener('resize', () => {});
     },
     updateMatch(match) {
-      if (match.content_kind === "match") {
-        match.note = {
-          ...match.note,
-          name: title,
-          description: description,
-        };
-      } else if (match.content_kind === "note") {
+      if (match.content_kind === "note") {
         match.step_content = {
           ...match.step_content,
           title: title,
@@ -341,7 +333,7 @@ function FlowMatch() {
                       this.updateMatch(updatedMatch)
                     }
                   }),
-                  vnode.attrs.match.content_kind === "match" && m(CodeBlock, { match: vnode.attrs.match }),
+                  vnode.attrs.match.match &&  m(CodeBlock, { match: vnode.attrs.match }),
                 ])
             ]),
           ])

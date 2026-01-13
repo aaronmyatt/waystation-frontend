@@ -1,5 +1,4 @@
 import m from 'mithril';
-import { _events, dispatch } from './utils';
 import { MarkdownRenderer } from './ws-marked'
 import { syntaxHighlighter } from './ws-hljs';
 import { githubSvg } from './ws-svg';
@@ -12,6 +11,7 @@ export function FlowPreview(): m.Component {
         oninit(vnode) {
             vnode.state.flow = globalThis.flowService.flow;
             vnode.state.markdown = globalThis.flowService.markdown || '';
+            vnode.state.containerWidth = 0;
         },
         onbeforeupdate(vnode) {
             if (globalThis.flowService.markdown !== vnode.state.markdown) {
@@ -25,23 +25,16 @@ export function FlowPreview(): m.Component {
         },
         view(vnode){
             const gitInfoAvailable = vnode.state.flow.git_repo_root || vnode.state.flow.git_branch || vnode.state.flow.git_commit_sha;
+            const gitInfoString = [
+                vnode.state.flow.git_repo_root ? `<strong class="inline-flex gap-2 items-baseline"><span>${githubSvg}</span> Repo:</strong> ${vnode.state.flow.git_repo_root}` : null,
+                vnode.state.flow.git_branch ? `<strong>Branch:</strong> ${vnode.state.flow.git_branch}` : null,
+                vnode.state.flow.git_commit_sha ? `<strong>Commit:</strong> ${vnode.state.flow.git_commit_sha}` : null,
+            ].filter(Boolean).join(' ');
+            
+            
             return m('.p-2 sm:p-4', [
-                gitInfoAvailable && m('.flex flex-col sm:flex-row mb-4 p-4 bg-base-200 rounded-lg sm:items-center gap-2 sm:gap-0', [
-                    m('.text-sm font-semibold text-base-content flex-shrink-0', m.trust(githubSvg)),
-                    m('.flex flex-col sm:flex-row gap-2 sm:gap-1 text-sm min-w-0 flex-1', [
-                        vnode.state.flow.git_repo_root && m('.flex items-center gap-2 sm:ml-2 min-w-0', [
-                            m('span.font-medium flex-shrink-0', 'Repository:'),
-                            m('span.text-base-content/70 truncate', vnode.state.flow.git_repo_root)
-                        ]),
-                        vnode.state.flow.git_branch && m('.flex items-center gap-2 sm:ml-6 min-w-0', [
-                            m('span.font-medium flex-shrink-0', 'Branch:'),
-                            m('span.text-base-content/70 truncate', vnode.state.flow.git_branch)
-                        ]),
-                        vnode.state.flow.git_commit_sha && m('.hidden sm:flex items-center gap-2 sm:ml-6 min-w-0', [
-                            m('span.font-medium flex-shrink-0', 'Commit:'),
-                            m('code.text-xs text-base-content/70 truncate', vnode.state.flow.git_commit_sha)
-                        ])
-                    ])
+                gitInfoAvailable && m('p.mb-4 p-4 bg-base-200 rounded-lg gap-2 truncate overflow-hidden', [
+                    m.trust(gitInfoString),                    
                 ]),
                 m(TagsInput, { flow: vnode.state.flow, enableCrud: false }),
                 m('.prose max-w-none', m.trust(marked.parse(vnode.state.markdown)))

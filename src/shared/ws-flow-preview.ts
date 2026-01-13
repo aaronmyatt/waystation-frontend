@@ -27,19 +27,19 @@ export function FlowPreview(): m.Component {
             const gitInfoAvailable = vnode.state.flow.git_repo_root || vnode.state.flow.git_branch || vnode.state.flow.git_commit_sha;
             return m('.p-2 sm:p-4', [
                 gitInfoAvailable && m('.flex flex-col sm:flex-row mb-4 p-4 bg-base-200 rounded-lg sm:items-center gap-2 sm:gap-0', [
-                    m('.text-sm font-semibold text-base-content', m.trust(githubSvg)),
-                    m('.flex flex-col sm:flex-row gap-2 sm:gap-1 text-sm', [
-                        vnode.state.flow.git_repo_root && m('.flex items-center gap-2 sm:ml-2', [
-                            m('span.font-medium', 'Repository:'),
-                            m('span.text-base-content/70', vnode.state.flow.git_repo_root)
+                    m('.text-sm font-semibold text-base-content flex-shrink-0', m.trust(githubSvg)),
+                    m('.flex flex-col sm:flex-row gap-2 sm:gap-1 text-sm min-w-0 flex-1', [
+                        vnode.state.flow.git_repo_root && m('.flex items-center gap-2 sm:ml-2 min-w-0', [
+                            m('span.font-medium flex-shrink-0', 'Repository:'),
+                            m('span.text-base-content/70 truncate', vnode.state.flow.git_repo_root)
                         ]),
-                        vnode.state.flow.git_branch && m('.flex items-center gap-2 sm:ml-6', [
-                            m('span.font-medium', 'Branch:'),
-                            m('span.text-base-content/70', vnode.state.flow.git_branch)
+                        vnode.state.flow.git_branch && m('.flex items-center gap-2 sm:ml-6 min-w-0', [
+                            m('span.font-medium flex-shrink-0', 'Branch:'),
+                            m('span.text-base-content/70 truncate', vnode.state.flow.git_branch)
                         ]),
-                        vnode.state.flow.git_commit_sha && m('.hidden sm:flex items-center gap-2 sm:ml-6', [
-                            m('span.font-medium', 'Commit:'),
-                            m('code.text-xs text-base-content/70', vnode.state.flow.git_commit_sha)
+                        vnode.state.flow.git_commit_sha && m('.hidden sm:flex items-center gap-2 sm:ml-6 min-w-0', [
+                            m('span.font-medium flex-shrink-0', 'Commit:'),
+                            m('code.text-xs text-base-content/70 truncate', vnode.state.flow.git_commit_sha)
                         ])
                     ])
                 ]),

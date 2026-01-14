@@ -104,7 +104,7 @@ export const Layout = {
           //end
         ]),
       ]),
-      m(".drawer-side", [
+      m(".drawer-side", {class: ' z-[101]'}, [
         m("label.drawer-overlay", {
           for: "tags-drawer",
           "aria-label": "close sidebar"

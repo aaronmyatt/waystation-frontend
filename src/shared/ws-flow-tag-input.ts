@@ -17,14 +17,11 @@ function debounce<T extends (...args: any[]) => void>(fn: T, wait = 300): T {
 
 export function TagBadge() {
   return {
-    oninit(vnode){
-      const params = m.buildQueryString({ tags: [vnode.attrs._tag.name].map(s => s.toLowerCase()).join(',') });
-      vnode.state.slug = '/?' + params;
-    },
     view(vnode) {
       return m('div.join.shadow-sm', [
         m(m.route.Link, {
-          href: vnode.state.slug,
+          href: m.route.get().replace(/\?.*$/, ''),
+          params: { ...m.route.param(), tag: vnode.attrs._tag.name },
           class: 'btn btn-primary btn-sm join-item'
         }, m('span.font-medium', vnode.attrs._tag.name)),
         vnode.attrs.ondelete && m('button.btn btn-primary btn-sm join-item opacity-60 hover:opacity-90 border border-l-1', {

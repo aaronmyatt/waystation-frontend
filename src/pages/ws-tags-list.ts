@@ -90,11 +90,7 @@ export const TagsList: m.Component = {
               e.stopPropagation();
               // Remove this tag from the query params
               const remainingSlugs = selectedTagSlugs.filter(s => s !== tag.slug?.toLowerCase());
-              if (remainingSlugs.length > 0) {
-                m.route.set('/', { tags: remainingSlugs.join(',') });
-              } else {
-                m.route.set('/');
-              }
+              m.route.set(m.route.get().replace(/\?.*$/, ''), { ...m.route.param(), tags: remainingSlugs.join(',') });
             }
           })
         )
@@ -111,9 +107,7 @@ export const TagsList: m.Component = {
         m('ul.grid gap-1 @sm:gap-4 @md:gap-6 grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3',
           filteredTags.map((tag) =>
             m('li.list-none', { key: tag.id },
-              m(m.route.Link, { href: `/?${m.buildQueryString({
-                tags: [...selectedTagSlugs, tag.slug].join(',')
-              })}`, class: 'block' },
+              m(m.route.Link, { href: m.route.get().replace(/\?.*$/, ''), params: { ...m.route.param(), tags: [...selectedTagSlugs, tag.slug].join(',') }, class: 'block' },
                 m(TagCard, {
                   _tag: tag,
                 })

@@ -39,7 +39,6 @@ export const _events = {
   },
   flows: {
     filterByRepo: 'ws::flows::filterByRepo',
-    search: 'ws::flows::search',
     refreshList: 'ws::flows::refreshList',
     publicOnly: 'ws::flows::publicOnly',
   },

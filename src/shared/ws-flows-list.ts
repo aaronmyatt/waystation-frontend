@@ -1,6 +1,6 @@
 import { MarkdownRenderer } from './ws-marked'
 import m from 'mithril'
-import { _events as _sharedEvents, dispatch } from './utils'
+import { _events as _sharedEvents, dispatch, debounce } from './utils'
 import { cogSvg, copySvg } from './ws-svg';
 import { FlowSettingsModal } from './ws-flow-settings-modal';
 import { formatDistanceToNow } from 'date-fns';
@@ -64,14 +64,54 @@ const FlowCard = {
   }
 }
 
+const SearchInput: m.Component = {
+  oninit(vnode) {
+    // Get initial search value from URL
+    const params = m.route.param();
+    vnode.state.searchValue = params.query || '';
+    
+    // Create debounced search function
+    vnode.state.debouncedSearch = debounce((value: string) => {
+      const currentPath = m.route.get().split('?')[0];
+      if (value) {
+        m.route.set(currentPath + '?query=' + encodeURIComponent(value));
+      } else {
+        m.route.set(currentPath);
+      }
+    }, 300);
+  },
+  view(vnode) {
+    return m('label.input input-ghost flex items-center gap-2 mb-4', [
+      m('svg.w-4.h-4.opacity-70', {
+        xmlns: 'http://www.w3.org/2000/svg',
+        viewBox: '0 0 16 16',
+        fill: 'currentColor'
+      }, m('path', {
+        'fill-rule': 'evenodd',
+        d: 'M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z',
+        'clip-rule': 'evenodd'
+      })),
+      m('input[type=text][placeholder=Search flows...]', {
+        class: 'grow',
+        value: vnode.state.searchValue,
+        oninput: (e: Event) => {
+          const target = e.target as HTMLInputElement;
+          vnode.state.searchValue = target.value;
+          vnode.state.debouncedSearch(target.value);
+        }
+      })
+    ]);
+  }
+};
+
 export const FlowList: m.Component = {
   view(vnode){
     if (globalThis.flowListService.flows.length === 0) {
       return m('.container mx-auto py-2 px-1 sm:p-4', m('p.text-center text-lg text-base-content/70', 'No flows found.'));
     } else {
       return (
-        // TODO: add search put here
       m('.container mx-auto', [
+        m(SearchInput),
         m('.', 
           globalThis.flowListService.groupByDate().map(([date, flows]) => {
             return [

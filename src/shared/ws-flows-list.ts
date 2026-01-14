@@ -70,6 +70,7 @@ export const FlowList: m.Component = {
       return m('.container mx-auto py-2 px-1 sm:p-4', m('p.text-center text-lg text-base-content/70', 'No flows found.'));
     } else {
       return (
+        // TODO: add search put here
       m('.container mx-auto', [
         m('.', 
           globalThis.flowListService.groupByDate().map(([date, flows]) => {

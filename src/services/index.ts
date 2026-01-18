@@ -1,6 +1,7 @@
 import m from "mithril";
 import { CopyFlowService } from "./copy-flow";
-import { _events, dispatch, storageKeys } from "../shared/utils";
+import { _events, dispatch, storageKeys, debounce } from "../shared/utils";
+import { api } from "../shared/api-client";
 
 class AuthService {
   _state = {
@@ -91,6 +92,8 @@ class TagsListService {
     per_page: 100,
     page: 1,
   };
+  private _debouncedRefresh: Function;
+  private _debouncedToggleFavourite: Function;
 
   constructor(){
     if (globalThis.__INITIAL_DATA__?.tags) {
@@ -104,6 +107,10 @@ class TagsListService {
         console.error("Failed to load initial tag data:", err);
       }
     }
+
+    // Create debounced versions of API methods
+    this._debouncedRefresh = debounce(this._refreshImpl.bind(this), 500);
+    this._debouncedToggleFavourite = debounce(this._toggleFavouriteImpl.bind(this), 300);
   }
 
   get tags() {
@@ -137,12 +144,12 @@ class TagsListService {
 
   search(query: string, pagination: { per_page: number; page: number }) {
     this._searchQuery = query;
-    dispatch(_events.tags.refreshUserTagsList, {
-      params: Object.assign({}, pagination, {
-        per_page: this._pagination.per_page,
-        page: this._pagination.page,
-        query: this._searchQuery,
-      })
+    // Call refresh directly instead of dispatching event
+    this.refresh({ 
+      per_page: this._pagination.per_page,
+      page: this._pagination.page,
+      query: this._searchQuery,
+      ...pagination
     });
   }
 
@@ -153,6 +160,47 @@ class TagsListService {
       page: tags.page,
     };
     m.redraw();
+  }
+
+  // Public API methods with debouncing
+  refresh(params?: any) {
+    this._debouncedRefresh(params);
+  }
+
+  toggleFavourite(tag: { id: string, is_favourite: boolean }) {
+    this._debouncedToggleFavourite(tag);
+  }
+
+  // Private implementation methods
+  private async _refreshImpl(params?: any) {
+    try {
+      const response = await api.userTags.list();
+      const tags = response.data;
+      this.load(tags);
+      console.log(`Loaded ${tags.rows.length} tags`, tags);
+    } catch (error: any) {
+      console.error("Error fetching tags:", error);
+      console.error("Error response:", error.response);
+      if (error.response?.status === 401) {
+        console.error("Authentication failed - please log in again");
+      }
+    }
+  }
+
+  private async _toggleFavouriteImpl(tag: { id: string, is_favourite: boolean }) {
+    try {
+      console.log("Toggle favourite tag event received:", { tag });
+      if(tag.is_favourite) {
+        await api.favouriteTags.delete(tag.id);
+      } else {
+        await api.favouriteTags.create(tag.id);
+      }
+
+      // Refresh the tags list after toggling
+      await this._refreshImpl();
+    } catch (error) {
+      console.error("Error toggling tag favourite:", error);
+    }
   }
 }
 

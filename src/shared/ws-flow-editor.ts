@@ -237,13 +237,11 @@ function FlowMatch() {
       window.removeEventListener('resize', () => {});
     },
     updateMatch(match) {
-      if (match.content_kind === "note") {
-        match.step_content = {
-          ...match.step_content,
-          title: title,
-          body: description,
-        };
-      }
+      match.step_content = {
+        ...match.step_content,
+        title: title,
+        body: description,
+      };
       globalThis.flowService.updateFlowMatch(match);
     },
     view(vnode) {

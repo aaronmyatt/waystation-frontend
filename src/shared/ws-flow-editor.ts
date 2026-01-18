@@ -5,6 +5,7 @@ import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
 import { TagsInput } from "./ws-flow-tag-input";
 import { syntaxHighlighter } from "../shared/ws-hljs";
+import { FlowGitInfo } from "../components/flow-git-info";
 
 let skipRederaw = false;
 
@@ -556,14 +557,7 @@ export function FlowEditor(): m.Component {
                 class: '!z-[101]'
               }, m(FlowToolbar)),
             ]),
-            vnode.state.flow?.git_repo_root 
-              && m(m.route.Link, {
-                href: '/',
-                params: { repo: vnode.state.flow.git_repo_root  }
-              }, m(".flex text-sm link link-secondary mb-1 flex items-center gap-1 truncate", [
-                m("span.block size-4", m.trust(githubSvg)),
-                m('span', vnode.state.flow.git_repo_root),
-              ])),
+            m(FlowGitInfo, { flow: vnode.state.flow }),
             m(TagsInput, {
               flow: vnode.state.flow, enableCrud: true
             }),

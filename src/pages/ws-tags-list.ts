@@ -58,6 +58,7 @@ const SearchBar = {
 export const TagsList: m.Component = {
   oninit() {
     // Trigger refresh on mount
+    // TODO: keep an eye out for cases where favourites/tags are added/removed but this list is not refreshed
     globalThis.tagsListService.search('', { per_page: 100, page: 1 });
   },
   view() {

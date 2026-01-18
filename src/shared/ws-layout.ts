@@ -26,7 +26,7 @@ export const Layout = {
   },
   view: (vnode) => {
     return m(".drawer", [
-      m("input#tags-drawer", {
+      m("input#main-drawer", {
         type: "checkbox",
         class: "drawer-toggle",
         checked: vnode.state.drawerOpen,
@@ -40,8 +40,8 @@ export const Layout = {
             m(".navbar-start flex-1 gap-2", [
               Logo,
               m("label.btn.btn-ghost.btn-circle.hidden.md:flex", {
-                for: "tags-drawer",
-                "aria-label": "Open tags drawer"
+                for: "main-drawer",
+                "aria-label": "Open main drawer"
               }, m("svg.h-6.w-6", {
                 xmlns: "http://www.w3.org/2000/svg",
                 fill: "none",
@@ -56,7 +56,7 @@ export const Layout = {
             ]),
             m(".navbar-end gap-2", [
               m("label.btn.btn-ghost.btn-circle.md:hidden", {
-                for: "tags-drawer",
+                for: "main-drawer",
                 "aria-label": "Open menu"
               }, m("svg.h-6.w-6", {
                 xmlns: "http://www.w3.org/2000/svg",
@@ -106,14 +106,14 @@ export const Layout = {
       ]),
       m(".drawer-side", {class: ' z-[101]'}, [
         m("label.drawer-overlay", {
-          for: "tags-drawer",
+          for: "main-drawer",
           "aria-label": "close sidebar"
         }),
         m(".bg-base-200 text-base-content min-h-full w-80 p-2 sm:p-4 flex flex-col", [
           m(".flex.justify-between items-center mb-4", [
             Logo,
             m("label.btn btn-circle btn-ghost lg:hidden", {
-              for: "tags-drawer"
+              for: "main-drawer"
             }, "✕")
           ]),
           m(".menu menu-vertical mb-4 w-full space-y-1 sm:space-y-2", [

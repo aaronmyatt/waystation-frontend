@@ -90,6 +90,13 @@ m.route(mountElement, "/", {
       return m(Layout, m('.container max-w-6xl mx-auto', m(FlowEditor, vnode.attrs)));
     },
   },
+  "/auth": {
+    onmatch() {
+      dispatch(_events.auth.login);
+      m.route.set(m.route.get())
+      return Promise.resolve(); // No-op to allow to stay as is
+    }
+  },
 });
 
 // Mount DevLog component to a separate element

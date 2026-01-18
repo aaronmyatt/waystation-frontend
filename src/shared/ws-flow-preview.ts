@@ -23,6 +23,10 @@ export function FlowPreview(): m.Component {
             // Highlight code blocks in markdown preview
             syntaxHighlighter.highlightAll();
         },
+        oncreate() {
+            // Highlight code blocks in markdown preview
+            syntaxHighlighter.highlightAll();
+        },
         view(vnode){
             return m('.p-2 sm:p-4', [
                 m(FlowGitInfo, { flow: vnode.state.flow }),

@@ -236,8 +236,7 @@ globalThis.addEventListener("ws::action::deleteFlow", async (event) => {
 
 // Tags List - Refresh/Fetch all tags (now handled by service)
 globalThis.addEventListener(_events.tags.refreshUserTagsList, (event) => {
-  const params = (event as CustomEvent<{ params?: any }>).detail.params || {};
-  globalThis.tagsListService?.refresh(params);
+  globalThis.tagsListService?.refresh();
 });
 
 globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {

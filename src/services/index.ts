@@ -144,13 +144,9 @@ class TagsListService {
 
   search(query: string, pagination: { per_page: number; page: number }) {
     this._searchQuery = query;
-    // Call refresh directly instead of dispatching event
-    this.refresh({ 
-      per_page: this._pagination.per_page,
-      page: this._pagination.page,
-      query: this._searchQuery,
-      ...pagination
-    });
+    // Call refresh to fetch tags from backend
+    // Note: Filtering is done client-side in the `tags` getter
+    this.refresh();
   }
 
   load(tags) {
@@ -163,8 +159,8 @@ class TagsListService {
   }
 
   // Public API methods with debouncing
-  refresh(params?: any) {
-    this._debouncedRefresh(params);
+  refresh() {
+    this._debouncedRefresh();
   }
 
   toggleFavourite(tag: { id: string, is_favourite: boolean }) {
@@ -172,7 +168,7 @@ class TagsListService {
   }
 
   // Private implementation methods
-  private async _refreshImpl(params?: any) {
+  private async _refreshImpl() {
     try {
       const response = await api.userTags.list();
       const tags = response.data;

@@ -255,10 +255,6 @@ const debouncedRefreshTagsList = debounce(async (event, requestTarget) => {
   }
 }, 500); // 500ms debounce, adjust as needed
 
-globalThis.addEventListener(_events.tags.refreshTagsList, (event) => {
-  debouncedRefreshTagsList(event, api.tags.list);
-});
-
 globalThis.addEventListener(_events.tags.refreshUserTagsList, (event) => {
   debouncedRefreshTagsList(event, api.userTags.list);
 });

@@ -175,7 +175,7 @@ export const Layout = {
                 )
               ),
           ]),
-          m(".flex-1", m(TagsList)),
+          vnode.state.loggedIn && m(".flex-1", m(TagsList)),
           m(".mt-4.md:hidden.flex.justify-center", m(ThemePicker))
         ])
       ])

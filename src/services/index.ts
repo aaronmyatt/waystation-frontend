@@ -192,8 +192,8 @@ class TagsListService {
         await api.favouriteTags.create(tag.id);
       }
 
-      // Refresh the tags list after toggling
-      await this._refreshImpl();
+      // Refresh the tags list after toggling (using debounced method)
+      this.refresh();
     } catch (error) {
       console.error("Error toggling tag favourite:", error);
     }

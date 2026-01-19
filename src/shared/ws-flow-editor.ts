@@ -21,6 +21,7 @@ const FlowToolbar = {
         },
         "Export"
       ),
+      // TODO: add hasChildSvg here that could open a right-side panel showing and previewing child (copies) / parent (copied from) flows
       m(
         ".dropdown dropdown-end",
         m(
@@ -109,6 +110,7 @@ const FlowMatchToolbar = {
           },
           m("span.text-secondary block size-4", m.trust(downSvg))
         ),
+        // TODO: add hasChildSvg here that could open a right-side panel showing and previewing child flows
         m(
           ".dropdown dropdown-end",
           m(

@@ -6,7 +6,7 @@ import { dispatch, _events } from "./utils";
 function Logo(){
   return {
     oninit(vnode) {
-      vnode.state.loggedIn = false;
+      this.onbeforeupdate(vnode);
     },
     onbeforeupdate(vnode) {
       vnode.state.loggedIn = globalThis.authService.loggedIn;

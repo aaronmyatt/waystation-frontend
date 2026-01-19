@@ -9,12 +9,12 @@ enum TabRoute {
 }
 
 export const Page: m.Component = {
-  activeTab: TabRoute.MyFlows,
+  activeTab: TabRoute.UserFlows,
 
   oninit() {
-    this.onupdate()
+    this.onbeforeupdate()
   },
-  onupdate() {
+  onbeforeupdate() {
     // Update activeTab based on current route
     const route = m.route.get();
     if (route === '/public' || route.startsWith('/public?')) {

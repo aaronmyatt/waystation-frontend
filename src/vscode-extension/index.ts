@@ -1,10 +1,10 @@
 import m from "mithril";
 import "../services";
 import { FlowEditor } from "../shared/ws-flow-editor";
-import { FlowList } from "../shared/ws-flows-list";
 import { DevLog } from "../shared/ws-dev-log";
 import { dispatch, _events } from "../shared/utils";
 import { Layout } from "../shared/ws-layout";
+import { Page as FlowList } from "../pages/ws-flows-vscode";
 
 // This repo primarily serves pre-bundled IIFE scripts (no module script tags).
 // Set the prefix explicitly so visiting /#!/auth works reliably.

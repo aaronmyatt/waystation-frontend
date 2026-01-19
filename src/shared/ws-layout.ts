@@ -3,17 +3,34 @@ import { TagsList } from "../pages/ws-tags-list";
 import { ThemePicker } from "./ws-theme-picker";
 import { dispatch, _events } from "./utils";
 
-const Logo = m(
-  m.route.Link,
-  { href: "/" },
-  m(
-    ".text-xl md:text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors duration-200",
-    m(
-      "span.bg-black text-white px-2 md:px-3 py-1 border-2 border-black shadow-lg transform hover:scale-105 transition-transform duration-200 font-mono tracking-wider text-sm md:text-base",
-      "WAYSTATION"
-    )
-  )
-);
+function Logo(){
+  return {
+    oninit(vnode) {
+      vnode.state.loggedIn = false;
+    },
+    onbeforeupdate(vnode) {
+      vnode.state.loggedIn = globalThis.authService.loggedIn;
+    },
+    view: (vnode) => {
+      return m(
+        m.route.Link,
+        { href: "/", class: "relative inline-block" },
+        [
+          m(
+            ".text-xl md:text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors duration-200",
+            m(
+              "span.bg-black text-white px-2 md:px-3 py-1 border-2 border-black shadow-lg transform hover:scale-105 transition-transform duration-200 font-mono tracking-wider text-sm md:text-base",
+              "WAYSTATION"
+            )
+          ),
+          vnode.state.loggedIn && m("span.status status-success animate-pulse absolute -bottom-1 -right-1", {
+            "aria-label": "Logged in"
+          })
+        ]
+      );
+    }
+  }
+}
 
 export const Layout = {
   oninit(vnode) {
@@ -38,7 +55,7 @@ export const Layout = {
         m("main.layout container mx-auto", [
           m(".navbar items-center px-3 md:px-6", [
             m(".navbar-start flex-1 gap-2", [
-              Logo,
+              m(Logo),
               m("label.btn.btn-ghost.btn-circle.hidden.md:flex", {
                 for: "tags-drawer",
                 "aria-label": "Open tags drawer"

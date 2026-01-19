@@ -9,8 +9,8 @@ export function FlowPreview(): m.Component {
 
     return {
         oninit(vnode) {
-            vnode.state.flow = globalThis.flowService.flow;
-            vnode.state.markdown = globalThis.flowService.markdown || '';
+            vnode.state.flow = vnode.attrs.flow || globalThis.flowService.flow;
+            vnode.state.markdown = vnode.attrs.markdown || globalThis.flowService.markdown || '';
             vnode.state.containerWidth = 0;
         },
         onbeforeupdate(vnode) {

@@ -53,19 +53,6 @@ const FlowToolbar = {
                 [m("span.block size-4 mr-2", m.trust(copySvg)), "Copy Flow"]
               )
             ),
-            globalThis.featureToggleService.isEnabled("llm-generation") && m("li",
-              m("button.btn btn-ghost border border-secondary",
-                {
-                  onclick: (e) => {
-                    dispatch(
-                      _events.action.generateFlowContent,
-                      {flow: { ...globalThis.flowService.flow }}
-                    );
-                  },
-                },
-                "Generate Description"
-              )
-            ),
             m("li",
               m("button.btn btn-ghost border border-error text-error",
                 {
@@ -155,18 +142,6 @@ const FlowMatchToolbar = {
                     },
                   },
                   "Create Child Flow"
-                )
-              ),
-              globalThis.featureToggleService.isEnabled("llm-generation") && m("li",
-                m("button.btn btn-ghost border border-base-300",
-                  {
-                    onclick: (e) => {
-                      dispatch(_events.action.generateFlowMatchContent, {
-                        flowMatch: vnode.attrs.match,
-                      });
-                    },
-                  },
-                  "Generate Description"
                 )
               ),
               m("li",

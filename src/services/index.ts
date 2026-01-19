@@ -1,5 +1,6 @@
 import m from "mithril";
 import { CopyFlowService } from "./copy-flow";
+import { TagsListService } from "./tags-list";
 import { _events, dispatch, storageKeys } from "../shared/utils";
 
 class AuthService {
@@ -83,80 +84,6 @@ class AuthService {
     m.route.set('/');
   }
 }
-
-class TagsListService {
-  _tags = []
-  _searchQuery = ''
-  _pagination = {
-    per_page: 100,
-    page: 1,
-  };
-
-  constructor(){
-    if (globalThis.__INITIAL_DATA__?.tags) {
-      try {
-        this._tags = globalThis.__INITIAL_DATA__.tags.rows || [];
-        this._pagination = {
-          per_page: globalThis.__INITIAL_DATA__.tags.per_page || 100,
-          page: globalThis.__INITIAL_DATA__.tags.page || 1,
-        };
-      } catch (err) {
-        console.error("Failed to load initial tag data:", err);
-      }
-    }
-  }
-
-  get tags() {
-    if (!this._searchQuery) {
-      return this._tags;
-    }
-    // Filter tags based on search query
-    const query = this._searchQuery.toLowerCase();
-    return this._tags.filter(tag =>
-      tag.name?.toLowerCase().startsWith(query) ||
-      tag.slug?.toLowerCase().startsWith(query)
-    );
-  }
-
-  push(tag) {
-    if(this._tags.find(t => t.id === tag.id)){
-      return;
-    }
-    this._tags.push(tag);
-    m.redraw();
-  }
-
-  delete(tagId) {
-    this._tags = this._tags.filter(tag => tag.id !== tagId);
-    m.redraw();
-  }
-
-  get searchQuery() {
-    return this._searchQuery;
-  }
-
-  search(query: string, pagination: { per_page: number; page: number }) {
-    this._searchQuery = query;
-    dispatch(_events.tags.refreshUserTagsList, {
-      params: Object.assign({}, pagination, {
-        per_page: this._pagination.per_page,
-        page: this._pagination.page,
-        query: this._searchQuery,
-      })
-    });
-  }
-
-  load(tags) {
-    this._tags = tags.rows;
-    this._pagination = {
-      per_page: tags.per_page,
-      page: tags.page,
-    };
-    m.redraw();
-  }
-}
-
-globalThis.tagsListService = new TagsListService();
 
 class FeatureToggleService {
   private features: Record<string, boolean> = {
@@ -421,9 +348,7 @@ globalThis.flowService = new FlowService();
 globalThis.flowListService = new FlowListService();
 globalThis.featureToggleService = new FeatureToggleService();
 globalThis.authService = new AuthService();
-globalThis.actions = {
-  copyFlow: () => new CopyFlowService(),
-};
+globalThis.tagsListService = new TagsListService();
 
 export {
   AuthService,
@@ -431,5 +356,6 @@ export {
   FlowService,
   FeatureToggleService,
   CopyFlowService,
+  TagsListService,
 };
 

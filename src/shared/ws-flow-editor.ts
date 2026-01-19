@@ -5,6 +5,7 @@ import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
 import { TagsInput } from "./ws-flow-tag-input";
 import { syntaxHighlighter } from "../shared/ws-hljs";
+import { FlowGitInfo } from "../components/flow-git-info";
 
 let skipRederaw = false;
 
@@ -50,19 +51,6 @@ const FlowToolbar = {
                   },
                 },
                 [m("span.block size-4 mr-2", m.trust(copySvg)), "Copy Flow"]
-              )
-            ),
-            globalThis.featureToggleService.isEnabled("llm-generation") && m("li",
-              m("button.btn btn-ghost border border-secondary",
-                {
-                  onclick: (e) => {
-                    dispatch(
-                      _events.action.generateFlowContent,
-                      {flow: { ...globalThis.flowService.flow }}
-                    );
-                  },
-                },
-                "Generate Description"
               )
             ),
             m("li",
@@ -156,18 +144,6 @@ const FlowMatchToolbar = {
                   "Create Child Flow"
                 )
               ),
-              globalThis.featureToggleService.isEnabled("llm-generation") && m("li",
-                m("button.btn btn-ghost border border-base-300",
-                  {
-                    onclick: (e) => {
-                      dispatch(_events.action.generateFlowMatchContent, {
-                        flowMatch: vnode.attrs.match,
-                      });
-                    },
-                  },
-                  "Generate Description"
-                )
-              ),
               m("li",
                 m("button.btn btn-ghost border border-error text-error",
                   {
@@ -237,13 +213,11 @@ function FlowMatch() {
       window.removeEventListener('resize', () => {});
     },
     updateMatch(match) {
-      if (match.content_kind === "note") {
-        match.step_content = {
-          ...match.step_content,
-          title: title,
-          body: description,
-        };
-      }
+      match.step_content = {
+        ...match.step_content,
+        title: title,
+        body: description,
+      };
       globalThis.flowService.updateFlowMatch(match);
     },
     view(vnode) {
@@ -558,14 +532,7 @@ export function FlowEditor(): m.Component {
                 class: '!z-[101]'
               }, m(FlowToolbar)),
             ]),
-            vnode.state.flow?.git_repo_root 
-              && m(m.route.Link, {
-                href: '/',
-                params: { repo: vnode.state.flow.git_repo_root  }
-              }, m(".flex text-sm link link-secondary mb-1 flex items-center gap-1 truncate", [
-                m("span.block size-4", m.trust(githubSvg)),
-                m('span', vnode.state.flow.git_repo_root),
-              ])),
+            m(FlowGitInfo, { flow: vnode.state.flow }),
             m(TagsInput, {
               flow: vnode.state.flow, enableCrud: true
             }),

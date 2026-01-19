@@ -48,7 +48,6 @@ export const _events = {
   },
   tags: {
     toggleFavourite: 'ws::tags::toggleFavourite',
-    refreshTagsList: 'ws::action::refreshTagsList',
     refreshUserTagsList: 'ws::action::refreshUserTagsList',
   },
   action: {

@@ -234,33 +234,9 @@ globalThis.addEventListener("ws::action::deleteFlow", async (event) => {
   }
 });
 
-// Tags List - Refresh/Fetch all tags (debounced)
-const debouncedRefreshTagsList = debounce(async (event, requestTarget) => {
-  try {
-    const params = (event as CustomEvent<{ params?: any }>).detail.params || {};
-    const response = await requestTarget(params);
-    const tags = response.data;
-
-    // Update the tags list service
-    if (globalThis.tagsListService) {
-      globalThis.tagsListService.load(tags);
-    }
-    console.log(`Loaded ${tags.rows.length} tags`, tags);
-  } catch (error: any) {
-    console.error("Error fetching tags:", error);
-    console.error("Error response:", error.response);
-    if (error.response?.status === 401) {
-      console.error("Authentication failed - please log in again");
-    }
-  }
-}, 500); // 500ms debounce, adjust as needed
-
-globalThis.addEventListener(_events.tags.refreshTagsList, (event) => {
-  debouncedRefreshTagsList(event, api.tags.list);
-});
-
+// Tags List - Refresh/Fetch all tags (now handled by service)
 globalThis.addEventListener(_events.tags.refreshUserTagsList, (event) => {
-  debouncedRefreshTagsList(event, api.userTags.list);
+  globalThis.tagsListService?.refresh();
 });
 
 globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {
@@ -277,32 +253,11 @@ globalThis.addEventListener(_events.flow.updateFlowSingular, async (event) => {
   }
 });
 
-
-const debounceTagUpdate = debounce(async (event) => {
+globalThis.addEventListener(_events.tags.toggleFavourite, (event) => {
   const customEvent = event as CustomEvent<{ tag: { id: string, is_favourite: boolean } }>;
-  console.log("Toggle favourite tag event received:", customEvent.detail);
   const { tag } = customEvent.detail;
-
-  try {
-    if(tag.is_favourite) {
-      await api.favouriteTags.delete(tag.id);
-    } else {
-      await api.favouriteTags.create(tag.id);
-    }
-
-    // Refresh the tags list
-    const listResponse = await api.userTags.list();
-    if (globalThis.tagsListService) {
-      globalThis.tagsListService.load(listResponse.data);
-    }
-  } catch (error) {
-    console.error("Error toggling tag favourite:", error);
-  }
-}, 300); // 300ms debounce to prevent rapid toggles
-
-globalThis.addEventListener(_events.tags.toggleFavourite, event => {
-  debounceTagUpdate(event)
-})
+  globalThis.tagsListService?.toggleFavourite(tag);
+});
 
 // Copy Flow
 globalThis.addEventListener(_events.flow.copyFlow, async (event) => {

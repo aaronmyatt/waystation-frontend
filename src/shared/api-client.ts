@@ -78,6 +78,13 @@ export const api = {
       apiClient.delete(`/flows/${id}`),
   },
 
+  // Flow Relations - API endpoint to fetch parent and child flows
+  // Returns: { parent: FlowObject | null, children: FlowObject[] }
+  flowRelations: {
+    get: (id: string) =>
+      apiClient.get(`/flow_relations/${id}`),
+  },
+
   // Flow Matches
   flowMatches: {
     list: (params?: { since?: number }) =>

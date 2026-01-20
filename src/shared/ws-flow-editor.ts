@@ -1,17 +1,33 @@
 import m from "mithril";
-import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg, githubSvg, copySvg } from "../shared/ws-svg";
+import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg, githubSvg, copySvg, flowRelationsSvg } from "../shared/ws-svg";
 import { dispatch, _events } from "../shared/utils";
 import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
 import { TagsInput } from "./ws-flow-tag-input";
 import { syntaxHighlighter } from "../shared/ws-hljs";
 import { FlowGitInfo } from "../components/flow-git-info";
+import { FlowParentChildDrawer } from "../components/flow-parent-child-drawer";
 
 let skipRederaw = false;
 
 const FlowToolbar = {
-  view() {
+  view(vnode) {
     return m("ul.flow-toolbar flex flex-wrap gap-2", [
+      // Button to open parent-child relations drawer
+      // Shows an icon that opens a drawer displaying parent and child flows
+      m(
+        "button.btn btn-sm btn-ghost text-secondary",
+        {
+          tabindex: -1,
+          "aria-label": "View flow relations",
+          onclick: () => {
+            // Dispatch event to open the relations drawer
+            // This will be handled in the FlowEditor component
+            vnode.attrs.onOpenRelations && vnode.attrs.onOpenRelations();
+          }
+        },
+        m("span.block size-4", m.trust(flowRelationsSvg))
+      ),
       m(
         "button.btn btn-sm btn-outline hidden sm:inline-flex",
         {
@@ -497,6 +513,8 @@ export function FlowEditor(): m.Component {
     oninit(vnode) {
       vnode.state.flow = globalThis.flowService.flow;
       vnode.state.matches = globalThis.flowService.matches;
+      // Initialize state for the relations drawer
+      vnode.state.relationsDrawerOpen = false;
     },
     onbeforeupdate(vnode) {
       if(skipRederaw){
@@ -530,7 +548,12 @@ export function FlowEditor(): m.Component {
               ),
               m(".toolbar-wrapper flex-shrink-0", {
                 class: '!z-[101]'
-              }, m(FlowToolbar)),
+              }, m(FlowToolbar, {
+                // Pass callback to open the relations drawer
+                onOpenRelations: () => {
+                  vnode.state.relationsDrawerOpen = true;
+                }
+              })),
             ]),
             m(FlowGitInfo, { flow: vnode.state.flow }),
             m(TagsInput, {
@@ -542,7 +565,16 @@ export function FlowEditor(): m.Component {
         m(FlowMatchList, {
           matches: vnode.state.matches,
         }),
-        m(InsertBetweenDialog)
+        m(InsertBetweenDialog),
+        // Add the parent-child relations drawer
+        // This drawer shows parent and child flows for navigation
+        m(FlowParentChildDrawer, {
+          flow: vnode.state.flow,
+          isOpen: vnode.state.relationsDrawerOpen,
+          onClose: () => {
+            vnode.state.relationsDrawerOpen = false;
+          }
+        })
       ]);
     },
   };

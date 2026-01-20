@@ -1,6 +1,7 @@
 import m from "mithril";
 import { CopyFlowService } from "./copy-flow";
 import { TagsListService } from "./tags-list";
+import { FlowRelationService } from "./flow-relation";
 import { _events, dispatch, storageKeys } from "../shared/utils";
 
 class AuthService {
@@ -349,6 +350,8 @@ globalThis.flowListService = new FlowListService();
 globalThis.featureToggleService = new FeatureToggleService();
 globalThis.authService = new AuthService();
 globalThis.tagsListService = new TagsListService();
+// FlowRelationService is intentionally NOT global - it should be instantiated per component
+// to manage independent state for different flow contexts
 
 export {
   AuthService,
@@ -357,5 +360,6 @@ export {
   FeatureToggleService,
   CopyFlowService,
   TagsListService,
+  FlowRelationService,
 };
 

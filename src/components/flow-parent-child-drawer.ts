@@ -12,8 +12,7 @@ export function FlowParentChildDrawer(): m.Component<FlowParentChildDrawerAttrs>
     return {
         view(vnode) {
             const { flow, onClose } = vnode.attrs;
-            const parentFlows = globalThis.flowService.getParentFlows(flow);
-            const childFlows = globalThis.flowService.getChildFlows(flow);
+            const [parentFlow, childFlows] = globalThis.flowRelationService.getRelations(flow);
 
             return m('.fixed inset-0 bg-black bg-opacity-50 flex justify-end',
                 m('.bg-white w-1/3 h-full shadow-lg overflow-y-auto',
@@ -23,18 +22,14 @@ export function FlowParentChildDrawer(): m.Component<FlowParentChildDrawerAttrs>
                     ),
                     m('.p-4',
                         m('h3.text-lg.font-semibold.mb-2', 'Parent Flows'),
-                        parentFlows.length === 0
-                            ? m('p.text-gray-500', 'No parent flows.')
-                            : m('ul.list-disc.list-inside',
-                                parentFlows.map(parentFlow =>
-                                    m('li.mb-2',
-                                        m('button.text-blue-600.hover:underline', {
-                                            onclick: () => {
-                                                globalThis.flowService.setPreviewFlow(parentFlow);
-                                            }
-                                        }, parentFlow.flow.name)
-                                    )
-                                )
+                        parentFlow 
+                            ? m('p.text-gray-500', 'No parent flows.') 
+                            : m('li.mb-2',
+                                m('button.text-blue-600.hover:underline', {
+                                    onclick: () => {
+                                        globalThis.flowService.setPreviewFlow(parentFlow);
+                                    }
+                                }, parentFlow.flow.name)
                             ),
                         m('h3.text-lg.font-semibold.mt-6.mb-2', 'Child Flows'),
                         childFlows.length === 0

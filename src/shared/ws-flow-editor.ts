@@ -6,7 +6,7 @@ import { CodeBlock, CodeLine } from "../shared/ws-hljs";
 import { TagsInput } from "./ws-flow-tag-input";
 import { syntaxHighlighter } from "../shared/ws-hljs";
 import { FlowGitInfo } from "../components/flow-git-info";
-import { FlowParentChildDrawer } from "../components/flow-parent-child-drawer";
+import { FlowParentChildModal } from "../components/flow-parent-child-drawer";
 
 let skipRederaw = false;
 
@@ -15,25 +15,15 @@ const FlowToolbar = {
     return m("ul.flow-toolbar flex flex-wrap gap-2", [
       // Button to open parent-child relations drawer
       // Shows an icon that opens a drawer displaying parent and child flows
-      m(
-        "button.btn btn-sm btn-ghost text-secondary",
-        {
-          tabindex: -1,
-          "aria-label": "View flow relations",
-          onclick: () => {
-            // Dispatch event to open the relations drawer
-            // This will be handled in the FlowEditor component
-            vnode.attrs.onOpenRelations && vnode.attrs.onOpenRelations();
-          }
-        },
-        m("span.block size-4", m.trust(flowRelationsSvg))
-      ),
+      m(FlowParentChildModal, {
+        flow: vnode.attrs.flow,
+      }),
       m(
         "button.btn btn-sm btn-outline hidden sm:inline-flex",
         {
           tabindex: -1,
           "aria-label": "Export flow",
-          onclick: () => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
+          onclick: () => dispatch(_events.action.export, {flow: { ...vnode.attrs.flow }})
         },
         "Export"
       ),
@@ -51,7 +41,7 @@ const FlowToolbar = {
             m("li",
               m("button.btn btn-ghost border border-secondary",
                 {
-                  onclick: (e) => dispatch(_events.action.export, {flow: { ...globalThis.flowService.flow }})
+                  onclick: (e) => dispatch(_events.action.export, {flow: { ...vnode.attrs.flow }})
                 },
                 "Export"
               )
@@ -62,7 +52,7 @@ const FlowToolbar = {
                   onclick: (e) => {
                     dispatch(
                       _events.flow.copyFlow,
-                      {flow: { ...globalThis.flowService.flow }}
+                      {flow: { ...vnode.attrs.flow }}
                     );
                   },
                 },
@@ -75,7 +65,7 @@ const FlowToolbar = {
                   onclick: (e) => {
                     dispatch(
                       _events.action.deleteFlow,
-                      {flow: { ...globalThis.flowService.flow }}
+                      {flow: { ...vnode.attrs.flow }}
                     );
                     m.route.set("/");
                   },
@@ -85,7 +75,6 @@ const FlowToolbar = {
             )
           ]
         ),
-        
       ),
     ]);
   },
@@ -549,10 +538,7 @@ export function FlowEditor(): m.Component {
               m(".toolbar-wrapper flex-shrink-0", {
                 class: '!z-[101]'
               }, m(FlowToolbar, {
-                // Pass callback to open the relations drawer
-                onOpenRelations: () => {
-                  vnode.state.relationsDrawerOpen = true;
-                }
+                flow: vnode.state.flow,
               })),
             ]),
             m(FlowGitInfo, { flow: vnode.state.flow }),
@@ -565,16 +551,7 @@ export function FlowEditor(): m.Component {
         m(FlowMatchList, {
           matches: vnode.state.matches,
         }),
-        m(InsertBetweenDialog),
-        // Add the parent-child relations drawer
-        // This drawer shows parent and child flows for navigation
-        m(FlowParentChildDrawer, {
-          flow: vnode.state.flow,
-          isOpen: vnode.state.relationsDrawerOpen,
-          onClose: () => {
-            vnode.state.relationsDrawerOpen = false;
-          }
-        })
+        m(InsertBetweenDialog)
       ]);
     },
   };

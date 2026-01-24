@@ -128,7 +128,7 @@ export const Layout = {
         }),
         m(".bg-base-200 text-base-content min-h-full w-80 p-2 sm:p-4 flex flex-col", [
           m(".flex.justify-between items-center mb-4", [
-            Logo,
+            m(Logo),
             m("label.btn btn-circle btn-ghost lg:hidden", {
               for: "main-drawer"
             }, "✕")

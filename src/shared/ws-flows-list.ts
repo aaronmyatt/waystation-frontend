@@ -23,11 +23,13 @@ function FlowDescriptionMd(){
   }
 }
 
-const FlowCard = {
+export const FlowCard = {
   oninit(vnode){
-    vnode.state.settingsModalEnabled = (
-      globalThis.featureToggleService.isEnabled('settings-modal') && globalThis.flowService.canEdit(vnode.attrs.flow)
-    );
+    vnode.state.settingsModalEnabled = vnode.attrs.settingsModalEnabled
+    
+    if(vnode.state.settingsModalEnabled === undefined){
+      vnode.state.settingsModalEnabled = globalThis.featureToggleService.isEnabled('settings-modal') && globalThis.flowService.canEdit(vnode.attrs.flow);
+    }
   },
   view(vnode){
     return m('.card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300 h-full', 

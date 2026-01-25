@@ -6,7 +6,7 @@ import { CodeBlock, CodeLine } from "../shared/ws-hljs";
 import { TagsInput } from "./ws-flow-tag-input";
 import { syntaxHighlighter } from "../shared/ws-hljs";
 import { FlowGitInfo } from "../components/flow-git-info";
-import { FlowParentChildModal } from "../components/flow-parent-child-drawer";
+import { FlowParentChildModal } from "../components/flow-parent-child-modal";
 
 let skipRederaw = false;
 

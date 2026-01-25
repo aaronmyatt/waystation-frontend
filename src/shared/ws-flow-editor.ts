@@ -15,7 +15,7 @@ const FlowToolbar = {
     return m("ul.flow-toolbar flex flex-wrap gap-2", [
       // Button to open parent-child relations drawer
       // Shows an icon that opens a drawer displaying parent and child flows
-      m(FlowParentChildModal, {
+      globalThis.authService.loggedIn && m(FlowParentChildModal, {
         ...vnode.attrs.flow
       }),
       m(
@@ -503,7 +503,6 @@ export function FlowEditor(): m.Component {
       vnode.state.flow = globalThis.flowService.flow;
       vnode.state.matches = globalThis.flowService.matches;
       // Initialize state for the relations drawer
-      vnode.state.relationsDrawerOpen = false;
     },
     onbeforeupdate(vnode) {
       if(skipRederaw){
@@ -542,7 +541,7 @@ export function FlowEditor(): m.Component {
               })),
             ]),
             m(FlowGitInfo, { flow: vnode.state.flow }),
-            m(TagsInput, {
+            globalThis.authService.loggedIn && m(TagsInput, {
               flow: vnode.state.flow, enableCrud: true
             }),
             m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),

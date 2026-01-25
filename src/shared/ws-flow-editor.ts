@@ -30,7 +30,7 @@ const FlowToolbar = {
       m(
         ".dropdown dropdown-end",
         m(
-          ".btn xs:btn-sm btn-ghost text-secondary",
+          ".btn btn-sm btn-ghost text-secondary",
           { tabindex: -1, "aria-label": "Flow menu" },
           m("span.block size-4", m.trust(verticalDotsSvg))
         ),

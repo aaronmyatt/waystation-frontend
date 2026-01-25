@@ -16,7 +16,7 @@ const FlowToolbar = {
       // Button to open parent-child relations drawer
       // Shows an icon that opens a drawer displaying parent and child flows
       m(FlowParentChildModal, {
-        flow: vnode.attrs.flow,
+        ...vnode.attrs.flow
       }),
       m(
         "button.btn btn-sm btn-outline hidden sm:inline-flex",

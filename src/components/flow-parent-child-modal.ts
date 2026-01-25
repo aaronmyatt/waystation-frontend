@@ -1,6 +1,6 @@
 import m from "mithril";
 import { FlowRelationService } from "../services/flow-relation";
-import { flowRelationsSvg } from "../shared/ws-svg";
+import { hasChildSvg } from "../shared/ws-svg";
 import { FlowCard } from "../shared/ws-flows-list";
 
 interface FlowParentChildModalAttrs {
@@ -67,9 +67,7 @@ export function FlowParentChildModal(): m.Component<FlowParentChildModalAttrs> {
           },
         },
         [
-          m("span.block size-4", [
-            m.trust(flowRelationsSvg),
-          ]),
+          m.trust(hasChildSvg),
         ],
       ),
       m("dialog.modal", [

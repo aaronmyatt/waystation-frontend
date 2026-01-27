@@ -2,6 +2,7 @@ import m, { type Params } from "mithril";
 import { api } from "../shared/api-client";
 import { storageKeys, _events } from "../shared/utils";
 import { CopyFlowService } from "../services";
+import { ChildFlowService } from "src/services/child-flow";
 
 globalThis.addEventListener(_events.auth.logout, (event) => {
   console.log("Logout event received");
@@ -286,6 +287,41 @@ globalThis.addEventListener(_events.flow.copyFlow, async (event) => {
     globalThis.flowListService.load(listResponse.data.rows);
   } catch (error) {
     console.error("Error copying flow:", error);
+  }
+});
+
+// Child Flow
+globalThis.addEventListener(_events.flow.createChildFlow, async (event) => {
+  const customEvent = event as CustomEvent<{ flow: any, flowMatch: any }>;
+  console.log("Child flow event received:", customEvent.detail);
+  const { flow, flowMatch } = customEvent.detail;
+
+  try {
+    const {data: originalFlow } = await api.flowAggregates.get(flow.id);
+    // Load the full flow data if we only have minimal data
+
+    const originalMatch = (originalFlow.matches || []).find((m) => m.id === flowMatch.id);
+    if (!originalMatch) {
+      throw new Error("Flow match not found in original flow");
+    }
+
+    const childFlow = (new ChildFlowService(originalFlow.flow, originalMatch)).process();
+
+    // Create the new flow via API
+    const createResponse = await api.flowAggregates.create(childFlow);
+    const newFlow = createResponse.data;
+    console.log("Child flow created successfully:", newFlow);
+
+    // Navigate to the new flow
+    if (newFlow.flow?.id) {
+      m.route.set(`/flow/${newFlow.flow.id}`);
+    }
+
+    // Refresh the flow list
+    const listResponse = await api.flows.list();
+    globalThis.flowListService.load(listResponse.data.rows);
+  } catch (error) {
+    console.error("Error creating child flow:", error);
   }
 });
 

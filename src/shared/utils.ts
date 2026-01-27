@@ -36,6 +36,8 @@ export const _events = {
     requestPublicFlow: 'ws::flow::requestPublicFlow',
     updateFlowSingular: "ws::action::updateFlow",
     copyFlow: "ws::flow::copyFlow",
+    // create a new flow with the current match as parent and first step
+    createChildFlow: "ws::flow::createChildFlow",
   },
   flows: {
     filterByRepo: 'ws::flows::filterByRepo',
@@ -61,9 +63,6 @@ export const _events = {
     // flow match actions
     generateFlowMatchContent: "ws::action::generateFlowMatchContent",
     insertFlowMatchAfter: "ws::action::insertFlowMatchAfter",
-
-    // create a new flow with the current match as parent and first step
-    createChildFlow: "ws::action::createChildFlow",
 
     // dispatch match click events for the extension to handle
     clickFlowMatch: "ws::click::flowMatch",

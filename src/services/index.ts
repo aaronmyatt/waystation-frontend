@@ -1,5 +1,6 @@
 import m from "mithril";
 import { CopyFlowService } from "./copy-flow";
+import { ChildFlowService } from "./child-flow";
 import { TagsListService } from "./tags-list";
 import { FlowRelationService } from "./flow-relation";
 import { _events, dispatch, storageKeys } from "../shared/utils";
@@ -359,6 +360,7 @@ export {
   FlowService,
   FeatureToggleService,
   CopyFlowService,
+  ChildFlowService,
   TagsListService,
   FlowRelationService,
 };

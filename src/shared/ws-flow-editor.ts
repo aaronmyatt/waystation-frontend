@@ -141,7 +141,8 @@ const FlowMatchToolbar = {
                 m("button.btn btn-ghost border border-base-300",
                   {
                     onclick: (e) => {
-                      dispatch(_events.action.createChildFlow, {
+                      dispatch(_events.flow.createChildFlow, {
+                        flow: { ...globalThis.flowService.flow },
                         flowMatch: { ...vnode.attrs.match },
                       });
                     },

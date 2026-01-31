@@ -1,5 +1,5 @@
 import m, { type Params } from "mithril";
-import { api } from "../shared/api-client";
+import { api, API_ORIGIN } from "../shared/api-client";
 import { storageKeys, _events } from "../shared/utils";
 import { CopyFlowService, ChildFlowService } from "../services";
 
@@ -322,6 +322,28 @@ globalThis.addEventListener(_events.flow.createChildFlow, async (event) => {
   } catch (error) {
     console.error("Error creating child flow:", error);
   }
+});
+
+globalThis.addEventListener(_events.file.uploadRequested, (event) => {
+  const customEvent = event as CustomEvent<{ fileId: string; file: File; service: any, flow: any }>;
+  const { fileId, file, service, flow } = customEvent.detail;
+  console.log("File upload requested:", fileId, file, service, flow);
+
+  // upload to backend
+  const formData = new FormData();
+  formData.append('image', file);
+
+  api.files.upload(flow.id, formData)
+    .then(({ data }) => {
+      console.log("File uploaded successfully:", data);
+      // Notify the service about the successful upload
+      service.onUploadSuccess(fileId, new URL(data.url, API_ORIGIN));
+    })
+    .catch((error) => {
+      console.error("Error uploading file:", error);
+      // Notify the service about the upload error
+      service.onUploadError(fileId, error.message || "Upload failed");
+    });
 });
 
 console.log("Flow API event listeners ready");

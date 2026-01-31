@@ -24,6 +24,7 @@ export default [
       replace({
         'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
         'process.env.API_BASE_URL': JSON.stringify(production ? 'https://waystation.aaronmyatt.com/api/v1' : 'http://localhost:4000/api/v1'),
+        'process.env.API_ORIGIN': JSON.stringify(production ? 'https://waystation.aaronmyatt.com' : 'http://localhost:4000'),
         preventAssignment: true,
       }),
       resolve({

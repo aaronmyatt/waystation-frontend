@@ -305,6 +305,7 @@ function FlowMatch() {
               [
                 m(".collapse-content p-0 space-y-1", [
                   m(FlowMatchDescriptionEditor, {
+                    flow: { ...globalThis.flowService.flow },
                     description,
                     onChange: (value) => {
                       if(value === description) return;
@@ -424,6 +425,7 @@ function FlowDescriptionEditor() {
       return m(
         ".editor",
         m(OvertypeBase, {
+          flow: vnode.attrs.flow,
           value: globalThis.flowService.flow.description || "",
           placeholder: "Enter description...",
           onChange: (description) => {
@@ -437,7 +439,7 @@ function FlowDescriptionEditor() {
         })
       );
     },
-  };
+  };  
 }
 
 function FlowMatchDescriptionEditor() {
@@ -447,6 +449,7 @@ function FlowMatchDescriptionEditor() {
         ".editor",
         [
           m(OvertypeBase, {
+            flow: vnode.attrs.flow,
             value: vnode.attrs.description,
             preview: vnode.attrs.togglePreview,
             onChange: vnode.attrs.onChange || (() => {}),
@@ -545,7 +548,10 @@ export function FlowEditor(): m.Component {
             globalThis.authService.loggedIn && m(TagsInput, {
               flow: vnode.state.flow, enableCrud: true
             }),
-            m(FlowDescriptionEditor, { description: globalThis.flowService.flow.description }),
+            m(FlowDescriptionEditor, { 
+              flow: vnode.state.flow,
+              description: globalThis.flowService.flow.description 
+            }),
           ]
         )),
         m(FlowMatchList, {

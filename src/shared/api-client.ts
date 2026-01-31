@@ -2,7 +2,8 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { storageKeys } from './utils';
 
 // API Client Configuration
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:4000/api/v1';
+export const API_ORIGIN = process.env.API_ORIGIN || 'http://localhost:4000';
+export const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:4000/api/v1';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -199,6 +200,16 @@ export const api = {
 
     get: (id: string) =>
       apiClient.get(`/public_flows/${id}`),
+  },
+
+  files: {
+    upload: (flow_id: string, formData: FormData) => {
+      return apiClient.post(`/flow_images/${flow_id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    }
   },
 
   // Status

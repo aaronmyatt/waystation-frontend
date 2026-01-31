@@ -1,5 +1,6 @@
 import OverType from "overtype";
 import m from "mithril";
+import { FileUploadService } from "../services/file-upload";
 
 function overtypeOptions(vnode) {
   const customTheme = {
@@ -61,12 +62,19 @@ function overtypeOptions(vnode) {
 }
 
 export const OvertypeBase = {
-  editors: [],
   oncreate(vnode) {
     const options = overtypeOptions(vnode);
     vnode.state.editors = OverType.init(vnode.dom, options);
     // Initialize current value to prevent first onbeforeupdate from triggering setValue
     vnode.state.currentValue = vnode.attrs.value || "";
+
+    // Initialize FileUploadService
+    if(vnode.attrs.flow) {
+      vnode.state.fileUploadService = new FileUploadService(vnode.attrs.flow, vnode.state.editors);
+      // Scan for any unfulfilled upload placeholders on load
+      vnode.state.fileUploadService.scanForUnfulfilledUploads();
+    }
+
 
     const overTypePreview = vnode.dom.querySelector(".overtype-preview");
     // match the preview styles to the editor options to prevent visual collapse
@@ -97,16 +105,109 @@ export const OvertypeBase = {
     );
 
     // hitting escape should blur the editor
-    vnode.dom.addEventListener("keydown", (e) => {
+    vnode.state.escapeHandler = (e) => {
       if (e.key === "Escape") {
         for (const editor of vnode.state.editors) {
           editor.blur();
         }
       }
-    });
+    };
+    vnode.dom.addEventListener("keydown", vnode.state.escapeHandler);
+
+    if(!vnode.state.fileUploadService) {
+      return;
+    }
+
+    // Add drag and drop handlers
+    vnode.state.dragOverHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      vnode.dom.classList.add('border-primary', 'bg-base-200');
+    };
+
+    vnode.state.dragLeaveHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      vnode.dom.classList.remove('border-primary', 'bg-base-200');
+    };
+
+    vnode.state.dropHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      vnode.dom.classList.remove('border-primary', 'bg-base-200');
+
+      const files = Array.from(e.dataTransfer.files as FileList).filter((file) =>
+        file.type.startsWith('image/')
+      );
+
+      if (files.length > 0) {
+        // Queue files and insert placeholders
+        vnode.state.fileUploadService.queueFiles(files);
+
+        // Notify parent component if handler provided
+        if (vnode.attrs.onFileDrop) {
+          vnode.attrs.onFileDrop(files, vnode.state.fileUploadService);
+        }
+      }
+    };
+
+    vnode.dom.addEventListener('dragover', vnode.state.dragOverHandler);
+    vnode.dom.addEventListener('dragleave', vnode.state.dragLeaveHandler);
+    vnode.dom.addEventListener('drop', vnode.state.dropHandler);
+
+    // Add paste support for images
+    vnode.state.pasteHandler = (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      const files: File[] = [];
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
+          const file = items[i].getAsFile();
+          if (file) files.push(file);
+        }
+      }
+
+      if (files.length > 0) {
+        e.preventDefault();
+        
+        // Queue files and insert placeholders
+        vnode.state.fileUploadService.queueFiles(files);
+
+        // Notify parent component if handler provided
+        if (vnode.attrs.onFileDrop) {
+          vnode.attrs.onFileDrop(files, vnode.state.fileUploadService);
+        }
+      }
+    };
+
+    vnode.dom.addEventListener('paste', vnode.state.pasteHandler);
   },
   onremove(vnode) {
-    vnode.dom.removeEventListener("keydown", () => {});
+    // Clean up event listeners
+    if (vnode.state.escapeHandler) {
+      vnode.dom.removeEventListener("keydown", vnode.state.escapeHandler);
+    }
+    if (vnode.state.dragOverHandler) {
+      vnode.dom.removeEventListener('dragover', vnode.state.dragOverHandler);
+    }
+    if (vnode.state.dragLeaveHandler) {
+      vnode.dom.removeEventListener('dragleave', vnode.state.dragLeaveHandler);
+    }
+    if (vnode.state.dropHandler) {
+      vnode.dom.removeEventListener('drop', vnode.state.dropHandler);
+    }
+    if (vnode.state.pasteHandler) {
+      vnode.dom.removeEventListener('paste', vnode.state.pasteHandler);
+    }
+
+    // Clean up file upload service
+    if (vnode.state.fileUploadService) {
+      vnode.state.fileUploadService.destroy();
+    }
+
+    // Clean up editors
     for (const editor of vnode.state.editors) {
       editor.destroy();
     }

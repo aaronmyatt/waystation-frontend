@@ -3,6 +3,7 @@ import { CopyFlowService } from "./copy-flow";
 import { ChildFlowService } from "./child-flow";
 import { TagsListService } from "./tags-list";
 import { FlowRelationService } from "./flow-relation";
+import { FileUploadService } from "./file-upload";
 import { _events, dispatch, storageKeys } from "../shared/utils";
 
 class AuthService {
@@ -363,5 +364,6 @@ export {
   ChildFlowService,
   TagsListService,
   FlowRelationService,
+  FileUploadService,
 };
 

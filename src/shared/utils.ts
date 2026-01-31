@@ -76,6 +76,11 @@ export const _events = {
     register: 'ws::auth::register',
     logout: 'ws::auth::logout'
   },
+  file: {
+    uploadRequested: 'ws::file::uploadRequested',
+    uploadSuccess: 'ws::file::uploadSuccess',
+    uploadError: 'ws::file::uploadError',
+  },
 };
 
 export const storageKeys = {

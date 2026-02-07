@@ -73,7 +73,17 @@ const FlowToolbar = {
                 },
                 "Delete Flow"
               )
-            )
+            ),
+            m("li",
+              m("button.btn btn-ghost border border-base-300",
+                {
+                  onclick: (e) => {
+                    dispatch(_events.ui.openFlowSettingsModal, { flow: { ...vnode.attrs.flow } });
+                  },
+                },
+                "Settings"
+              )
+            ),
           ]
         ),
       ),

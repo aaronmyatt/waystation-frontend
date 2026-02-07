@@ -89,6 +89,30 @@ class AuthService {
   }
 }
 
+class ConfigService {
+  private config: { workspaceLocalOnly: boolean } = { workspaceLocalOnly: false };
+
+  constructor() {
+    if (globalThis.__INITIAL_DATA__?.config) {
+      this.config = { ...this.config, ...globalThis.__INITIAL_DATA__.config };
+    }
+  }
+
+  get workspaceLocalOnly(): boolean {
+    return this.config.workspaceLocalOnly;
+  }
+
+  setWorkspaceLocalOnly(value: boolean) {
+    this.config.workspaceLocalOnly = value;
+    dispatch(_events.config.toggleWorkspaceLocalOnly, { workspaceLocalOnly: value });
+    m.redraw();
+  }
+
+  toggleWorkspaceLocalOnly() {
+    this.setWorkspaceLocalOnly(!this.config.workspaceLocalOnly);
+  }
+}
+
 class FlowListService {
   _flows = []
 
@@ -319,6 +343,9 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
   }
 
   canEdit(flow?: any): boolean {
+    if(globalThis.__INITIAL_DATA__?.isVscode){
+      return true;
+    }
     return this.isOwnedByCurrentUser(flow);
   }
 }
@@ -326,6 +353,7 @@ Right click a line in your editor and choose '**Add Line**' to add a code match 
 globalThis.flowService = new FlowService();
 globalThis.flowListService = new FlowListService();
 globalThis.featureToggleService = new FeatureToggleService();
+globalThis.configService = new ConfigService();
 globalThis.authService = new AuthService();
 globalThis.tagsListService = new TagsListService();
 // FlowRelationService is intentionally NOT global - it should be instantiated per component
@@ -336,6 +364,7 @@ export {
   FlowListService,
   FlowService,
   FeatureToggleService,
+  ConfigService,
   CopyFlowService,
   ChildFlowService,
   TagsListService,

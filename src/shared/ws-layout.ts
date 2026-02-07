@@ -32,6 +32,28 @@ function Logo(){
   }
 }
 
+function WorkspaceConfigToggle() {
+  return {
+    view(_vnode) {
+      return m('.p-4', [
+        m('label.flex items-center justify-between cursor-pointer gap-2', [
+          m('.flex flex-col', [
+            m('span.font-semibold.text-base-content', 'Workspace Local Only'),
+            m('span.text-sm.text-base-content/70', 'Prevent flows from syncing to the server for this workspace')
+          ]),
+          m('input.toggle.toggle-primary', {
+            type: 'checkbox',
+            checked: globalThis.configService.workspaceLocalOnly,
+            onchange: (e: Event) => {
+              globalThis.configService.setWorkspaceLocalOnly((e.target as HTMLInputElement).checked);
+            }
+          })
+        ])
+      ]);
+    }
+  };
+}
+
 export const Layout = {
   oninit(vnode) {
     vnode.state.menuOpen = false;
@@ -191,8 +213,9 @@ export const Layout = {
                   "Logout"
                 )
               ),
-          ]),
-          vnode.state.loggedIn && m(".flex-1", m(TagsList)),
+           ]),
+           vnode.state.loggedIn && m(".flex-1", m(TagsList)),
+           m(WorkspaceConfigToggle),
           m(".mt-4.md:hidden.flex.justify-center", m(ThemePicker))
         ])
       ])

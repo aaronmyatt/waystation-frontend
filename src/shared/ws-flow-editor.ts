@@ -1,5 +1,5 @@
 import m from "mithril";
-import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg, githubSvg, copySvg, flowRelationsSvg } from "../shared/ws-svg";
+import { upSvg, downSvg, verticalDotsSvg, plusSvg, chevronDownSvg, chevronUpSvg, githubSvg, copySvg } from "../shared/ws-svg";
 import { dispatch, _events } from "../shared/utils";
 import { OvertypeBase } from "../shared/ws-overtype";
 import { CodeBlock, CodeLine } from "../shared/ws-hljs";
@@ -7,6 +7,7 @@ import { TagsInput } from "./ws-flow-tag-input";
 import { syntaxHighlighter } from "../shared/ws-hljs";
 import { FlowGitInfo } from "../components/flow-git-info";
 import { FlowParentChildModal } from "../components/flow-parent-child-modal";
+import { FlowSettingsModal } from "./ws-flow-settings-modal";
 
 let skipRederaw = false;
 
@@ -557,7 +558,8 @@ export function FlowEditor(): m.Component {
         m(FlowMatchList, {
           matches: vnode.state.matches,
         }),
-        m(InsertBetweenDialog)
+        m(InsertBetweenDialog),
+        m(FlowSettingsModal),
       ]);
     },
   };

@@ -10,9 +10,11 @@ export function FlowSettingsModal() {
           el && el.showModal();
           vnode.state.flow = (event as CustomEvent).detail.flow;
           // default visibility when opening (can be changed by the user)
+          vnode.state.visibilityFormEnabled = globalThis.featureToggleService.isEnabled('flow-visibility-settings');
           vnode.state.visibility = vnode.state.flow.status || 'private';
           // default local_only when opening (can be changed by the user)
           vnode.state.localOnly = vnode.state.flow.local_only || false;
+
         });
     },
     oncreate(vnode){
@@ -34,7 +36,7 @@ export function FlowSettingsModal() {
                 }, '✕')
               ),
               m('h3.text-lg font-bold text-base-content mb-4', 'Flow Settings'),
-              m('form', {},
+              vnode.state.visibilityFormEnabled && m('form', {},
                 m('.join.join-vertical',
                   [
                     // Private

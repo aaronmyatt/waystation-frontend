@@ -81,6 +81,9 @@ export const _events = {
     uploadSuccess: 'ws::file::uploadSuccess',
     uploadError: 'ws::file::uploadError',
   },
+  config: {
+    toggleWorkspaceLocalOnly: 'ws::config::toggleWorkspaceLocalOnly'
+  }
 };
 
 export const storageKeys = {

@@ -7,6 +7,11 @@ interface InitialData {
     matches: any[];
     isDirty: boolean;
   };
+  features?: Record<string, boolean>;
+  tags?: any;
+  config?: {
+    workspaceLocalOnly?: boolean;
+  };
 }
 
 declare global {
@@ -15,6 +20,7 @@ declare global {
   var flowListService: any;
   var tagsListService: any;
   var featureToggleService: any;
+  var configService: any;
   var authService: any;
   var marked: any;
   var syntaxHighlighter: any;

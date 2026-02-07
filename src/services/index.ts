@@ -4,6 +4,7 @@ import { ChildFlowService } from "./child-flow";
 import { TagsListService } from "./tags-list";
 import { FlowRelationService } from "./flow-relation";
 import { FileUploadService } from "./file-upload";
+import { FeatureToggleService } from "./feature-toggle";
 import { _events, dispatch, storageKeys } from "../shared/utils";
 
 class AuthService {
@@ -88,32 +89,6 @@ class AuthService {
   }
 }
 
-class FeatureToggleService {
-  private features: Record<string, boolean> = {
-    "settings-modal": true,
-    "llm-generation": true,
-  };
-
-  constructor() {
-    // initialize from window global if available
-    if (globalThis.__INITIAL_DATA__?.features) {
-      this.features = {
-        ...this.features,
-        ...globalThis.__INITIAL_DATA__.features,
-      };
-    }
-  }
-
-
-  isEnabled(featureName: string): boolean {
-    return !!this.features[featureName];
-  }
-
-  setFeature(featureName: string, isEnabled: boolean) {
-    this.features[featureName] = isEnabled;
-  }
-}
-
 class FlowListService {
   _flows = []
 
@@ -159,7 +134,7 @@ class FlowListService {
 class FlowService {
   markdown: string = "";
   _flow: {
-    flow: { name: string; description: string };
+    flow: { name: string; description: string; local_only?: boolean;};
     matches: {
       flow_match_id: string;
       content_kind: string;
@@ -174,6 +149,7 @@ class FlowService {
     flow: {
       name: "",
       description: "",
+      local_only: false,
     },
     matches: [],
   };

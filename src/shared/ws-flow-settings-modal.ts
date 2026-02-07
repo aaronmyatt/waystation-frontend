@@ -11,6 +11,8 @@ export function FlowSettingsModal() {
           vnode.state.flow = (event as CustomEvent).detail.flow;
           // default visibility when opening (can be changed by the user)
           vnode.state.visibility = vnode.state.flow.status || 'private';
+          // default local_only when opening (can be changed by the user)
+          vnode.state.localOnly = vnode.state.flow.local_only || false;
         });
     },
     oncreate(vnode){
@@ -94,6 +96,23 @@ export function FlowSettingsModal() {
                   ]
                 )
               ),
+              // Local-Only Toggle Section
+              m('.divider.my-4'),
+              m('.p-4', [
+                m('label.flex.items-center.justify-between.cursor-pointer', [
+                  m('.flex.flex-col', [
+                    m('span.font-semibold.text-base-content', 'Local Only'),
+                    m('span.text-sm.text-base-content/70', 'Prevent this flow from syncing to the server')
+                  ]),
+                  m('input.toggle.toggle-primary', {
+                    type: 'checkbox',
+                    checked: vnode.state.localOnly,
+                    onchange: (e: Event) => {
+                      vnode.state.localOnly = (e.target as HTMLInputElement).checked;
+                    }
+                  })
+                ])
+              ]),
               m('.modal-action',
                 [
                   m('button.btn btn-ghost', {
@@ -110,7 +129,10 @@ export function FlowSettingsModal() {
                           // Save settings
                           dispatch(_events.flow.updateFlowSingular, {
                               flowId: vnode.state.flow.id,
-                              flow: { status: vnode.state.visibility },
+                              flow: { 
+                                status: vnode.state.visibility,
+                                local_only: vnode.state.localOnly
+                              },
                           });
                           el && el.close();
                       }

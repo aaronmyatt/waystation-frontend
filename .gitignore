@@ -13,4 +13,4 @@ dist/waystation-web-styles-temp.js
 # Generated TypeScript declarations (can be regenerated)
 dist/**/*.d.ts
 dist/**/*.d.ts.map
-docs/assets/
+docs/assets
